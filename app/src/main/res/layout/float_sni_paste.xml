@@ -35,6 +35,16 @@
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/saveButton"
+            style="@style/Theme.TouchTool.IconButton.Filled"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="4dp"
+            android:visibility="gone"
+            app:icon="@drawable/icon_menu_save" />
+
     </com.google.android.material.card.MaterialCardView>
 
 </FrameLayout>
