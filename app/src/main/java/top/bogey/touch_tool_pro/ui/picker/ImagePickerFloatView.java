@@ -131,7 +131,7 @@ public class ImagePickerFloatView extends BasePickerFloatView {
         canvas.drawRect(markArea, markPaint);
         canvas.restore();
 
-        drawChild(canvas, binding.buttonBox, getDrawingTime());
+        if (isMarked) drawChild(canvas, binding.buttonBox, getDrawingTime());
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -217,6 +217,7 @@ public class ImagePickerFloatView extends BasePickerFloatView {
         markArea.bottom = Math.min(getHeight(), markArea.bottom);
 
         binding.markBox.setVisibility(isMarked ? VISIBLE : INVISIBLE);
+        binding.buttonBox.setVisibility(isMarked ? VISIBLE : INVISIBLE);
         if (isMarked) {
             ViewGroup.LayoutParams params = binding.markBox.getLayoutParams();
             params.width = markArea.width() + 2 * offset;
@@ -225,6 +226,15 @@ public class ImagePickerFloatView extends BasePickerFloatView {
 
             binding.markBox.setX(markArea.left - offset);
             binding.markBox.setY(markArea.top - offset);
+
+            float x = markArea.left + (markArea.width() - binding.buttonBox.getWidth()) / 2f;
+            x = Math.max(Math.min(x, getWidth() - binding.buttonBox.getWidth()), 0);
+            binding.buttonBox.setX(x);
+            if (markArea.bottom + offset * 2 + binding.buttonBox.getHeight() > getHeight()) {
+                binding.buttonBox.setY(markArea.top - offset * 2 - binding.buttonBox.getHeight());
+            } else {
+                binding.buttonBox.setY(markArea.bottom + offset * 2);
+            }
         }
         postInvalidate();
     }

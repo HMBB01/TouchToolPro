@@ -533,6 +533,8 @@
     <!-- 任务日志 -->
     <string name="task_running_log">任务日志</string>
     <string name="task_running_log_clear">清除日志</string>
+    <string name="task_capture">任务截图</string>
+    <string name="task_capture_tips">保存任务截图还是分享任务截图？</string>
 
     <!-- 导入导出 -->
     <string name="task_setting_export">导出任务</string>

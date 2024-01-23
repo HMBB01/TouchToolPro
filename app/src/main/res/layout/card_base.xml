@@ -46,59 +46,25 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="24dp"
-                android:baselineAligned="false"
                 android:gravity="center_vertical">
 
-                <LinearLayout
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/title"
                     android:layout_width="0dp"
-                    android:layout_height="24dp"
-                    android:layout_weight="1"
-                    android:gravity="start|center_vertical"
-                    android:orientation="vertical">
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lines="1"
-                        android:minWidth="24dp"
-                        android:textSize="11sp"
-                        tools:ignore="SmallSp" />
-
-                    <FrameLayout
-                        android:id="@+id/desBox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone">
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/des"
-                            android:layout_width="wrap_content"
-                            android:layout_height="11dp"
-                            android:layout_gravity="bottom"
-                            android:gravity="center_vertical"
-                            android:textSize="8sp"
-                            tools:ignore="SmallSp" />
-
-                    </FrameLayout>
-
-                </LinearLayout>
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp">
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:textSize="11sp"
+                    tools:ignore="SmallSp" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/editButton"
-                        style="@style/Theme.TouchTool.IconButton"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        app:icon="@drawable/icon_edit"
-                        app:iconSize="16dp" />
-
-
-                </FrameLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/editButton"
+                    style="@style/Theme.TouchTool.IconButton"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="4dp"
+                    app:icon="@drawable/icon_edit"
+                    app:iconSize="16dp" />
 
             </LinearLayout>
 
@@ -155,6 +121,17 @@
 
         </LinearLayout>
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/des"
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:background="?attr/colorTertiaryContainer"
+            android:gravity="center"
+            android:paddingHorizontal="4dp"
+            android:textColor="?attr/colorOnTertiaryContainer"
+            android:textSize="11sp"
+            android:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/pinBox"
             android:layout_width="match_parent"
@@ -186,7 +163,7 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/errorText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="16dp"
             android:gravity="center"
             android:paddingHorizontal="4dp"
             android:textSize="11sp"

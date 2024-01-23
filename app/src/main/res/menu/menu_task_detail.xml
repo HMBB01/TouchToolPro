@@ -18,6 +18,10 @@
                 android:id="@+id/showLog"
                 android:title="@string/task_running_log" />
 
+            <item
+                android:id="@+id/capture"
+                android:title="@string/task_capture" />
+
         </menu>
 
     </item>

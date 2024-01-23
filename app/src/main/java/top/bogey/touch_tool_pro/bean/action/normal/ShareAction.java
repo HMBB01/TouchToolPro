@@ -2,16 +2,9 @@ package top.bogey.touch_tool_pro.bean.action.normal;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
-
-import androidx.core.content.FileProvider;
 
 import com.google.gson.JsonObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -28,6 +21,7 @@ import top.bogey.touch_tool_pro.bean.pin.pins.PinImage;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinSpinner;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
+import top.bogey.touch_tool_pro.utils.AppUtils;
 
 public class ShareAction extends NormalAction {
     private final transient LinkedHashMap<String, ArrayList<String>> apps = new LinkedHashMap<>(Collections.singletonMap(MainApplication.getInstance().getString(R.string.common_package_name), new ArrayList<>()));
@@ -79,7 +73,7 @@ public class ShareAction extends NormalAction {
                         intent.setType("text/*");
                     }
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent.putExtra(Intent.EXTRA_STREAM, valueToCacheFile(instance, value));
+                    intent.putExtra(Intent.EXTRA_STREAM, AppUtils.valueToCacheFile(instance, value));
                 }
             }
 
@@ -95,35 +89,5 @@ public class ShareAction extends NormalAction {
         }
 
         executeNext(runnable, context, outPin);
-    }
-
-    private Uri valueToCacheFile(Context context, PinValue value) {
-        File file;
-        if (value instanceof PinImage) {
-            file = new File(context.getCacheDir(), System.currentTimeMillis() + ".jpg");
-        } else {
-            file = new File(context.getCacheDir(), System.currentTimeMillis() + "text.txt");
-        }
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-            if (value instanceof PinImage image) {
-                Bitmap bitmap = image.getImage(context);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-            } else {
-                fileOutputStream.write(value.toString().getBytes());
-            }
-            fileOutputStream.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return FileProvider.getUriForFile(context, context.getPackageName() + ".file_provider", file);
     }
 }

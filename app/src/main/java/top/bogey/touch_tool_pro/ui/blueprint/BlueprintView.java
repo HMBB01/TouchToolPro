@@ -1,5 +1,8 @@
 package top.bogey.touch_tool_pro.ui.blueprint;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +28,7 @@ import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinImage;
 import top.bogey.touch_tool_pro.bean.task.Task;
 import top.bogey.touch_tool_pro.databinding.ViewBlueprintBinding;
 import top.bogey.touch_tool_pro.save.SaveRepository;
@@ -81,7 +85,7 @@ public class BlueprintView extends Fragment {
                         .setPositiveButton(R.string.close, (dialog, which) -> dialog.dismiss())
                         .setNeutralButton(R.string.export_task, (dialog, which) -> {
                             dialog.dismiss();
-                            AppUtils.exportLog(MainApplication.getInstance(), SaveRepository.getInstance().getLog(task.getId()));
+                            AppUtils.exportString(getContext(), SaveRepository.getInstance().getLog(task.getId()));
                         })
                         .setNegativeButton(R.string.task_running_log_clear, (dialog, which) -> {
                             dialog.dismiss();
@@ -89,6 +93,33 @@ public class BlueprintView extends Fragment {
                         })
                         .show();
                 return true;
+            } else if (itemId == R.id.capture) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.dialog_title)
+                        .setMessage(R.string.task_capture_tips)
+                        .setPositiveButton(R.string.save, (dialog, which) -> {
+                            dialog.dismiss();
+                            Bitmap bitmap = binding.cardLayout.captureFunctionContext();
+                            AppUtils.exportImage(getContext(), bitmap);
+                        })
+                        .setNegativeButton(R.string.action_share_action_title, (dialog, which) -> {
+                            dialog.dismiss();
+                            Bitmap bitmap = binding.cardLayout.captureFunctionContext();
+                            Uri uri = AppUtils.valueToCacheFile(getContext(), new PinImage(bitmap));
+                            Intent intent = new Intent(Intent.ACTION_SEND);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.setType("image/*");
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.putExtra(Intent.EXTRA_STREAM, uri);
+
+                            Intent chooser = Intent.createChooser(intent, "");
+                            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(chooser);
+                        })
+                        .setNeutralButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                        .show();
+
+
             } else if (functionContextStack.size() > 1) {
                 popActionContext();
                 return true;

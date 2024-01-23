@@ -5,9 +5,11 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -90,6 +92,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     private float offsetY = 0;
     private float scale = 1f;
     private boolean editMode = true;
+
+    private boolean includeBackground = true;
 
     public CardLayoutView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -248,7 +252,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         card.setScaleY(scale);
         float x = action.getX() * getScaleGridSize() + offsetX;
         float y = action.getY() * getScaleGridSize() + offsetY;
-        card.setPosition(x - 1, y - 1);
+        card.setPosition(x, y);
         float width = card.getWidth() * scale;
         float height = card.getHeight() * scale;
         RectF cardArea = new RectF(x, y, x + width, y + height);
@@ -328,41 +332,83 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         return gridSize * scale;
     }
 
-    @Override
-    protected void dispatchDraw(Canvas canvas) {
+    public Bitmap captureFunctionContext() {
+        float tmpScale = scale;
+        scale = 1;
+        setCardsPosition();
+        ArrayList<Point> points = new ArrayList<>();
+        cardMap.forEach((id, card) -> {
+            card.setVisibility(VISIBLE);
+            int x = (int) card.getX();
+            int y = (int) card.getY();
+            int width = (int) (card.getWidth() * scale);
+            int height = (int) (card.getHeight() * scale);
+            points.add(new Point(x, y));
+            points.add(new Point(x + width, y + height));
+        });
+        Rect area = DisplayUtils.calculatePointArea(points);
+
+        float scaleGridSize = getScaleGridSize();
+        area.left -= scaleGridSize;
+        area.top -= scaleGridSize;
+        area.right += scaleGridSize;
+        area.bottom += scaleGridSize;
+        Bitmap bitmap = Bitmap.createBitmap(area.width(), area.height(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        canvas.drawColor(DisplayUtils.getAttrColor(getContext(), com.google.android.material.R.attr.colorSurface, 0));
+        drawBackground(canvas, -area.left, -area.top);
+        canvas.translate(-area.left, -area.top);
+        includeBackground = false;
+        dispatchDraw(canvas);
+        includeBackground = true;
+
+        scale = tmpScale;
+        setCardsPosition();
+        return bitmap;
+    }
+
+    private void drawBackground(Canvas canvas, float cx, float cy) {
         canvas.save();
         float gridScaleSize = getScaleGridSize();
-        float ofX = offsetX % gridScaleSize;
-        float ofY = offsetY % gridScaleSize;
+        float ofX = cx % gridScaleSize;
+        float ofY = cy % gridScaleSize;
         canvas.translate(ofX, ofY);
 
         // 格子背景
-        float gridRow = getHeight() / gridScaleSize; //有多少行
-        float gridCol = getWidth() / gridScaleSize;  //有多少列
+        float gridRow = canvas.getHeight() / gridScaleSize; //有多少行
+        float gridCol = canvas.getWidth() / gridScaleSize;  //有多少列
 
         float bigGridSize = 10 * gridScaleSize;
-        float startY = offsetY - ofY;
+        float startY = cy - ofY;
         for (int i = 0; i < gridRow; i++) {
-            if (startY == i * gridScaleSize) {
+            float y = i * gridScaleSize;
+            if (startY == y) {
                 gridPaint.setStrokeWidth(6);
             } else {
-                float v = (startY - i * gridScaleSize) % bigGridSize;
+                float v = (startY - y) % bigGridSize;
                 gridPaint.setStrokeWidth((Math.abs(v) < 1 || Math.abs(v) > bigGridSize - 1) ? 2 : 0.5f);
             }
-            canvas.drawLine(-gridScaleSize, i * gridScaleSize, getWidth() + gridScaleSize, i * gridScaleSize, gridPaint);
+            canvas.drawLine(-gridScaleSize, y, canvas.getWidth() + gridScaleSize, y, gridPaint);
         }
 
-        float startX = offsetX - ofX;
+        float startX = cx - ofX;
         for (int i = 0; i < gridCol; i++) {
-            if (offsetX == i * gridScaleSize + ofX) {
+            float x = i * gridScaleSize;
+            if (cx == x + ofX) {
                 gridPaint.setStrokeWidth(4);
             } else {
-                float v = (startX - i * gridScaleSize) % bigGridSize;
+                float v = (startX - x) % bigGridSize;
                 gridPaint.setStrokeWidth((Math.abs(v) < 1 || Math.abs(v) > bigGridSize - 1) ? 2 : 0.5f);
             }
-            canvas.drawLine(i * gridScaleSize, -gridScaleSize, i * gridScaleSize, getHeight() + gridScaleSize, gridPaint);
+            canvas.drawLine(x, -gridScaleSize, x, canvas.getHeight() + gridScaleSize, gridPaint);
         }
         canvas.restore();
+    }
+
+    @Override
+    protected void dispatchDraw(@NonNull Canvas canvas) {
+        if (includeBackground) drawBackground(canvas, offsetX, offsetY);
 
         // 所有连接的线
         linePaint.setStrokeWidth(5 * scale);

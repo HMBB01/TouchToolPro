@@ -65,14 +65,14 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
         binding.title.setText(action.getTitle());
         binding.icon.setImageResource(action.getType().getConfig().getIcon());
         binding.des.setText(action.getDescription());
-        binding.desBox.setVisibility((action.getDescription() == null || action.getDescription().isEmpty()) ? GONE : VISIBLE);
+        binding.des.setVisibility((action.getDescription() == null || action.getDescription().isEmpty()) ? GONE : VISIBLE);
         binding.expandButton.setIconResource(action.isExpand() ? R.drawable.icon_zoom_in : R.drawable.icon_zoom_out);
         binding.functionButton.setVisibility(action instanceof FunctionReferenceAction ? VISIBLE : GONE);
 
         binding.editButton.setOnClickListener(v -> AppUtils.showEditDialog(context, R.string.action_subtitle_add_des, action.getDescription(), result -> {
             action.setDescription((String) result);
             binding.des.setText(result);
-            binding.desBox.setVisibility((result == null || result.length() == 0) ? GONE : VISIBLE);
+            binding.des.setVisibility((result == null || result.length() == 0) ? GONE : VISIBLE);
         }));
 
         binding.functionButton.setOnClickListener(v -> {

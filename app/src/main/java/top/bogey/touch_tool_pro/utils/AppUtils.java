@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.PowerManager;
 import android.provider.Settings;
@@ -36,6 +37,8 @@ import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.other.ScreenStateAction;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinImage;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.task.Task;
 
 public class AppUtils {
@@ -315,15 +318,31 @@ public class AppUtils {
         }
     }
 
-    public static void exportLog(Context context, String log) {
-        String fileName = "log_" + formatDateLocalDate(context, System.currentTimeMillis()) + formatDateLocalTime(context, System.currentTimeMillis()) + ".txt";
+    public static void exportString(Context context, String string) {
+        String fileName = "export_" + formatDateLocalDate(context, System.currentTimeMillis()) + formatDateLocalTime(context, System.currentTimeMillis()) + ".txt";
         MainApplication.getInstance().getMainActivity().launcherCreateDocument(fileName, (code, intent) -> {
             if (code == Activity.RESULT_OK) {
                 Uri uri = intent.getData();
                 if (uri == null) return;
                 try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
                     if (outputStream == null) return;
-                    outputStream.write(log.getBytes());
+                    outputStream.write(string.getBytes());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+    public static void exportImage(Context context, Bitmap image) {
+        String fileName = "export_" + formatDateLocalDate(context, System.currentTimeMillis()) + formatDateLocalTime(context, System.currentTimeMillis()) + ".jpg";
+        MainApplication.getInstance().getMainActivity().launcherCreateDocument(fileName, (code, intent) -> {
+            if (code == Activity.RESULT_OK) {
+                Uri uri = intent.getData();
+                if (uri == null) return;
+                try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+                    if (outputStream == null) return;
+                    image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -427,5 +446,35 @@ public class AppUtils {
             }
         }
         return file.delete();
+    }
+
+    public static Uri valueToCacheFile(Context context, PinValue value) {
+        File file;
+        if (value instanceof PinImage) {
+            file = new File(context.getCacheDir(), System.currentTimeMillis() + ".jpg");
+        } else {
+            file = new File(context.getCacheDir(), System.currentTimeMillis() + "text.txt");
+        }
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+            if (value instanceof PinImage image) {
+                Bitmap bitmap = image.getImage(context);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+            } else {
+                fileOutputStream.write(value.toString().getBytes());
+            }
+            fileOutputStream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return FileProvider.getUriForFile(context, context.getPackageName() + ".file_provider", file);
     }
 }
