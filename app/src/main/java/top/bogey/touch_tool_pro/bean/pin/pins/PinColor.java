@@ -42,6 +42,14 @@ public class PinColor extends PinScreen {
         max = GsonUtils.getAsInt(jsonObject, "max", 0);
     }
 
+    @Override
+    public void newInfo() {
+        super.newInfo();
+        color = new int[]{0, 0, 0};
+        min = 0;
+        max = 0;
+    }
+
     @NonNull
     @Override
     public String toString() {

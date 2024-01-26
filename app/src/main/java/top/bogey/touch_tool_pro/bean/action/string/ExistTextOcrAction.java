@@ -15,6 +15,7 @@ import top.bogey.touch_tool_pro.bean.action.ActionType;
 import top.bogey.touch_tool_pro.bean.action.other.CheckAction;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
+import top.bogey.touch_tool_pro.bean.pin.PinSubType;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinArea;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinBoolean;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinPoint;
@@ -27,7 +28,7 @@ import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 
 public class ExistTextOcrAction extends CheckAction {
     private transient Pin textPin = new Pin(new PinString(), R.string.pin_string);
-    private transient Pin areaPin = new Pin(new PinArea(), R.string.pin_area);
+    private transient Pin areaPin = new Pin(new PinArea(PinSubType.OCR), R.string.pin_area);
     private transient Pin posPin = new Pin(new PinPoint(), R.string.pin_point, true);
     private transient Pin fullTextPin = new Pin(new PinString(), R.string.pin_string, true);
 

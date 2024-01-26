@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import top.bogey.touch_tool_pro.R;
+import top.bogey.touch_tool_pro.bean.pin.PinSubType;
 import top.bogey.touch_tool_pro.bean.pin.PinType;
 import top.bogey.touch_tool_pro.utils.DisplayUtils;
 import top.bogey.touch_tool_pro.utils.GsonUtils;
@@ -21,6 +22,10 @@ public class PinArea extends PinScreen {
 
     public PinArea() {
         super(PinType.AREA);
+    }
+
+    public PinArea(PinSubType subType) {
+        super(PinType.AREA, subType);
     }
 
     public PinArea(Rect area) {
@@ -36,6 +41,12 @@ public class PinArea extends PinScreen {
     public PinArea(JsonObject jsonObject) {
         super(jsonObject);
         area = GsonUtils.getAsObject(jsonObject, "area", Rect.class, new Rect());
+    }
+
+    @Override
+    public void newInfo() {
+        super.newInfo();
+        area = new Rect();
     }
 
     @Override

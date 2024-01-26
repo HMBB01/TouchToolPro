@@ -13,6 +13,7 @@ import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.action.ActionType;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
+import top.bogey.touch_tool_pro.bean.pin.PinSubType;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinArea;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinInteger;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinString;
@@ -24,7 +25,7 @@ import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 
 public class OcrTextStateAction extends Action {
     private transient Pin textPin = new Pin(new PinString(), R.string.pin_string, true);
-    private transient Pin areaPin = new Pin(new PinArea(), R.string.pin_area);
+    private transient Pin areaPin = new Pin(new PinArea(PinSubType.OCR), R.string.pin_area);
     private transient Pin similarPin = new Pin(new PinInteger(95), R.string.action_ocr_text_state_subtitle_similar);
 
     public OcrTextStateAction() {

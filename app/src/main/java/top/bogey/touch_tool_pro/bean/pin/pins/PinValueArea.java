@@ -15,8 +15,8 @@ public class PinValueArea extends PinValue {
     private int max = 60000;
     private int step = 10;
 
-    private int low = 100;
-    private int high = 100;
+    private int low = 10;
+    private int high = 60000;
 
     public PinValueArea() {
         super(PinType.VALUE_AREA);
@@ -47,6 +47,12 @@ public class PinValueArea extends PinValue {
         step = GsonUtils.getAsInt(jsonObject, "step", 10);
         low = GsonUtils.getAsInt(jsonObject, "low", 10);
         high = GsonUtils.getAsInt(jsonObject, "high", 60000);
+    }
+
+    @Override
+    public void newInfo() {
+        low = min;
+        high = max;
     }
 
     @NonNull

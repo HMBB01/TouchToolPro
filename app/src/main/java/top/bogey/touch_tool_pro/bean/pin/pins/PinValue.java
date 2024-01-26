@@ -24,6 +24,11 @@ public class PinValue extends PinObject {
         super(jsonObject);
     }
 
+    @Override
+    public void newInfo() {
+
+    }
+
     public boolean cast(String value) {
         return false;
     }

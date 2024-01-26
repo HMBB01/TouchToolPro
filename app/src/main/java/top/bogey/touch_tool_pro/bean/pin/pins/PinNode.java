@@ -36,6 +36,11 @@ public class PinNode extends PinValue {
         node = parseNode(GsonUtils.getAsString(jsonObject, "node", null));
     }
 
+    @Override
+    public void newInfo() {
+        node = null;
+    }
+
     private AccessibilityNodeInfo parseNode(String s) {
         if (s == null || s.isEmpty()) return null;
         byte[] bytes = Base64.decode(s, Base64.NO_WRAP);

@@ -37,6 +37,11 @@ public class PinExecute extends PinObject {
         image = GsonUtils.getAsString(jsonObject, "image", null);
     }
 
+    @Override
+    public void newInfo() {
+        image = null;
+    }
+
     public void setImage(Bitmap image) {
         if (image == null) {
             this.image = null;

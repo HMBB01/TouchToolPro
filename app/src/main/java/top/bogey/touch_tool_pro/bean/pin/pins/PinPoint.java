@@ -41,6 +41,12 @@ public class PinPoint extends PinScreen {
     }
 
     @Override
+    public void newInfo() {
+        x = 0;
+        y = 0;
+    }
+
+    @Override
     public boolean cast(String value) {
         Pattern pattern = Pattern.compile("\\((\\d+),(\\d+)\\)");
         Matcher matcher = pattern.matcher(value);

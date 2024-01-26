@@ -40,6 +40,11 @@ public class PinSpinner extends PinValue {
     }
 
     @Override
+    public void newInfo() {
+        index = 0;
+    }
+
+    @Override
     public boolean match(PinObject pinObject) {
         if (getType() == pinObject.getType()) {
             PinSpinner spinner = (PinSpinner) pinObject;

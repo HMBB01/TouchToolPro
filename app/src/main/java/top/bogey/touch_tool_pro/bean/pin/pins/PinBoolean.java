@@ -27,6 +27,10 @@ public class PinBoolean extends PinValue {
         bool = GsonUtils.getAsBoolean(jsonObject, "bool", false);
     }
 
+    public PinBoolean(PinType type) {
+        bool = false;
+    }
+
     @Override
     public int getPinColor(Context context) {
         return context.getColor(R.color.BooleanPinColor);

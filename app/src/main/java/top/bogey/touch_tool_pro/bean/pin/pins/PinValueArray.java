@@ -45,6 +45,11 @@ public class PinValueArray extends PinValue {
         values = GsonUtils.getAsObject(jsonObject, "values", TypeToken.getParameterized(ArrayList.class, PinObject.class).getType(), new ArrayList<>());
     }
 
+    @Override
+    public void newInfo() {
+        values.clear();
+    }
+
     public PinType getPinType() {
         return pinType;
     }

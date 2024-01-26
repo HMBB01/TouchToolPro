@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.databinding.FloatSniPasteBinding;
-import top.bogey.touch_tool_pro.utils.AppUtils;
 import top.bogey.touch_tool_pro.utils.DisplayUtils;
 import top.bogey.touch_tool_pro.utils.easy_float.EasyFloat;
 import top.bogey.touch_tool_pro.utils.easy_float.FloatGravity;
@@ -51,9 +50,6 @@ public class SniPasteFloatView extends FrameLayout implements FloatViewInterface
         this(context);
         binding.image.setVisibility(VISIBLE);
         binding.image.setImageBitmap(image);
-
-        binding.saveButton.setVisibility(VISIBLE);
-        binding.saveButton.setOnClickListener(v -> AppUtils.exportImage(context, image));
     }
 
     public SniPasteFloatView(@NonNull Context context, int[] color) {

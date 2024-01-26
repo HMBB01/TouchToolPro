@@ -35,6 +35,12 @@ public class PinTask extends PinValue {
         startId = GsonUtils.getAsString(jsonObject, "startId", null);
     }
 
+    @Override
+    public void newInfo() {
+        taskId = null;
+        startId = null;
+    }
+
     @NonNull
     @Override
     public String toString() {

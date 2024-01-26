@@ -18,6 +18,7 @@ import top.bogey.touch_tool_pro.bean.base.IdentityInfo;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinExecute;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinObject;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.task.Task;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
 import top.bogey.touch_tool_pro.save.SaveRepository;
@@ -72,7 +73,11 @@ public class Function extends FunctionContext implements ActionExecuteInterface 
                 addAction(taskAction);
             }
         }
-        getVars().putAll(task.getVars());
+        getVars().forEach((key, value) -> {
+            PinValue pinValue = (PinValue) value.copy();
+            pinValue.newInfo();
+            getVars().put(key, pinValue);
+        });
     }
 
     public Function(Function function, FunctionReferenceAction executeAction, FunctionContext outContext) {
@@ -84,7 +89,11 @@ public class Function extends FunctionContext implements ActionExecuteInterface 
         for (Action act : function.getActions()) {
             addAction((Action) act.copy());
         }
-        getVars().putAll(function.getVars());
+        function.getVars().forEach((key, value) -> {
+            PinValue copy = (PinValue) value.copy();
+            copy.newInfo();
+            getVars().put(key, copy);
+        });
 
         this.executeAction = executeAction;
         this.outContext = outContext;

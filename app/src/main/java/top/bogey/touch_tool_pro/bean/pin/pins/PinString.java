@@ -49,6 +49,11 @@ public class PinString extends PinValue {
     }
 
     @Override
+    public void newInfo() {
+        value = "";
+    }
+
+    @Override
     public boolean cast(String value) {
         this.value = value;
         return true;

@@ -34,7 +34,7 @@ public class ChangeAreaFloatView extends FrameLayout implements FloatViewInterfa
         binding.countButton2.setOnClickListener(v -> setOffset(2));
         binding.countButton5.setOnClickListener(v -> setOffset(5));
         binding.countButton10.setOnClickListener(v -> setOffset(10));
-        binding.countButton1.setChecked(true);
+        binding.countButton10.setChecked(true);
 
         binding.topLeftButton.setOnClickListener(v -> setScale(-1, -1));
         binding.topRightButton.setOnClickListener(v -> setScale(1, -1));

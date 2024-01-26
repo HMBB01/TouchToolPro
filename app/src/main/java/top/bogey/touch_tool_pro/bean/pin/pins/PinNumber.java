@@ -27,6 +27,11 @@ public abstract class PinNumber<T extends Number> extends PinValue {
     }
 
     @Override
+    public void newInfo() {
+        cast("0");
+    }
+
+    @Override
     public abstract int getPinColor(Context context);
 
     @NonNull

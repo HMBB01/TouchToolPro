@@ -50,6 +50,14 @@ public class PinTouch extends PinScreen {
     }
 
     @Override
+    public void newInfo() {
+        super.newInfo();
+        records.clear();
+        anchor = TouchAnchor.TOP_LEFT;
+        anchorPoint = new Point();
+    }
+
+    @Override
     public int getPinColor(Context context) {
         return context.getColor(R.color.TouchPinColor);
     }

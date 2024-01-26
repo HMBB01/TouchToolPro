@@ -38,6 +38,11 @@ public class PinApplication extends PinValue {
         apps.putAll(GsonUtils.getAsObject(jsonObject, "apps", TypeToken.getParameterized(LinkedHashMap.class, String.class, TypeToken.getParameterized(ArrayList.class, String.class).getType()).getType(), new LinkedHashMap<>()));
     }
 
+    @Override
+    public void newInfo() {
+        apps.clear();
+    }
+
     public boolean contain(Context context, String packageName, String activityName) {
         boolean includeActivity = activityName == null || activityName.isEmpty();
         PinApplication pinApplication = new PinApplication(includeActivity ? PinSubType.SINGLE_ACTIVITY : PinSubType.SINGLE);

@@ -42,6 +42,12 @@ public class PinImage extends PinScreen {
         image = GsonUtils.getAsString(jsonObject, "image", null);
     }
 
+    @Override
+    public void newInfo() {
+        super.newInfo();
+        image = null;
+    }
+
     @NonNull
     @Override
     public String toString() {

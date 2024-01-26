@@ -498,6 +498,7 @@
 
     <!-- 采集器 -->
     <string name="picker_area_preview_title">选择区域</string>
+    <string name="picker_ocr_area_preview_title">选择OCR区域</string>
     <string name="picker_color_preview_title">选择颜色</string>
     <string name="picker_image_preview_title">选择图片</string>
     <string name="picker_touch_preview_title">采集手势</string>

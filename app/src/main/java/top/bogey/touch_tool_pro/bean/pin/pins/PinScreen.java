@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.JsonObject;
 
+import top.bogey.touch_tool_pro.bean.pin.PinSubType;
 import top.bogey.touch_tool_pro.bean.pin.PinType;
 import top.bogey.touch_tool_pro.utils.DisplayUtils;
 import top.bogey.touch_tool_pro.utils.GsonUtils;
@@ -17,6 +18,10 @@ public abstract class PinScreen extends PinValue {
         super(type);
     }
 
+    public PinScreen(PinType type, PinSubType subType) {
+        super(type, subType);
+    }
+
     public PinScreen(PinType type, Context context) {
         super(type);
         screen = DisplayUtils.getScreen(context);
@@ -25,6 +30,11 @@ public abstract class PinScreen extends PinValue {
     public PinScreen(JsonObject jsonObject) {
         super(jsonObject);
         screen = GsonUtils.getAsInt(jsonObject, "screen", 1080);
+    }
+
+    @Override
+    public void newInfo() {
+        screen = 1080;
     }
 
     @NonNull
