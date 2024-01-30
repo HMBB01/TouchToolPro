@@ -335,24 +335,26 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     public Bitmap captureFunctionContext() {
         float tmpScale = scale;
         scale = 1;
-        setCardsPosition();
+        float scaleGridSize = getScaleGridSize();
+
         ArrayList<Point> points = new ArrayList<>();
         cardMap.forEach((id, card) -> {
             card.setVisibility(VISIBLE);
-            int x = (int) card.getX();
-            int y = (int) card.getY();
-            int width = (int) (card.getWidth() * scale);
-            int height = (int) (card.getHeight() * scale);
+            Action action = card.getAction();
+            int x = (int) (action.getX() * scaleGridSize);
+            int y = (int) (action.getY() * scaleGridSize);
+            int width = (int) card.getWidth();
+            int height = (int) card.getHeight();
             points.add(new Point(x, y));
             points.add(new Point(x + width, y + height));
         });
-        Rect area = DisplayUtils.calculatePointArea(points);
 
-        float scaleGridSize = getScaleGridSize();
+        Rect area = DisplayUtils.calculatePointArea(points);
         area.left -= scaleGridSize;
         area.top -= scaleGridSize;
         area.right += scaleGridSize;
         area.bottom += scaleGridSize;
+
         Bitmap bitmap = Bitmap.createBitmap(area.width(), area.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
@@ -381,7 +383,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
         float bigGridSize = 10 * gridScaleSize;
         float startY = cy - ofY;
-        for (int i = 0; i < gridRow; i++) {
+        for (int i = 0; i <= gridRow; i++) {
             float y = i * gridScaleSize;
             if (startY == y) {
                 gridPaint.setStrokeWidth(6);
@@ -393,7 +395,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         }
 
         float startX = cx - ofX;
-        for (int i = 0; i < gridCol; i++) {
+        for (int i = 0; i <= gridCol; i++) {
             float x = i * gridScaleSize;
             if (cx == x + ofX) {
                 gridPaint.setStrokeWidth(4);
