@@ -44,6 +44,7 @@ public class NodePickerFloatView extends BasePickerFloatView implements NodePick
     private final Paint gridPaint;
     private final Paint markPaint;
     private final int[] location = new int[2];
+    private final int offset;
 
     private final ArrayList<NodePickerItemInfo> rootNodes = new ArrayList<>();
     private NodePickerItemInfo selectNode;
@@ -111,6 +112,8 @@ public class NodePickerFloatView extends BasePickerFloatView implements NodePick
         });
         binding.typeGroup.check(binding.typeGroup.getChildAt(SettingSave.getInstance().getSelectNodeType()).getId());
 
+        offset = Math.round(DisplayUtils.dp2px(context, 4));
+
         if (pinNode instanceof PinNodePath pinNodePath) {
             selectNode = pinNodePath.getNodeItemInfo(rootNodes);
             showNodeView(selectNode);
@@ -143,6 +146,21 @@ public class NodePickerFloatView extends BasePickerFloatView implements NodePick
             binding.markBox.setLayoutParams(params);
             binding.markBox.setX(rect.left);
             binding.markBox.setY(rect.top - location[1]);
+
+            float x = rect.left + (rect.width() - binding.buttonBox.getWidth()) / 2f;
+            x = Math.max(Math.min(x, getWidth() - binding.buttonBox.getWidth()), 0);
+            binding.buttonBox.setX(x - location[0]);
+
+            if (getHeight() < rect.height() + offset * 2 + binding.buttonBox.getHeight()) {
+                binding.buttonBox.setY(rect.bottom - offset * 2 - binding.buttonBox.getHeight() - location[1]);
+            } else if (rect.bottom + offset * 2 + binding.buttonBox.getHeight() > getHeight()) {
+                binding.buttonBox.setY(rect.top - offset * 2 - binding.buttonBox.getHeight() - location[1]);
+            } else {
+                binding.buttonBox.setY(rect.bottom + offset * 2 - location[1]);
+            }
+        } else {
+            binding.buttonBox.setX((getWidth() - binding.buttonBox.getWidth()) / 2f);
+            binding.buttonBox.setY(getHeight() - DisplayUtils.dp2px(getContext(), 64) - binding.buttonBox.getHeight());
         }
         postInvalidate();
     }

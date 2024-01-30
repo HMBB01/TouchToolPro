@@ -36,7 +36,7 @@ public class NodePickerTreeAdapter extends TreeViewAdapter {
         setTreeNodeLongClickListener((treeNode, view) -> {
             NodePickerItemInfo nodeInfo = (NodePickerItemInfo) treeNode.getValue();
             picker.selectNode(nodeInfo);
-            selectedNode = treeNode;
+            setSelectedNode(nodeInfo);
             return true;
         });
         searchNodes(null);

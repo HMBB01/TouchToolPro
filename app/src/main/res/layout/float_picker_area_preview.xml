@@ -84,10 +84,11 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/ocrButton"
                         style="@style/Theme.TouchTool.IconButton.Outlined"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center_horizontal"
                         android:layout_marginTop="2dp"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         app:icon="@drawable/icon_text" />
 
                 </FrameLayout>

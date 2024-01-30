@@ -68,7 +68,7 @@ public class AreaPickerFloatPreview extends BasePickerFloatView {
                                     builder.append(ocrResult.getLabel());
                                 }
 
-                                Toast.makeText(context, builder.toString(), Toast.LENGTH_SHORT).show();
+                                post(() -> Toast.makeText(context, builder.toString(), Toast.LENGTH_SHORT).show());
                             }
                         }
                     });
