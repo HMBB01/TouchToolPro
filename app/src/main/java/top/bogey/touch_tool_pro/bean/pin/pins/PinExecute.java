@@ -42,6 +42,11 @@ public class PinExecute extends PinObject {
         image = null;
     }
 
+    @Override
+    public boolean isReference() {
+        return false;
+    }
+
     public void setImage(Bitmap image) {
         if (image == null) {
             this.image = null;

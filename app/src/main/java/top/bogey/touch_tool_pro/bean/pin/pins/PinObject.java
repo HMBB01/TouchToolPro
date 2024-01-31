@@ -49,6 +49,8 @@ public abstract class PinObject {
 
     public abstract void newInfo();
 
+    public abstract boolean isReference();
+
     // 针脚是否能够连接，看类型是否一致或检测对象继承于我
     public boolean match(PinObject pinObject) {
         return type == pinObject.type || getClass().isInstance(pinObject) || pinObject.getClass().isInstance(this);

@@ -25,7 +25,11 @@ public class SetCommonVariableValue extends SetVariableValue {
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         if (isError(context)) return;
         PinValue value = (PinValue) getPinValue(runnable, context, valuePin);
-        SaveRepository.getInstance().setVariable(varKey, (PinValue) value.copy());
+        if (value.isReference()) {
+            SaveRepository.getInstance().setVariable(varKey, value);
+        } else {
+            SaveRepository.getInstance().setVariable(varKey, (PinValue) value.copy());
+        }
         executeNext(runnable, context, outPin);
     }
 

@@ -34,6 +34,8 @@ public class IntToValueAreaAction extends Action {
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         PinInteger x = (PinInteger) getPinValue(runnable, context, xPin);
         PinInteger y = (PinInteger) getPinValue(runnable, context, yPin);
-        valueAreaPin.getValue(PinValueArea.class).setArea(x.getValue(), y.getValue(), 1);
+        PinValueArea valueArea = valueAreaPin.getValue(PinValueArea.class);
+        valueArea.setLow(x.getValue());
+        valueArea.setHigh(y.getValue());
     }
 }

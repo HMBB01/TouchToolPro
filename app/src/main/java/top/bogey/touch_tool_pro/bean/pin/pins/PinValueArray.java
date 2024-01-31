@@ -50,6 +50,11 @@ public class PinValueArray extends PinValue {
         values.clear();
     }
 
+    @Override
+    public boolean isReference() {
+        return true;
+    }
+
     public PinType getPinType() {
         return pinType;
     }

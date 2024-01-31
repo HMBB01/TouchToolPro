@@ -26,7 +26,7 @@ public class GetCommonVariableValue extends GetVariableValue {
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         PinValue value = SaveRepository.getInstance().getVariable(varKey);
         if (value == null) return;
-        if (value instanceof PinValueArray) {
+        if (value.isReference()) {
             valuePin.setValue(value);
         } else {
             valuePin.setValue(value.copy());

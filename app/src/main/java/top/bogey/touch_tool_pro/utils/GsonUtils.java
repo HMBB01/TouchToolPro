@@ -19,7 +19,6 @@ public class GsonUtils {
             .registerTypeAdapter(Pin.class, new Pin.PinDeserialize())
             .registerTypeAdapter(PinObject.class, new PinObject.PinObjectDeserializer())
             .registerTypeAdapter(PinTouch.class, new PinTouch.PinTouchSerializer())
-            .registerTypeAdapter(PinNode.class, new PinNode.PinNodeSerializer())
             .registerTypeAdapter(Action.class, new Action.ActionDeserializer())
             .registerTypeAdapter(FunctionContext.class, new FunctionContext.FunctionContextDeserializer())
             .create();

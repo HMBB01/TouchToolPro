@@ -35,6 +35,11 @@ public class PinAdd extends PinObject {
     }
 
     @Override
+    public boolean isReference() {
+        return false;
+    }
+
+    @Override
     public int getPinColor(Context context) {
         return DisplayUtils.getAttrColor(context, com.google.android.material.R.attr.colorSurfaceVariant, 0);
     }

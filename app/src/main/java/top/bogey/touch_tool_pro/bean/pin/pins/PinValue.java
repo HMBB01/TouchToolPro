@@ -38,4 +38,9 @@ public class PinValue extends PinObject {
     public String toString() {
         return "";
     }
+
+    @Override
+    public boolean isReference() {
+        return false;
+    }
 }
