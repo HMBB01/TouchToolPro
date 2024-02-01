@@ -40,6 +40,11 @@ public class ForLogicAction extends NormalAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
+    @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         if (pin.equals(inPin)) {
             needBreak = false;

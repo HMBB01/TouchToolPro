@@ -42,6 +42,11 @@ public class ArrayForLogicAction extends ArrayNormalAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
+    @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         if (pin.equals(inPin)) {
             needBreak = false;

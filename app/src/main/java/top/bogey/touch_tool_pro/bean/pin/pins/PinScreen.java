@@ -33,7 +33,7 @@ public abstract class PinScreen extends PinValue {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         screen = 1080;
     }
 

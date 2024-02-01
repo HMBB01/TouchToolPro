@@ -46,7 +46,6 @@ public class GetNodesInPosAction extends Action {
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         ArrayList<PinValue> values = nodesPin.getValue(PinValueArray.class).getValues();
-        values.clear();
         PinPoint pos = (PinPoint) getPinValue(runnable, context, posPin);
         PinBoolean exclude = (PinBoolean) getPinValue(runnable, context, excludeGroupView);
         ArrayList<AccessibilityNodeInfo> nodes = getNodeIn(pos.getX(MainApplication.getInstance()), pos.getY(MainApplication.getInstance()));

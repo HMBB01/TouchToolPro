@@ -34,7 +34,6 @@ public class AppStateAction extends Action {
         String activityName = state.getActivityName();
 
         PinApplication app = appPin.getValue(PinApplication.class);
-        app.getApps().clear();
         app.getApps().put(packageName, new ArrayList<>(Collections.singleton(activityName)));
     }
 }

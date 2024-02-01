@@ -40,7 +40,7 @@ public class PinSpinner extends PinValue {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         index = 0;
     }
 

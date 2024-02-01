@@ -57,6 +57,12 @@ public class FunctionReferenceAction extends Action {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+        if (function == null) return;
+        if (function.isJustCall()) super.resetReturnValue(pin);
+    }
+
+    @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         Log.d("TAG", "execute: " + context);
         if (!synced) sync(context);

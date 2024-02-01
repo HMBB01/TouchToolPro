@@ -38,8 +38,6 @@ public class BoolAndAction extends CheckAction implements ActionMorePinInterface
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         PinBoolean result = resultPin.getValue(PinBoolean.class);
-        result.setBool(false);
-
         for (Pin boolPin : calculateMorePins()) {
             PinBoolean bool = (PinBoolean) getPinValue(runnable, context, boolPin);
             if (!bool.isBool()) return;

@@ -12,5 +12,7 @@ public interface ActionExecuteInterface {
 
     void calculate(TaskRunnable runnable, FunctionContext context, Pin pin);
 
+    void resetReturnValue(Pin pin);
+
     PinObject getPinValue(TaskRunnable runnable, FunctionContext context, Pin pin);
 }

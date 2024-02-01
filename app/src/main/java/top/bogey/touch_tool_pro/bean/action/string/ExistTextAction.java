@@ -49,11 +49,15 @@ public class ExistTextAction extends CheckAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+        if (pin.equals(resultPin)) super.resetReturnValue(pin);
+    }
+
+    @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         if (!pin.equals(resultPin)) return;
 
         PinBoolean result = resultPin.getValue(PinBoolean.class);
-        result.setBool(false);
 
         PinString text = (PinString) getPinValue(runnable, context, textPin);
         if (text.getValue() == null || text.getValue().isEmpty()) return;

@@ -38,10 +38,7 @@ public class ImageContainAction extends CheckAction {
 
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
-        if (!pin.equals(resultPin)) return;
-
         PinBoolean result = resultPin.getValue(PinBoolean.class);
-        result.setBool(false);
 
         MainApplication instance = MainApplication.getInstance();
         PinImage image = (PinImage) getPinValue(runnable, context, imagePin);

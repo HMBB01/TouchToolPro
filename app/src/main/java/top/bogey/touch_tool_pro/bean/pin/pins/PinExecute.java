@@ -38,13 +38,8 @@ public class PinExecute extends PinObject {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         image = null;
-    }
-
-    @Override
-    public boolean isReference() {
-        return false;
     }
 
     public void setImage(Bitmap image) {

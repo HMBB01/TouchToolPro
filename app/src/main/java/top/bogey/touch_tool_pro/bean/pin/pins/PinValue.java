@@ -25,7 +25,7 @@ public class PinValue extends PinObject {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
 
     }
 
@@ -37,10 +37,5 @@ public class PinValue extends PinObject {
     @Override
     public String toString() {
         return "";
-    }
-
-    @Override
-    public boolean isReference() {
-        return false;
     }
 }

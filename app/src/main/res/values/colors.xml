@@ -18,6 +18,9 @@
     <color name="ValueAreaPinColor">#00BBBB</color>
     <color name="ArrayPinColor">#00BBFF</color>
 
+    <color name="SelectedPinMul">#FFDF00</color>
+    <color name="SelectedPinAdd">#443322</color>
+
     <color name="LauncherBackgroundColor">#FAFAFA</color>
     <color name="HalfAlpha">#88333333</color>
 </resources>

@@ -51,13 +51,16 @@ public class ExistTextOcrAction extends CheckAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+        if (pin.equals(resultPin)) super.resetReturnValue(pin);
+    }
+
+    @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         if (!pin.equals(resultPin)) return;
 
         PinBoolean result = resultPin.getValue(PinBoolean.class);
-        result.setBool(false);
         PinString fullText = fullTextPin.getValue(PinString.class);
-        fullText.setValue("");
 
         MainAccessibilityService service = MainApplication.getInstance().getService();
         if (!service.isCaptureEnabled()) return;

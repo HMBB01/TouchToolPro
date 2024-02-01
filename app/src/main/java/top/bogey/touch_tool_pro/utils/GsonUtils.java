@@ -10,7 +10,6 @@ import java.lang.reflect.Type;
 import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
-import top.bogey.touch_tool_pro.bean.pin.pins.PinNode;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinObject;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinTouch;
 

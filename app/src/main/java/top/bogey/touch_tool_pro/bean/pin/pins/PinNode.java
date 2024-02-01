@@ -13,7 +13,7 @@ import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.pin.PinType;
 
 public class PinNode extends PinValue {
-    private AccessibilityNodeInfo node;
+    private transient AccessibilityNodeInfo node;
 
     public PinNode() {
         super(PinType.NODE);
@@ -29,13 +29,15 @@ public class PinNode extends PinValue {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         node = null;
     }
 
     @Override
-    public boolean isReference() {
-        return true;
+    public PinObject copy() {
+        PinNode copy = (PinNode) super.copy();
+        copy.node = node;
+        return copy;
     }
 
     @NonNull

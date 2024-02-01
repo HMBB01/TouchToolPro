@@ -44,8 +44,8 @@ public class PinArea extends PinScreen {
     }
 
     @Override
-    public void newInfo() {
-        super.newInfo();
+    public void resetValue() {
+        super.resetValue();
         area = new Rect();
     }
 

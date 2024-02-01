@@ -7,6 +7,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.ComposePathEffect;
+import android.graphics.CornerPathEffect;
+import android.graphics.DashPathEffect;
+import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -62,8 +66,12 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     private static final int DRAG_NONE = 0;
     private static final int DRAG_SELF = 1;
     private static final int DRAG_CARD = 2;
-    private static final int DRAG_PIN = 3;
-    private static final int DRAG_SCALE = 4;
+    private static final int DRAG_MULTI_CARD = 3;
+    private static final int DRAG_PIN = 4;
+    private static final int DRAG_SCALE = 5;
+    private static final int DRAG_SELECT_CARD = 6;
+
+    private static final long LONG_TOUCH_TIME = 500L;
 
     private final float gridSize;
     private final Paint gridPaint;
@@ -71,29 +79,42 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     private final int[] location = new int[2];
     private final RectF show = new RectF();
 
-    private final LinkedHashMap<String, ActionCard<?>> cardMap = new LinkedHashMap<>();
-    private final HashMap<String, String> dragLinks = new HashMap<>();
+    private final HashMap<ActionType, Action> cacheActions = new HashMap<>();
     private final ScaleGestureDetector detector;
-    private final HashMap<ActionType, Action> tmpActions = new HashMap<>();
+
     private FunctionContext functionContext;
+    private final LinkedHashMap<String, ActionCard<?>> cardMap = new LinkedHashMap<>();
+
     private int dragState = DRAG_NONE;
+
     private ActionCard<?> dragCard = null;
+    private boolean dragOut;// 拖动的针脚是不是输出针脚
+
     private PinView dragPin = null;
     private PinView matchedPin = null;
+    private boolean isBreakLink = false;
+    private final HashMap<String, String> dragLinks = new HashMap<>();
+    private boolean isClick = false;
+
+    private RectF selectedArea;
+    private final HashSet<ActionCard<?>> selectedCards = new HashSet<>();
+
     private float dragX = 0;
     private float dragY = 0;
     private float startX = 0;
     private float startY = 0;
-    private boolean dragOut;
-    private boolean isClick = false;
-    private boolean isBreakLink = false;
-    private AlertDialog dialog;
+    private long touchStartTime;
+
     private float offsetX = 0;
     private float offsetY = 0;
     private float scale = 1f;
+
     private boolean editMode = true;
 
+    private AlertDialog dialog;
+
     private boolean includeBackground = true;
+
 
     public CardLayoutView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -153,7 +174,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                 try {
                     Constructor<? extends Action> constructor = actionClass.getConstructor();
                     Action action = constructor.newInstance();
-                    tmpActions.put(actionType, action);
+                    cacheActions.put(actionType, action);
                 } catch (Exception ignored) {
                 }
             }
@@ -332,25 +353,28 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         return gridSize * scale;
     }
 
-    public Bitmap captureFunctionContext() {
-        float tmpScale = scale;
-        scale = 1;
-        setCardsPosition();
-
-        float scaleGridSize = getScaleGridSize();
-
+    private Rect getCardsArea(HashSet<ActionCard<?>> cards) {
         ArrayList<Point> points = new ArrayList<>();
-        cardMap.forEach((id, card) -> {
-            card.setVisibility(VISIBLE);
+        cards.forEach(card -> {
             int x = (int) card.getX();
             int y = (int) card.getY();
-            int width = card.getWidth();
-            int height = card.getHeight();
+            int width = (int) (card.getWidth() * scale);
+            int height = (int) (card.getHeight() * scale);
             points.add(new Point(x, y));
             points.add(new Point(x + width, y + height));
         });
+        return DisplayUtils.calculatePointArea(points);
+    }
 
-        Rect area = DisplayUtils.calculatePointArea(points);
+    public Bitmap captureFunctionContext() {
+        cleanSelectedCards();
+        float tmpScale = scale;
+        scale = 1;
+        setCardsPosition();
+        cardMap.forEach((id, card) -> card.setVisibility(VISIBLE));
+
+        float scaleGridSize = getScaleGridSize();
+        Rect area = getCardsArea(new HashSet<>(cardMap.values()));
         area.left -= scaleGridSize;
         area.top -= scaleGridSize;
         area.right += scaleGridSize;
@@ -411,15 +435,19 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
         if (includeBackground) drawBackground(canvas, offsetX, offsetY);
+        CornerPathEffect cornerPathEffect = new CornerPathEffect(getScaleGridSize() / 2);
+        linePaint.setPathEffect(cornerPathEffect);
 
         // 所有连接的线
-        linePaint.setStrokeWidth(5 * scale);
+        linePaint.setStrokeWidth(4 * scale);
         for (ActionCard<?> card : cardMap.values()) {
+            if (selectedCards.contains(card)) continue;
             Action action = card.getAction();
             for (Pin pin : action.getPins()) {
                 for (Map.Entry<String, String> entry : pin.getLinks().entrySet()) {
                     ActionCard<?> baseCard = cardMap.get(entry.getValue());
                     if (baseCard == null) continue;
+                    if (selectedCards.contains(baseCard)) continue;
                     PinView pinBaseView = baseCard.getPinViewById(entry.getKey());
                     if (pinBaseView == null) continue;
                     // 只画输出的线
@@ -430,6 +458,30 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                 }
             }
         }
+
+        // 选中的卡的连线需要置顶，且变色
+        linePaint.setStrokeWidth(8 * scale);
+        linePaint.setColorFilter(new LightingColorFilter(getResources().getColor(R.color.SelectedPinMul, null), getResources().getColor(R.color.SelectedPinAdd, null)));
+        for (ActionCard<?> card : cardMap.values()) {
+            Action action = card.getAction();
+            for (Pin pin : action.getPins()) {
+                for (Map.Entry<String, String> entry : pin.getLinks().entrySet()) {
+                    ActionCard<?> baseCard = cardMap.get(entry.getValue());
+                    if (baseCard == null) continue;
+                    if (selectedCards.contains(baseCard)) {
+                        PinView pinBaseView = baseCard.getPinViewById(entry.getKey());
+                        if (pinBaseView == null) continue;
+                        linePaint.setColor(pinBaseView.getPin().getValue().getPinColor(getContext()));
+                        if (pinBaseView.getPin().isOut()) {
+                            canvas.drawPath(calculateLinePath(pinBaseView, card.getPinViewById(pin.getId())), linePaint);
+                        } else {
+                            canvas.drawPath(calculateLinePath(card.getPinViewById(pin.getId()), pinBaseView), linePaint);
+                        }
+                    }
+                }
+            }
+        }
+        linePaint.setColorFilter(null);
 
         if (dragState == DRAG_PIN) {
             for (Map.Entry<String, String> entry : dragLinks.entrySet()) {
@@ -453,6 +505,20 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
         // 所有卡片
         super.dispatchDraw(canvas);
+
+        if (dragState == DRAG_SELECT_CARD) {
+            DashPathEffect dashPathEffect = new DashPathEffect(new float[]{getScaleGridSize(), getScaleGridSize()}, 0);
+            linePaint.setPathEffect(new ComposePathEffect(cornerPathEffect, dashPathEffect));
+            linePaint.setStrokeWidth(4 * scale);
+            RectF rect = new RectF(selectedArea);
+            rect.offset(-location[0], -location[1]);
+            rect.left -= getScaleGridSize();
+            rect.top -= getScaleGridSize();
+            rect.right += getScaleGridSize();
+            rect.bottom += getScaleGridSize();
+            canvas.drawRect(rect, linePaint);
+        }
+
     }
 
     //带拐点的路径，尽可能少的拐点
@@ -588,6 +654,24 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         return calculateLinePath(outLocation, inLocation, pinBaseView.getPin().isVertical());
     }
 
+    private void cleanSelectedCards() {
+        HashSet<ActionCard<?>> cards = new HashSet<>(selectedCards);
+        cards.forEach(this::removeSelectedCard);
+    }
+
+    private boolean removeSelectedCard(ActionCard<?> card) {
+        if (selectedCards.remove(card)) {
+            card.setSelected(false);
+            return true;
+        }
+        return false;
+    }
+
+    private void addSelectedCard(ActionCard<?> card) {
+        card.setSelected(true);
+        selectedCards.add(card);
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -601,6 +685,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
             startX = rawX;
             startY = rawY;
             isClick = true;
+            touchStartTime = System.currentTimeMillis();
             if (editMode) {
                 for (int i = getChildCount() - 1; i >= 0; i--) {
                     ActionCard<?> card = (ActionCard<?>) getChildAt(i);
@@ -637,10 +722,18 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                     }
                 }
             }
+
             if (dragState == DRAG_NONE) {
                 dragState = DRAG_SELF;
                 dragX = rawX;
                 dragY = rawY;
+            } else if (dragState == DRAG_CARD) {
+                if (selectedCards.contains(dragCard)) {
+                    dragState = DRAG_MULTI_CARD;
+                } else {
+                    cleanSelectedCards();
+                    addSelectedCard(dragCard);
+                }
             }
         } else if (actionMasked == MotionEvent.ACTION_UP) {
             if (dragState == DRAG_PIN) {
@@ -679,6 +772,10 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                         return true;
                     }
                 }
+            } else if (dragState == DRAG_SELF) {
+                if (isClick) {
+                    cleanSelectedCards();
+                }
             }
 
             dragLinks.clear();
@@ -690,6 +787,11 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         } else if (actionMasked == MotionEvent.ACTION_MOVE) {
             if (Math.abs(rawX - startX) * Math.abs(rawY - startY) > 81) {
                 isClick = false;
+            }
+            if (isClick && dragState == DRAG_SELF) {
+                if (System.currentTimeMillis() - touchStartTime > LONG_TOUCH_TIME) {
+                    dragState = DRAG_SELECT_CARD;
+                }
             }
 
             if (dragState == DRAG_CARD) {
@@ -706,6 +808,19 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                     dragY += dy * scaleGridSize;
                 }
                 setCardPosition(dragCard);
+            } else if (dragState == DRAG_MULTI_CARD) {
+                float scaleGridSize = getScaleGridSize();
+                int dx = (int) ((rawX - dragX) / scaleGridSize);
+                int dy = (int) ((rawY - dragY) / scaleGridSize);
+
+                for (ActionCard<?> card : selectedCards) {
+                    Action action = card.getAction();
+                    if (dx != 0) action.setX(action.getX() + dx);
+                    if (dy != 0) action.setY(action.getY() + dy);
+                    setCardPosition(card);
+                }
+                dragX += dx * scaleGridSize;
+                dragY += dy * scaleGridSize;
             } else if (dragState == DRAG_PIN) {
                 dragX = rawX;
                 dragY = rawY;
@@ -742,6 +857,18 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                 dragX = rawX;
                 dragY = rawY;
                 setCardsPosition();
+            } else if (dragState == DRAG_SELECT_CARD) {
+                cleanSelectedCards();
+                selectedArea = new RectF(startX, startY, rawX, rawY);
+                selectedArea.sort();
+                for (ActionCard<?> baseCard : cardMap.values()) {
+                    int[] location = new int[2];
+                    baseCard.getLocationOnScreen(location);
+                    Rect rect = new Rect(location[0], location[1], location[0] + (int) (baseCard.getWidth() * scale), location[1] + (int) (baseCard.getHeight() * scale));
+                    if (RectF.intersects(selectedArea, new RectF(rect))) {
+                        addSelectedCard(baseCard);
+                    }
+                }
             }
         }
         postInvalidate();
@@ -855,8 +982,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         checkCards();
     }
 
-    public HashMap<ActionType, Action> getTmpActions() {
-        return tmpActions;
+    public HashMap<ActionType, Action> getCacheActions() {
+        return cacheActions;
     }
 
     public LinkedHashMap<String, ActionCard<?>> getCardMap() {

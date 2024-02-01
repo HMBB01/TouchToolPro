@@ -50,8 +50,8 @@ public class PinTouch extends PinScreen {
     }
 
     @Override
-    public void newInfo() {
-        super.newInfo();
+    public void resetValue() {
+        super.resetValue();
         records.clear();
         anchor = TouchAnchor.TOP_LEFT;
         anchorPoint = new Point();

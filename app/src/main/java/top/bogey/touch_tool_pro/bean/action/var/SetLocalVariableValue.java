@@ -7,9 +7,7 @@ import top.bogey.touch_tool_pro.bean.action.ActionCheckResult;
 import top.bogey.touch_tool_pro.bean.action.ActionType;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
-import top.bogey.touch_tool_pro.bean.pin.pins.PinNode;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
-import top.bogey.touch_tool_pro.bean.pin.pins.PinValueArray;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
 
 public class SetLocalVariableValue extends SetVariableValue {
@@ -26,11 +24,7 @@ public class SetLocalVariableValue extends SetVariableValue {
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         if (isError(context)) return;
         PinValue value = (PinValue) getPinValue(runnable, context, valuePin);
-        if (value.isReference()) {
-            context.setVarOnParent(varKey, value);
-        } else {
-            context.setVarOnParent(varKey, (PinValue) value.copy());
-        }
+        context.setVarOnParent(varKey, (PinValue) value.copy());
         executeNext(runnable, context, outPin);
     }
 

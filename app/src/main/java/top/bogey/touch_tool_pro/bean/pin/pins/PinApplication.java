@@ -39,7 +39,7 @@ public class PinApplication extends PinValue {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         apps.clear();
     }
 

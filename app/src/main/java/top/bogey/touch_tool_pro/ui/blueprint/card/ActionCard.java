@@ -52,6 +52,7 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
         this.action = action;
 
         setCardBackgroundColor(DisplayUtils.getAttrColor(context, com.google.android.material.R.attr.colorSurfaceVariant, 0));
+        setStrokeColor(DisplayUtils.getAttrColor(context, com.google.android.material.R.attr.colorPrimary, 0));
         setStrokeWidth(0);
         setPivotX(0);
         setPivotY(0);
@@ -149,6 +150,14 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
         animation.setRepeatCount(3);
         animation.setRepeatMode(Animation.REVERSE);
         startAnimation(animation);
+    }
+
+    public void setSelected(boolean selected) {
+        if (selected) {
+            setStrokeWidth((int) DisplayUtils.dp2px(getContext(), 1));
+        } else {
+            setStrokeWidth(0);
+        }
     }
 
     protected void addPinView(Pin pin) {

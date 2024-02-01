@@ -25,6 +25,11 @@ public class GetVariableValue extends Action {
         valuePin = addPin(tmpPins.remove(0));
     }
 
+    @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
     public String getVarKey() {
         return varKey;
     }

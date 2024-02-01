@@ -43,8 +43,8 @@ public class PinColor extends PinScreen {
     }
 
     @Override
-    public void newInfo() {
-        super.newInfo();
+    public void resetValue() {
+        super.resetValue();
         color = new int[]{0, 0, 0};
         min = 0;
         max = 0;

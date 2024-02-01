@@ -32,6 +32,7 @@ public class StringToIntAction extends Action {
 
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
+        valuePin.getValue(PinInteger.class).setValue(0);
         PinString text = (PinString) getPinValue(runnable, context, textPin);
         if (text.getValue() == null || text.getValue().isEmpty()) return;
         Pattern pattern = Pattern.compile("^.*?(\\d+)");

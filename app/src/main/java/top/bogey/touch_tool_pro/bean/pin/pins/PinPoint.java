@@ -41,7 +41,7 @@ public class PinPoint extends PinScreen {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         x = 0;
         y = 0;
     }

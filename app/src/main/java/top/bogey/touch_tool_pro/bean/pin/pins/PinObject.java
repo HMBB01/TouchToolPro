@@ -47,9 +47,7 @@ public abstract class PinObject {
         return GsonUtils.copy(this, PinObject.class);
     }
 
-    public abstract void newInfo();
-
-    public abstract boolean isReference();
+    public abstract void resetValue();
 
     // 针脚是否能够连接，看类型是否一致或检测对象继承于我
     public boolean match(PinObject pinObject) {

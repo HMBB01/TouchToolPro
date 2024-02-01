@@ -287,8 +287,18 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+        for (Pin p : getPins()) {
+            if (p.isOut()) {
+                p.getValue().resetValue();
+            }
+        }
+    }
+
+    @Override
     public PinObject getPinValue(TaskRunnable runnable, FunctionContext context, Pin pin) {
         if (pin.isOut()) {
+            resetReturnValue(pin);
             calculate(runnable, context, pin);
             return pin.getValue();
         }

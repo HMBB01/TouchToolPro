@@ -87,7 +87,7 @@ public class SelectActionDialog extends FrameLayout {
             types.put(ActionMap.CUSTOM, customFunctions);
         }
 
-        HashMap<ActionType, Action> tmpActions = layoutView.getTmpActions();
+        HashMap<ActionType, Action> tmpActions = layoutView.getCacheActions();
         for (ActionMap actionMap : ActionMap.values()) {
             ArrayList<Object> actionTypes = new ArrayList<>();
             for (ActionType actionType : actionMap.getTypes()) {

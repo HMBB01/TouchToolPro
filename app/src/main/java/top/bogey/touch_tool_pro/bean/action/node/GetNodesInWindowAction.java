@@ -36,7 +36,6 @@ public class GetNodesInWindowAction extends Action {
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         ArrayList<PinValue> values = nodesPin.getValue(PinValueArray.class).getValues();
-        values.clear();
 
         MainAccessibilityService service = MainApplication.getInstance().getService();
         for (AccessibilityNodeInfo info : service.getNeedWindowsRoot()) {

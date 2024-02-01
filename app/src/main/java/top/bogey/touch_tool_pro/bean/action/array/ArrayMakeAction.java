@@ -37,7 +37,6 @@ public class ArrayMakeAction extends ArrayAction implements ActionMorePinInterfa
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         ArrayList<PinValue> values = arrayPin.getValue(PinValueArray.class).getValues();
-        values.clear();
         for (Pin valuePin : calculateMorePins()) {
             PinValue value = (PinValue) getPinValue(runnable, context, valuePin);
             values.add((PinValue) value.copy());

@@ -35,10 +35,7 @@ public class ColorEqualAction extends CheckAction {
 
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
-        if (!pin.equals(resultPin)) return;
-
         PinBoolean result = resultPin.getValue(PinBoolean.class);
-        result.setBool(false);
 
         PinColor color = (PinColor) getPinValue(runnable, context, colorPin);
         PinColor other = (PinColor) getPinValue(runnable, context, otherPin);

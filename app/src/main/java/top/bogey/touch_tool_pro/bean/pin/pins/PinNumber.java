@@ -27,7 +27,7 @@ public abstract class PinNumber<T extends Number> extends PinValue {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         cast("0");
     }
 

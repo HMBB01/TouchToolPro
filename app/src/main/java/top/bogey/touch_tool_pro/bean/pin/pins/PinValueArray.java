@@ -46,13 +46,8 @@ public class PinValueArray extends PinValue {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         values.clear();
-    }
-
-    @Override
-    public boolean isReference() {
-        return true;
     }
 
     public PinType getPinType() {
@@ -78,7 +73,6 @@ public class PinValueArray extends PinValue {
     public void setValues(ArrayList<PinValue> values) {
         this.values = values;
     }
-
 
     @Override
     public PinObject copy() {

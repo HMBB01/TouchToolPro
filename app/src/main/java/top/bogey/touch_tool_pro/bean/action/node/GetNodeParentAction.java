@@ -31,7 +31,6 @@ public class GetNodeParentAction extends Action {
 
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
-        parentNode.getValue(PinNode.class).setNode(null);
         PinNode node = (PinNode) getPinValue(runnable, context, nodePin);
         AccessibilityNodeInfo nodeInfo = node.getNode();
         if (nodeInfo != null) {

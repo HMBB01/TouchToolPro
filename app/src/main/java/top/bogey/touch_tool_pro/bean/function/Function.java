@@ -75,7 +75,7 @@ public class Function extends FunctionContext implements ActionExecuteInterface 
         }
         getVars().forEach((key, value) -> {
             PinValue pinValue = (PinValue) value.copy();
-            pinValue.newInfo();
+            pinValue.resetValue();
             getVars().put(key, pinValue);
         });
     }
@@ -91,7 +91,7 @@ public class Function extends FunctionContext implements ActionExecuteInterface 
         }
         function.getVars().forEach((key, value) -> {
             PinValue copy = (PinValue) value.copy();
-            copy.newInfo();
+            copy.resetValue();
             getVars().put(key, copy);
         });
 
@@ -187,6 +187,11 @@ public class Function extends FunctionContext implements ActionExecuteInterface 
                 }
             }
         }
+    }
+
+    @Override
+    public void resetReturnValue(Pin pin) {
+
     }
 
     @Override

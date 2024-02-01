@@ -36,7 +36,7 @@ public class PinTask extends PinValue {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         taskId = null;
         startId = null;
     }

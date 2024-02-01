@@ -30,13 +30,8 @@ public class PinAdd extends PinObject {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
 
-    }
-
-    @Override
-    public boolean isReference() {
-        return false;
     }
 
     @Override

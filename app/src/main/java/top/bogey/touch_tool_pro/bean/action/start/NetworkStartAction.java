@@ -25,6 +25,11 @@ public class NetworkStartAction extends StartAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
+    @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         int networkType = WorldState.getInstance().getNetworkType();
         statePin.getValue(PinSpinner.class).setIndex(NetworkStateAction.networkTypeToIndex(networkType));

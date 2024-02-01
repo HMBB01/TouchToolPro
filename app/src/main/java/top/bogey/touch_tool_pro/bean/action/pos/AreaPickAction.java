@@ -39,6 +39,11 @@ public class AreaPickAction extends NormalAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
+    @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         KeepAliveFloatView keepView = MainApplication.getInstance().getKeepView();
         AtomicBoolean complete = new AtomicBoolean(false);

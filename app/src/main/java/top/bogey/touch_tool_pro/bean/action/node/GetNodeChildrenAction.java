@@ -37,7 +37,6 @@ public class GetNodeChildrenAction extends Action {
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         ArrayList<PinValue> values = childrenPin.getValue(PinValueArray.class).getValues();
-        values.clear();
         PinNode node = (PinNode) getPinValue(runnable, context, nodePin);
         AccessibilityNodeInfo nodeInfo = node.getNode();
         if (nodeInfo != null) {

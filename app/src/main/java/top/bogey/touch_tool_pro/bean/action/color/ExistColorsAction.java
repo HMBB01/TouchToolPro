@@ -52,13 +52,16 @@ public class ExistColorsAction extends CheckAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+        if (pin.equals(resultPin)) super.resetReturnValue(pin);
+    }
+
+    @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         if (!pin.equals(resultPin)) return;
 
         PinBoolean result = resultPin.getValue(PinBoolean.class);
-        result.setBool(false);
         ArrayList<PinValue> values = allPosPin.getValue(PinValueArray.class).getValues();
-        values.clear();
 
         MainAccessibilityService service = MainApplication.getInstance().getService();
         if (!service.isCaptureEnabled()) return;

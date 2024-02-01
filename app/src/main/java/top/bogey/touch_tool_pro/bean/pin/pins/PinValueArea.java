@@ -50,7 +50,7 @@ public class PinValueArea extends PinValue {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         low = min;
         high = max;
     }

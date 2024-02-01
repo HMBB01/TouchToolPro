@@ -36,6 +36,11 @@ public class NotifyStartAction extends StartAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
+    @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         PinString notice = noticePin.getValue(PinString.class);
         notice.setValue(WorldState.getInstance().getNotificationText());

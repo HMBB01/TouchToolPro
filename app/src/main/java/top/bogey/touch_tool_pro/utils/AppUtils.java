@@ -342,7 +342,7 @@ public class AppUtils {
                 if (uri == null) return;
                 try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
                     if (outputStream == null) return;
-                    image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

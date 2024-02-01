@@ -34,6 +34,11 @@ public class ShellAction extends NormalAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
+    @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         if (SuperUser.isSuperUser()) {
             PinString cmd = (PinString) getPinValue(runnable, context, cmdPin);

@@ -41,11 +41,6 @@ public class StringRegexAction extends CheckAction implements ActionMorePinInter
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         PinBoolean result = resultPin.getValue(PinBoolean.class);
-        result.setBool(false);
-        ArrayList<Pin> pins = calculateMorePins();
-        for (Pin stringPin : pins) {
-            stringPin.getValue(PinString.class).setValue(null);
-        }
 
         PinString text = (PinString) getPinValue(runnable, context, textPin);
         if (text.getValue() == null || text.getValue().isEmpty()) return;
@@ -55,6 +50,7 @@ public class StringRegexAction extends CheckAction implements ActionMorePinInter
 
         Pattern pattern = Pattern.compile(match.getValue());
         Matcher matcher = pattern.matcher(text.getValue());
+        ArrayList<Pin> pins = calculateMorePins();
         if (matcher.find()) {
             result.setBool(true);
             for (int i = 1; i <= matcher.groupCount(); i++) {

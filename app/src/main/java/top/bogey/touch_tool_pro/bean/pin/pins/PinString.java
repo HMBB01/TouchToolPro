@@ -49,7 +49,7 @@ public class PinString extends PinValue {
     }
 
     @Override
-    public void newInfo() {
+    public void resetValue() {
         value = "";
     }
 

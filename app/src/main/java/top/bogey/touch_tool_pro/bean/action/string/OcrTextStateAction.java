@@ -47,7 +47,6 @@ public class OcrTextStateAction extends Action {
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         PinString text = textPin.getValue(PinString.class);
-        text.setValue("");
 
         MainAccessibilityService service = MainApplication.getInstance().getService();
         if (!service.isCaptureEnabled()) return;

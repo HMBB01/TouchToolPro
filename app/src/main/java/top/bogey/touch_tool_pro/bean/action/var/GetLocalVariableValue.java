@@ -25,7 +25,7 @@ public class GetLocalVariableValue extends GetVariableValue {
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
         PinValue value = context.findVar(varKey);
         if (value == null) return;
-        if (value.isReference()) {
+        if (value instanceof PinValueArray) {
             valuePin.setValue(value);
         } else {
             valuePin.setValue(value.copy());

@@ -28,6 +28,11 @@ public class ArrayAppendAction extends ArrayNormalAction {
     }
 
     @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
+    @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         PinValueArray array = (PinValueArray) getPinValue(runnable, context, arrayPin);
         PinValueArray other = (PinValueArray) getPinValue(runnable, context, otherPin);

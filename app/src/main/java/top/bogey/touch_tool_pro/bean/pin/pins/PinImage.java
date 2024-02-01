@@ -43,8 +43,8 @@ public class PinImage extends PinScreen {
     }
 
     @Override
-    public void newInfo() {
-        super.newInfo();
+    public void resetValue() {
+        super.resetValue();
         image = null;
     }
 
