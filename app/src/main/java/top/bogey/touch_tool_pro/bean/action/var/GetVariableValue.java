@@ -32,7 +32,7 @@ public class GetVariableValue extends Action {
 
     @Override
     public String getTitle() {
-        return varKey;
+        return super.getTitle() + varKey;
     }
 
     public String getVarKey() {

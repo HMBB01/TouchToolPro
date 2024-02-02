@@ -7,6 +7,7 @@
     <string name="enter">确认</string>
     <string name="cancel">取消</string>
     <string name="save">保存</string>
+    <string name="save_tips">已保存</string>
     <string name="close">关闭</string>
 
     <!-- 时间 -->
@@ -107,7 +108,7 @@
     <string name="exchange_task">转换</string>
     <string name="exchange_task_1">不保留转换</string>
     <string name="exchange_task_2">保留转换</string>
-    <string name="exchange_task_tips">任务转换为自定义卡之后无法恢复，任务内自定义卡无法跟随任务转换，确定要转换选中的任务吗？</string>
+    <string name="exchange_task_tips">任务转换为自定义卡之后无法转回，任务内自定义卡无法跟随任务转换，确定要转换选中的任务吗？</string>
     <string name="copy_to">复制到</string>
 
 
@@ -158,8 +159,8 @@
     <string name="function_fast_end">结束时中止内部执行</string>
 
     <!-- 变量 -->
-    <string name="action_set_value_action_title">设置变量值</string>
-    <string name="action_get_value_action_title">获取变量值</string>
+    <string name="action_set_value_action_title">设置 </string>
+    <string name="action_get_value_action_title">获取 </string>
     <string name="action_set_common_value_action_title">设置全局变量值</string>
     <string name="action_get_common_value_action_title">获取全局变量值</string>
 

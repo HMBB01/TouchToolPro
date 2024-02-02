@@ -16,6 +16,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -51,6 +52,7 @@ import top.bogey.touch_tool_pro.bean.pin.Pin;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValueArray;
 import top.bogey.touch_tool_pro.bean.task.Task;
+import top.bogey.touch_tool_pro.databinding.CardMultiSelectMenuBinding;
 import top.bogey.touch_tool_pro.save.FunctionSaveChangedListener;
 import top.bogey.touch_tool_pro.save.SaveRepository;
 import top.bogey.touch_tool_pro.save.TaskSaveChangedListener;
@@ -70,6 +72,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     private static final int DRAG_SELECT_CARD = 6;
 
     private static final long LONG_TOUCH_TIME = 500L;
+
+    private final CardMultiSelectMenuBinding binding;
 
     private final float gridSize;
     private final Paint gridPaint;
@@ -112,6 +116,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     private AlertDialog dialog;
 
     private boolean includeBackground = true;
+    private boolean needDelete = false;
 
 
     public CardLayoutView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -119,6 +124,47 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
         setSaveEnabled(false);
         setSaveFromParentEnabled(false);
+
+        binding = CardMultiSelectMenuBinding.inflate(LayoutInflater.from(context), this, true);
+        binding.getRoot().setVisibility(GONE);
+        binding.deleteButton.setOnClickListener(v -> {
+            if (needDelete) {
+                for (ActionCard<?> card : selectedCards) {
+                    removeAction(card.getAction());
+                }
+                selectedCards.clear();
+            } else {
+                binding.deleteButton.setChecked(true);
+                needDelete = true;
+                postDelayed(() -> {
+                    binding.deleteButton.setChecked(false);
+                    needDelete = false;
+                }, 1500);
+            }
+        });
+
+        binding.copyButton.setOnClickListener(v -> {
+            for (ActionCard<?> card : selectedCards) {
+                Action copy = (Action) card.getAction().copy();
+                copy.newInfo();
+                addAction(copy);
+            }
+        });
+
+        binding.expandButton.setOnClickListener(v -> {
+            for (ActionCard<?> card : selectedCards) {
+                Action action = card.getAction();
+                action.setExpand(!action.isExpand());
+                for (Pin pin : action.getPins()) {
+                    PinView pinView = card.getPinViewById(pin.getId());
+                    if (pinView != null) pinView.setExpand(action.isExpand());
+                }
+            }
+        });
+
+        binding.changeButton.setOnClickListener(v -> {
+
+        });
 
         gridSize = DisplayUtils.dp2px(context, 8);
 
@@ -510,6 +556,9 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
             rect.right += getScaleGridSize();
             rect.bottom += getScaleGridSize();
             canvas.drawRect(rect, linePaint);
+
+            binding.getRoot().setX(rect.right);
+            binding.getRoot().setY(rect.top);
         }
     }
 
@@ -578,7 +627,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
             touchStartTime = System.currentTimeMillis();
             if (editMode) {
                 for (int i = getChildCount() - 1; i >= 0; i--) {
-                    ActionCard<?> card = (ActionCard<?>) getChildAt(i);
+                    View view = getChildAt(i);
+                    if (!(view instanceof ActionCard<?> card)) continue;
                     int[] location = new int[2];
                     card.getLocationOnScreen(location);
                     if (new Rect(location[0], location[1], location[0] + (int) (card.getWidth() * scale), location[1] + (int) (card.getHeight() * scale)).contains((int) rawX, (int) rawY)) {
@@ -667,6 +717,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                     cleanSelectedCards();
                 }
             }
+
+            binding.getRoot().setVisibility(selectedCards.size() > 1 ? VISIBLE : GONE);
 
             dragLinks.clear();
             dragCard = null;
@@ -858,8 +910,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         offsetX = 0;
         offsetY = 0;
         scale = 1f;
+        cardMap.forEach((id, card) -> removeView(card));
         cardMap.clear();
-        removeAllViews();
         for (Action action : functionContext.getActions()) {
             if (action instanceof FunctionReferenceAction) {
                 ((FunctionReferenceAction) action).sync(functionContext);

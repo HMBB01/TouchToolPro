@@ -10,6 +10,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -342,12 +343,23 @@ public class AppUtils {
                 if (uri == null) return;
                 try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
                     if (outputStream == null) return;
-                    image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             }
         });
+    }
+
+    public static void saveImage(Context context, Bitmap image) {
+        String fileName = "save" + formatDateLocalDate(context, System.currentTimeMillis()) + formatDateLocalMillisecond(context, System.currentTimeMillis()) + ".jpg";
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName);
+
+        try (OutputStream outputStream = new FileOutputStream(file)) {
+            image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static ArrayList<FunctionContext> importFunctionContexts(Context context, Uri uri) {

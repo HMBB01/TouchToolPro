@@ -27,7 +27,7 @@ public class SetVariableValue extends NormalAction {
 
     @Override
     public String getTitle() {
-        return varKey;
+        return super.getTitle() + varKey;
     }
 
     public String getVarKey() {
