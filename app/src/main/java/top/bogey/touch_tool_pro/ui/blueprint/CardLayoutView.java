@@ -13,8 +13,6 @@ import android.graphics.DashPathEffect;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
@@ -353,19 +351,6 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         return gridSize * scale;
     }
 
-    private Rect getCardsArea(HashSet<ActionCard<?>> cards) {
-        ArrayList<Point> points = new ArrayList<>();
-        cards.forEach(card -> {
-            int x = (int) card.getX();
-            int y = (int) card.getY();
-            int width = (int) (card.getWidth() * scale);
-            int height = (int) (card.getHeight() * scale);
-            points.add(new Point(x, y));
-            points.add(new Point(x + width, y + height));
-        });
-        return DisplayUtils.calculatePointArea(points);
-    }
-
     public Bitmap captureFunctionContext() {
         cleanSelectedCards();
         float tmpScale = scale;
@@ -374,7 +359,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         cardMap.forEach((id, card) -> card.setVisibility(VISIBLE));
 
         float scaleGridSize = getScaleGridSize();
-        Rect area = getCardsArea(new HashSet<>(cardMap.values()));
+        Rect area = CardLayoutUtils.getCardsArea(new HashSet<>(cardMap.values()), 1);
         area.left -= scaleGridSize;
         area.top -= scaleGridSize;
         area.right += scaleGridSize;
@@ -462,21 +447,19 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         // 选中的卡的连线需要置顶，且变色
         linePaint.setStrokeWidth(8 * scale);
         linePaint.setColorFilter(new LightingColorFilter(getResources().getColor(R.color.SelectedPinMul, null), getResources().getColor(R.color.SelectedPinAdd, null)));
-        for (ActionCard<?> card : cardMap.values()) {
+        for (ActionCard<?> card : selectedCards) {
             Action action = card.getAction();
             for (Pin pin : action.getPins()) {
                 for (Map.Entry<String, String> entry : pin.getLinks().entrySet()) {
                     ActionCard<?> baseCard = cardMap.get(entry.getValue());
                     if (baseCard == null) continue;
-                    if (selectedCards.contains(baseCard)) {
-                        PinView pinBaseView = baseCard.getPinViewById(entry.getKey());
-                        if (pinBaseView == null) continue;
-                        linePaint.setColor(pinBaseView.getPin().getValue().getPinColor(getContext()));
-                        if (pinBaseView.getPin().isOut()) {
-                            canvas.drawPath(calculateLinePath(pinBaseView, card.getPinViewById(pin.getId())), linePaint);
-                        } else {
-                            canvas.drawPath(calculateLinePath(card.getPinViewById(pin.getId()), pinBaseView), linePaint);
-                        }
+                    PinView pinBaseView = baseCard.getPinViewById(entry.getKey());
+                    if (pinBaseView == null) continue;
+                    linePaint.setColor(pinBaseView.getPin().getValue().getPinColor(getContext()));
+                    if (pinBaseView.getPin().isOut()) {
+                        canvas.drawPath(calculateLinePath(pinBaseView, card.getPinViewById(pin.getId())), linePaint);
+                    } else {
+                        canvas.drawPath(calculateLinePath(card.getPinViewById(pin.getId()), pinBaseView), linePaint);
                     }
                 }
             }
@@ -510,122 +493,31 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
             DashPathEffect dashPathEffect = new DashPathEffect(new float[]{getScaleGridSize(), getScaleGridSize()}, 0);
             linePaint.setPathEffect(new ComposePathEffect(cornerPathEffect, dashPathEffect));
             linePaint.setStrokeWidth(4 * scale);
+            linePaint.setColor(DisplayUtils.getAttrColor(getContext(), com.google.android.material.R.attr.colorPrimary, 0));
             RectF rect = new RectF(selectedArea);
             rect.offset(-location[0], -location[1]);
+            canvas.drawRect(rect, linePaint);
+        }
+
+        if (dragState != DRAG_SELECT_CARD && selectedCards.size() > 1) {
+            DashPathEffect dashPathEffect = new DashPathEffect(new float[]{getScaleGridSize(), getScaleGridSize()}, 0);
+            linePaint.setPathEffect(new ComposePathEffect(cornerPathEffect, dashPathEffect));
+            linePaint.setStrokeWidth(4 * scale);
+            linePaint.setColor(DisplayUtils.getAttrColor(getContext(), com.google.android.material.R.attr.colorPrimary, 0));
+            Rect rect = CardLayoutUtils.getCardsArea(selectedCards, scale);
             rect.left -= getScaleGridSize();
             rect.top -= getScaleGridSize();
             rect.right += getScaleGridSize();
             rect.bottom += getScaleGridSize();
             canvas.drawRect(rect, linePaint);
         }
-
     }
 
-    //带拐点的路径，尽可能少的拐点
     private Path calculateLinePath(int[] outLocation, int[] inLocation, boolean v) {
         Path path = new Path();
         if (outLocation == null || inLocation == null) return path;
-        float scaleGridSize = getScaleGridSize();
-
-        PointF outLinkLinePoint;
-        PointF inLinkLinePoint;
-
-        if (v) {
-            outLinkLinePoint = new PointF(outLocation[0], outLocation[1] + scaleGridSize);
-            inLinkLinePoint = new PointF(inLocation[0], inLocation[1] - scaleGridSize);
-        } else {
-            outLinkLinePoint = new PointF(outLocation[0] + scaleGridSize, outLocation[1]);
-            inLinkLinePoint = new PointF(inLocation[0] - scaleGridSize, inLocation[1]);
-        }
-
-        // 结束点在右边，为正方向
-        int xScale = outLinkLinePoint.x < inLinkLinePoint.x ? 1 : -1;
-        // 结束点在下边，为正方向
-        int yScale = outLinkLinePoint.y < inLinkLinePoint.y ? 1 : -1;
-
-        path.moveTo(outLocation[0], outLocation[1]);
-        path.lineTo(outLinkLinePoint.x, outLinkLinePoint.y);
-
-        float offsetX = Math.abs(outLinkLinePoint.x - inLinkLinePoint.x);
-        float offsetY = Math.abs(outLinkLinePoint.y - inLinkLinePoint.y);
-        boolean xLong = offsetX > offsetY;
-
-        /*
-        垂直连接：
-            X长度为0：
-                yScale = 1, 向下连接，看其他条件
-                yScale = -1, 向右绕2格连接
-            X更长：
-                yScale = 1, 就先竖，再横，再竖
-                yScale = -1， 就先横，再斜，再横
-            Y更长：
-                yScale = 1, 就先竖，再斜，再竖
-                yScale = -1, 就先横，再竖，再横
-        水平连接：
-            X更长：
-                xScale = 1, 就先横，再斜，再横
-                xScale = -1, 就先竖，再横，再竖
-            Y更长：
-                xScale = 1, 就先横，再竖，再横
-                xScale = -1, 就先竖，再斜，再竖
-            Y长度为0：
-                xScale = 1, 水平连接，看其他条件
-                xScale = -1, 向下绕2格连接
-        */
-        float linkLineLen = Math.abs(offsetX - offsetY) / 2;
-
-        boolean flag = true;
-        if (offsetX < scaleGridSize * 3.1 && v) {
-            if (yScale == 1 && offsetX < scaleGridSize / 2) {
-                flag = false;
-            } else if (yScale == -1 && offsetY > scaleGridSize) {
-                // 向左绕2格连接
-                float x = Math.max(outLinkLinePoint.x, inLinkLinePoint.x) - scaleGridSize * 6;
-                path.lineTo(x, outLinkLinePoint.y);
-                path.lineTo(x, inLinkLinePoint.y);
-                flag = false;
-            }
-        } else if (offsetY < scaleGridSize * 3.1 && !v) {
-            if (xScale == 1 && offsetY < scaleGridSize / 2) {
-                flag = false;
-            } else if (xScale == -1 && offsetX > scaleGridSize) {
-                //向下绕2格连接
-                float y = Math.max(outLinkLinePoint.y, inLinkLinePoint.y) + scaleGridSize * 6;
-                path.lineTo(outLinkLinePoint.x, y);
-                path.lineTo(inLinkLinePoint.x, y);
-                flag = false;
-            }
-        }
-
-        if (flag) {
-            if (xLong) {
-                if ((v && yScale == 1) || (!v && xScale == -1)) {
-                    //就先竖，再横，再竖
-                    path.lineTo(outLinkLinePoint.x, outLinkLinePoint.y + offsetY / 2 * yScale);
-                    path.lineTo(inLinkLinePoint.x, inLinkLinePoint.y - offsetY / 2 * yScale);
-                } else {
-                    //就先横，再斜，再横
-                    path.lineTo(outLinkLinePoint.x + linkLineLen * xScale, outLinkLinePoint.y);
-                    path.lineTo(inLinkLinePoint.x - linkLineLen * xScale, inLinkLinePoint.y);
-                }
-            } else {
-                if ((v && yScale == 1) || (!v && xScale == -1)) {
-                    //就先竖，再斜，再竖
-                    path.lineTo(outLinkLinePoint.x, outLinkLinePoint.y + linkLineLen * yScale);
-                    path.lineTo(inLinkLinePoint.x, inLinkLinePoint.y - linkLineLen * yScale);
-                } else {
-                    //就先横，再竖，再横
-                    path.lineTo(outLinkLinePoint.x + offsetX / 2 * xScale, outLinkLinePoint.y);
-                    path.lineTo(inLinkLinePoint.x - offsetX / 2 * xScale, inLinkLinePoint.y);
-                }
-            }
-        }
-
-        path.lineTo(inLinkLinePoint.x, inLinkLinePoint.y);
-        path.lineTo(inLocation[0], inLocation[1]);
-
+        path = CardLayoutUtils.calculateLinePath(outLocation, inLocation, v, getScaleGridSize());
         path.offset(-location[0] - getX(), -location[1] - getY());
-
         return path;
     }
 
@@ -659,12 +551,10 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         cards.forEach(this::removeSelectedCard);
     }
 
-    private boolean removeSelectedCard(ActionCard<?> card) {
+    private void removeSelectedCard(ActionCard<?> card) {
         if (selectedCards.remove(card)) {
             card.setSelected(false);
-            return true;
         }
-        return false;
     }
 
     private void addSelectedCard(ActionCard<?> card) {

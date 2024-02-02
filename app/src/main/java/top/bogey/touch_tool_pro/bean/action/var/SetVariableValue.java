@@ -25,6 +25,11 @@ public class SetVariableValue extends NormalAction {
         valuePin = addPin(tmpPins.remove(0));
     }
 
+    @Override
+    public String getTitle() {
+        return varKey;
+    }
+
     public String getVarKey() {
         return varKey;
     }

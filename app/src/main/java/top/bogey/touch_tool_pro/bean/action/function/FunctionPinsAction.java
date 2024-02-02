@@ -29,4 +29,9 @@ public class FunctionPinsAction extends Action {
             break;
         }
     }
+
+    @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
 }

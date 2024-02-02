@@ -75,4 +75,10 @@ public abstract class FunctionInnerAction extends Action implements ActionListen
         if (pins != null && !pins.isEmpty()) return pins.get(0);
         return null;
     }
+
+    @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
 }

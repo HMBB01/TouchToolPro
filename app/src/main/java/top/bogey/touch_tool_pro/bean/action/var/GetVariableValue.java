@@ -30,6 +30,11 @@ public class GetVariableValue extends Action {
 
     }
 
+    @Override
+    public String getTitle() {
+        return varKey;
+    }
+
     public String getVarKey() {
         return varKey;
     }
