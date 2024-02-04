@@ -710,10 +710,10 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
             }
 
             case MotionEvent.ACTION_MOVE -> {
-                longTouchHandler.removeCallbacksAndMessages(null);
                 if (Math.abs(x - startX) * Math.abs(y - startY) > 81) touchMoved = true;
 
                 if (touchMoved) {
+                    longTouchHandler.removeCallbacksAndMessages(null);
                     switch (touchState) {
                         case TOUCH_BACKGROUND -> touchState = TOUCH_DRAG_BACKGROUND;
                         case TOUCH_CARD -> {
