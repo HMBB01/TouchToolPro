@@ -120,6 +120,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
     private boolean includeBackground = true;
     private boolean needDelete = false;
+    private boolean touchMoved = false;
 
 
     public CardLayoutView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -673,6 +674,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                 startX = x;
                 startY = y;
                 touchState = TOUCH_BACKGROUND;
+                touchMoved = false;
                 if (editMode) {
                     ActionCard<?> card = getCardInPos(x, y);
                     if (card != null) {
@@ -709,31 +711,35 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
             case MotionEvent.ACTION_MOVE -> {
                 longTouchHandler.removeCallbacksAndMessages(null);
-                switch (touchState) {
-                    case TOUCH_BACKGROUND -> touchState = TOUCH_DRAG_BACKGROUND;
-                    case TOUCH_CARD -> {
-                        touchState = TOUCH_DRAG_CARD;
-                        if (!selectedCards.contains(touchedCard)) {
-                            cleanSelectedCards();
-                            addSelectedCard(touchedCard);
+                if (Math.abs(x - startX) * Math.abs(y - startY) > 81) touchMoved = true;
+
+                if (touchMoved) {
+                    switch (touchState) {
+                        case TOUCH_BACKGROUND -> touchState = TOUCH_DRAG_BACKGROUND;
+                        case TOUCH_CARD -> {
+                            touchState = TOUCH_DRAG_CARD;
+                            if (!selectedCards.contains(touchedCard)) {
+                                cleanSelectedCards();
+                                addSelectedCard(touchedCard);
+                            }
                         }
-                    }
-                    case TOUCH_PIN -> {
-                        touchState = TOUCH_DRAG_PIN;
-                        dragLinks.clear();
-                        Pin pin = touchedPinView.getPin();
-                        HashMap<String, String> links = pin.getLinks();
-                        // 数量为0 或者 是输出针脚且可以多输出，从这个点出线。进线要么连接，要么断开，没有只断开一个连接的方式
-                        if (links.isEmpty() || (!pin.isSingleLink() && pin.isOut())) {
-                            dragLinks.put(pin.getId(), pin.getActionId());
-                            dragOut = !pin.isOut();
-                            toLink = true;
-                        } else {
-                            // 否则就是挪线
-                            dragLinks.putAll(links);
-                            dragOut = pin.isOut();
-                            toLink = false;
-                            pin.cleanLinks(functionContext);
+                        case TOUCH_PIN -> {
+                            touchState = TOUCH_DRAG_PIN;
+                            dragLinks.clear();
+                            Pin pin = touchedPinView.getPin();
+                            HashMap<String, String> links = pin.getLinks();
+                            // 数量为0 或者 是输出针脚且可以多输出，从这个点出线。进线要么连接，要么断开，没有只断开一个连接的方式
+                            if (links.isEmpty() || (!pin.isSingleLink() && pin.isOut())) {
+                                dragLinks.put(pin.getId(), pin.getActionId());
+                                dragOut = !pin.isOut();
+                                toLink = true;
+                            } else {
+                                // 否则就是挪线
+                                dragLinks.putAll(links);
+                                dragOut = pin.isOut();
+                                toLink = false;
+                                pin.cleanLinks(functionContext);
+                            }
                         }
                     }
                 }
