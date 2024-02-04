@@ -15,6 +15,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -63,17 +64,23 @@ import top.bogey.touch_tool_pro.ui.blueprint.pin.PinView;
 import top.bogey.touch_tool_pro.utils.DisplayUtils;
 
 public class CardLayoutView extends FrameLayout implements TaskSaveChangedListener, FunctionSaveChangedListener, VariableSaveChangedListener {
-    private static final int DRAG_NONE = 0;
-    private static final int DRAG_SELF = 1;
-    private static final int DRAG_CARD = 2;
-    private static final int DRAG_MULTI_CARD = 3;
-    private static final int DRAG_PIN = 4;
-    private static final int DRAG_SCALE = 5;
-    private static final int DRAG_SELECT_CARD = 6;
+    private static final int TOUCH_NONE = 0;
+    private static final int TOUCH_BACKGROUND = 1;
+    private static final int TOUCH_CARD = 2;
+    private static final int TOUCH_PIN = 3;
+
+    private static final int TOUCH_SCALE = 4;
+    private static final int TOUCH_SELECT_AREA = 5;
+
+    private static final int TOUCH_DRAG_BACKGROUND = 6;
+    private static final int TOUCH_DRAG_CARD = 7;
+    private static final int TOUCH_DRAG_PIN = 8;
 
     private static final long LONG_TOUCH_TIME = 500L;
 
+
     private final CardMultiSelectMenuBinding binding;
+    private final Handler longTouchHandler;
 
     private final float gridSize;
     private final Paint gridPaint;
@@ -87,16 +94,11 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     private FunctionContext functionContext;
     private final LinkedHashMap<String, ActionCard<?>> cardMap = new LinkedHashMap<>();
 
-    private int dragState = DRAG_NONE;
-
-    private ActionCard<?> dragCard = null;
-    private boolean dragOut;// 拖动的针脚是不是输出针脚
-
-    private PinView dragPin = null;
-    private PinView matchedPin = null;
-    private boolean isBreakLink = false;
+    private int touchState = TOUCH_NONE;
+    private ActionCard<?> touchedCard = null;
+    private PinView touchedPinView = null;
     private final HashMap<String, String> dragLinks = new HashMap<>();
-    private boolean isClick = false;
+    private boolean dragOut;// 拖动的针脚是不是输出针脚
 
     private RectF selectedArea;
     private final HashSet<ActionCard<?>> selectedCards = new HashSet<>();
@@ -105,7 +107,6 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     private float dragY = 0;
     private float startX = 0;
     private float startY = 0;
-    private long touchStartTime;
 
     private float offsetX = 0;
     private float offsetY = 0;
@@ -166,6 +167,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
         });
 
+        longTouchHandler = new Handler();
+
         gridSize = DisplayUtils.dp2px(context, 8);
 
         gridPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -183,13 +186,13 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         detector = new ScaleGestureDetector(context, new ScaleGestureDetector.OnScaleGestureListener() {
             @Override
             public boolean onScaleBegin(@NonNull ScaleGestureDetector detector) {
-                dragState = DRAG_SCALE;
+                touchState = TOUCH_SCALE;
                 return true;
             }
 
             @Override
             public void onScaleEnd(@NonNull ScaleGestureDetector detector) {
-                dragState = DRAG_NONE;
+                touchState = TOUCH_NONE;
             }
 
             @Override
@@ -299,7 +302,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         ActionCard<?> card = cardMap.remove(action.getId());
         if (card == null) return;
         for (Pin pin : action.getPins()) {
-            pinRemoveLinks(card.getPinViewById(pin.getId()));
+            pin.cleanLinks(functionContext);
         }
 
         removeView(card);
@@ -357,19 +360,19 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     }
 
     private void showSelectActionDialog() {
-        if (dragPin == null) return;
-        SelectActionDialog actionDialog = new SelectActionDialog(getContext(), this, dragPin.getPin().getPinClass(), dragOut);
+        if (touchedPinView == null) return;
+        SelectActionDialog actionDialog = new SelectActionDialog(getContext(), this, touchedPinView.getPin().getPinClass(), dragOut);
         if (actionDialog.isEmpty()) return;
         dialog = new MaterialAlertDialogBuilder(getContext())
                 .setView(actionDialog)
                 .setOnDismissListener(dialog -> {
                     this.dialog = null;
                     dragLinks.clear();
-                    dragCard = null;
-                    dragPin = null;
+                    touchedCard = null;
+                    touchedPinView = null;
                     dragX = location[0];
                     dragY = location[1];
-                    dragState = DRAG_NONE;
+                    touchState = TOUCH_NONE;
                     postInvalidate();
                 })
                 .show();
@@ -379,18 +382,16 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         if (dialog != null) dialog.dismiss();
     }
 
-    public boolean tryLinkDragPin(Action action) {
-        if (dragPin != null) {
-            Pin pin = action.getFirstPinByClass(dragPin.getPin().getPinClass(), dragOut);
+    public void tryLinkDragPin(Action action) {
+        if (touchedPinView != null) {
+            Pin pin = action.getFirstPinByClass(touchedPinView.getPin().getPinClass(), dragOut);
             if (pin != null) {
-                if (action instanceof ArrayAction arrayAction && dragPin.getPin().getValue() instanceof PinValueArray array) {
+                if (action instanceof ArrayAction arrayAction && touchedPinView.getPin().getValue() instanceof PinValueArray array) {
                     arrayAction.setValueType(functionContext, array.getPinType());
                 }
                 pin.addLinks(dragLinks, functionContext);
-                return true;
             }
         }
-        return false;
     }
 
     private float getScaleGridSize() {
@@ -512,30 +513,34 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         }
         linePaint.setColorFilter(null);
 
-        if (dragState == DRAG_PIN) {
+        // 拖动的连线
+        if (touchState == TOUCH_DRAG_PIN) {
+            PinView pinInDragPos = null;
+            ActionCard<?> cardInPos = getCardInPos(dragX, dragY);
+            if (cardInPos != null) {
+                pinInDragPos = cardInPos.getPinViewByPos(dragX - cardInPos.getX(), dragY - cardInPos.getY());
+            }
+
             for (Map.Entry<String, String> entry : dragLinks.entrySet()) {
                 ActionCard<?> card = cardMap.get(entry.getValue());
                 if (card == null) continue;
-                PinView pinBaseView = card.getPinViewById(entry.getKey());
-                if (pinBaseView == null) continue;
-                if (matchedPin != null &&
-                        (
-                                (isBreakLink && dragPin.getPin().isSameValueType(matchedPin.getPin())) ||
-                                        (!isBreakLink && dragPin.getPin().isCanLink(matchedPin.getPin()))
-                        )
-                ) {
-                    linePaint.setColor(dragPin.getPin().getValue().getPinColor(getContext()));
+                PinView pinView = card.getPinViewById(entry.getKey());
+                if (pinView == null) continue;
+
+                if (pinInDragPos != null && touchedPinView.getPin().isCanLink(pinInDragPos.getPin())) {
+                    linePaint.setColor(touchedPinView.getPin().getValue().getPinColor(getContext()));
                 } else {
                     linePaint.setColor(DisplayUtils.getAttrColor(getContext(), com.google.android.material.R.attr.colorPrimaryInverse, 0));
                 }
-                canvas.drawPath(calculateLinePath(pinBaseView), linePaint);
+                canvas.drawPath(calculateLinePath(pinView), linePaint);
             }
         }
 
         // 所有卡片
         super.dispatchDraw(canvas);
 
-        if (dragState == DRAG_SELECT_CARD) {
+        // 选框
+        if (touchState == TOUCH_SELECT_AREA) {
             DashPathEffect dashPathEffect = new DashPathEffect(new float[]{getScaleGridSize(), getScaleGridSize()}, 0);
             linePaint.setPathEffect(new ComposePathEffect(cornerPathEffect, dashPathEffect));
             linePaint.setStrokeWidth(4 * scale);
@@ -543,22 +548,22 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
             RectF rect = new RectF(selectedArea);
             rect.offset(-location[0], -location[1]);
             canvas.drawRect(rect, linePaint);
-        }
+        } else {
+            if (selectedCards.size() > 1) {
+                DashPathEffect dashPathEffect = new DashPathEffect(new float[]{getScaleGridSize(), getScaleGridSize()}, 0);
+                linePaint.setPathEffect(new ComposePathEffect(cornerPathEffect, dashPathEffect));
+                linePaint.setStrokeWidth(4 * scale);
+                linePaint.setColor(DisplayUtils.getAttrColor(getContext(), com.google.android.material.R.attr.colorPrimary, 0));
+                Rect rect = CardLayoutUtils.getCardsArea(selectedCards, scale);
+                rect.left -= getScaleGridSize();
+                rect.top -= getScaleGridSize();
+                rect.right += getScaleGridSize();
+                rect.bottom += getScaleGridSize();
+                canvas.drawRect(rect, linePaint);
 
-        if (dragState != DRAG_SELECT_CARD && selectedCards.size() > 1) {
-            DashPathEffect dashPathEffect = new DashPathEffect(new float[]{getScaleGridSize(), getScaleGridSize()}, 0);
-            linePaint.setPathEffect(new ComposePathEffect(cornerPathEffect, dashPathEffect));
-            linePaint.setStrokeWidth(4 * scale);
-            linePaint.setColor(DisplayUtils.getAttrColor(getContext(), com.google.android.material.R.attr.colorPrimary, 0));
-            Rect rect = CardLayoutUtils.getCardsArea(selectedCards, scale);
-            rect.left -= getScaleGridSize();
-            rect.top -= getScaleGridSize();
-            rect.right += getScaleGridSize();
-            rect.bottom += getScaleGridSize();
-            canvas.drawRect(rect, linePaint);
-
-            binding.getRoot().setX(rect.right);
-            binding.getRoot().setY(rect.top);
+                binding.getRoot().setX(rect.right);
+                binding.getRoot().setY(rect.top);
+            }
         }
     }
 
@@ -595,6 +600,22 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         return calculateLinePath(outLocation, inLocation, pinBaseView.getPin().isVertical());
     }
 
+    private ActionCard<?> getCardInPos(float x, float y) {
+        ArrayList<ActionCard<?>> cards = new ArrayList<>(cardMap.values());
+        cards.sort((o1, o2) -> indexOfChild(o1) - indexOfChild(o2));
+        for (ActionCard<?> card : cards) {
+            float cardX = card.getX();
+            float cardY = card.getY();
+            float cardWidth = card.getWidth() * scale;
+            float cardHeight = card.getHeight() * scale;
+            RectF rectF = new RectF(cardX, cardY, cardX + cardWidth, cardY + cardHeight);
+            if (rectF.contains(x, y)) {
+                return card;
+            }
+        }
+        return null;
+    }
+
     private void cleanSelectedCards() {
         HashSet<ActionCard<?>> cards = new HashSet<>(selectedCards);
         cards.forEach(this::removeSelectedCard);
@@ -615,200 +636,176 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         detector.onTouchEvent(event);
-        if (dragState == DRAG_SCALE) return true;
+        if (touchState == TOUCH_SCALE) return true;
 
-        float rawX = event.getRawX();
-        float rawY = event.getRawY();
+        float x = event.getX();
+        float y = event.getY();
+
         int actionMasked = event.getActionMasked();
-        if (actionMasked == MotionEvent.ACTION_DOWN) {
-            startX = rawX;
-            startY = rawY;
-            isClick = true;
-            touchStartTime = System.currentTimeMillis();
-            if (editMode) {
-                for (int i = getChildCount() - 1; i >= 0; i--) {
-                    View view = getChildAt(i);
-                    if (!(view instanceof ActionCard<?> card)) continue;
-                    int[] location = new int[2];
-                    card.getLocationOnScreen(location);
-                    if (new Rect(location[0], location[1], location[0] + (int) (card.getWidth() * scale), location[1] + (int) (card.getHeight() * scale)).contains((int) rawX, (int) rawY)) {
-                        dragState = DRAG_CARD;
-                        dragCard = card;
-                        PinView pinBaseView = card.getPinViewByPos(rawX, rawY);
-                        if (pinBaseView != null) {
-                            Pin pin = pinBaseView.getPin();
-                            dragState = DRAG_PIN;
-                            dragPin = pinBaseView;
-                            HashMap<String, String> links = pin.getLinks();
-                            // 数量为0 或者 是出线且可以出多条线，从这个点出线。进线要么连接，要么断开
-                            if (links.size() == 0 || (!pin.isSingleLink() && pin.isOut())) {
-                                dragLinks.put(pin.getId(), pin.getActionId());
-                                // 目标方向与自身相反
-                                dragOut = !pin.isOut();
-                                isBreakLink = false;
-                            } else {
-                                // 否则就是挪线
-                                dragLinks.putAll(links);
-                                dragOut = pin.isOut();
-                                isBreakLink = true;
-                                pinRemoveLinks(pinBaseView);
-                            }
+        switch (actionMasked) {
+            case MotionEvent.ACTION_DOWN -> {
+                startX = x;
+                startY = y;
+                touchState = TOUCH_BACKGROUND;
+                if (editMode) {
+                    ActionCard<?> card = getCardInPos(x, y);
+                    if (card != null) {
+                        touchState = TOUCH_CARD;
+                        touchedCard = card;
+                        touchedCard.bringToFront();
+
+                        PinView pinView = card.getPinViewByPos(x - card.getX(), y - card.getY());
+                        if (pinView != null) {
+                            touchState = TOUCH_PIN;
+                            touchedPinView = pinView;
+                        }
+                    }
+                }
+
+                switch (touchState) {
+                    case TOUCH_BACKGROUND -> longTouchHandler.postDelayed(() -> touchState = TOUCH_SELECT_AREA, LONG_TOUCH_TIME);
+
+                    case TOUCH_PIN -> longTouchHandler.postDelayed(() -> {
+                        Pin pin = touchedPinView.getPin();
+                        Pin linkedPin = pin.getLinkedPin(functionContext);
+                        if (linkedPin == null) return;
+                        Action action = functionContext.getActionById(linkedPin.getActionId());
+                        showCard(action.getX(), action.getY(), action.getClass());
+
+                        touchState = TOUCH_NONE;
+                    }, LONG_TOUCH_TIME);
+                }
+
+                dragX = x;
+                dragY = y;
+            }
+
+            case MotionEvent.ACTION_MOVE -> {
+                boolean moved = Math.abs(x - startX) * Math.abs(y - startY) > 81;
+                if (!moved) break;
+
+                longTouchHandler.removeCallbacksAndMessages(null);
+                switch (touchState) {
+                    case TOUCH_BACKGROUND -> touchState = TOUCH_DRAG_BACKGROUND;
+                    case TOUCH_CARD -> {
+                        touchState = TOUCH_DRAG_CARD;
+                        if (!selectedCards.contains(touchedCard)) {
+                            cleanSelectedCards();
+                            addSelectedCard(touchedCard);
+                        }
+                    }
+                    case TOUCH_PIN -> {
+                        touchState = TOUCH_DRAG_PIN;
+                        dragLinks.clear();
+                        Pin pin = touchedPinView.getPin();
+                        HashMap<String, String> links = pin.getLinks();
+                        // 数量为0 或者 是输出针脚且可以多输出，从这个点出线。进线要么连接，要么断开，没有只断开一个连接的方式
+                        if (links.isEmpty() || (!pin.isSingleLink() && pin.isOut())) {
+                            dragLinks.put(pin.getId(), pin.getActionId());
+                            dragOut = !pin.isOut();
                         } else {
-                            dragCard.bringToFront();
+                            // 否则就是挪线
+                            dragLinks.putAll(links);
+                            dragOut = pin.isOut();
+                            pin.cleanLinks(functionContext);
                         }
-                        dragX = rawX;
-                        dragY = rawY;
-                        break;
                     }
                 }
-            }
 
-            if (dragState == DRAG_NONE) {
-                dragState = DRAG_SELF;
-                dragX = rawX;
-                dragY = rawY;
-            } else if (dragState == DRAG_CARD) {
-                if (selectedCards.contains(dragCard)) {
-                    dragState = DRAG_MULTI_CARD;
-                } else {
-                    cleanSelectedCards();
-                    addSelectedCard(dragCard);
-                }
-            }
-        } else if (actionMasked == MotionEvent.ACTION_UP) {
-            if (dragState == DRAG_PIN) {
-                if (isClick) {
-                    if (dragPin != null) {
-                        pinRemoveLinks(dragPin);
+                switch (touchState) {
+                    case TOUCH_DRAG_BACKGROUND -> {
+                        offsetX += (x - dragX);
+                        offsetY += (y - dragY);
+                        dragX = x;
+                        dragY = y;
+                        setCardsPosition();
                     }
-                } else {
-                    boolean flag = true;
-                    ActionCard<?> selectCard = null;
-                    // 看是否放到针脚上了
-                    for (ActionCard<?> baseCard : cardMap.values()) {
-                        int[] location = new int[2];
-                        baseCard.getLocationOnScreen(location);
-                        if (new Rect(location[0], location[1], location[0] + (int) (baseCard.getWidth() * scale), location[1] + (int) (baseCard.getHeight() * scale)).contains((int) rawX, (int) rawY)) {
-                            if (selectCard == null) selectCard = baseCard;
 
-                            PinView pinBaseView = baseCard.getPinViewByPos(rawX, rawY);
-                            if (pinBaseView == null) continue;
-                            if (pinAddLinks(pinBaseView, dragLinks)) {
-                                flag = false;
-                                break;
+                    case TOUCH_SELECT_AREA -> {
+                        cleanSelectedCards();
+                        selectedArea = new RectF(startX, startY, x, y);
+                        selectedArea.sort();
+                        cardMap.forEach((id, card) -> {
+                            float cardX = card.getX();
+                            float cardY = card.getY();
+                            float cardWidth = card.getWidth() * scale;
+                            float cardHeight = card.getHeight() * scale;
+                            RectF rectF = new RectF(cardX, cardY, cardX + cardWidth, cardY + cardHeight);
+                            if (RectF.intersects(selectedArea, rectF)) {
+                                addSelectedCard(card);
                             }
+                        });
+                    }
+
+                    case TOUCH_DRAG_CARD -> {
+                        float scaleGridSize = getScaleGridSize();
+                        int dx = (int) ((x - dragX) / scaleGridSize);
+                        int dy = (int) ((y - dragY) / scaleGridSize);
+
+                        for (ActionCard<?> card : selectedCards) {
+                            Action action = card.getAction();
+                            if (dx != 0) action.setX(action.getX() + dx);
+                            if (dy != 0) action.setY(action.getY() + dy);
+                            setCardPosition(card);
                         }
+                        dragX += dx * scaleGridSize;
+                        dragY += dy * scaleGridSize;
                     }
 
-                    // 看是否能连接卡片
-                    if (flag && selectCard != null) {
-                        flag = !tryLinkDragPin(selectCard.getAction());
+                    case TOUCH_DRAG_PIN -> {
+                        float offset = gridSize * 4;
+                        float scaleGridSize = getScaleGridSize();
+                        if (x < offset) {
+                            offsetX += scaleGridSize;
+                        } else if (x > getWidth() - offset) {
+                            offsetX -= scaleGridSize;
+                        }
+                        if (y < offset) {
+                            offsetY += scaleGridSize;
+                        } else if (y > getHeight() - offset) {
+                            offsetY -= scaleGridSize;
+                        }
+                        dragX = x;
+                        dragY = y;
+                        setCardsPosition();
                     }
-
-                    // 无效的拖动，尝试弹出能连接这个拖动针脚的所有动作
-                    if (flag && dragPin != null && !isBreakLink) {
-                        showSelectActionDialog();
-                        postInvalidate();
-                        return true;
-                    }
-                }
-            } else if (dragState == DRAG_SELF) {
-                if (isClick) {
-                    cleanSelectedCards();
                 }
             }
 
-            binding.getRoot().setVisibility(selectedCards.size() > 1 ? VISIBLE : GONE);
+            case MotionEvent.ACTION_UP -> {
+                longTouchHandler.removeCallbacksAndMessages(null);
+                switch (touchState) {
+                    case TOUCH_BACKGROUND -> cleanSelectedCards();
 
-            dragLinks.clear();
-            dragCard = null;
-            dragPin = null;
-            dragX = location[0];
-            dragY = location[1];
-            dragState = DRAG_NONE;
-        } else if (actionMasked == MotionEvent.ACTION_MOVE) {
-            if (Math.abs(rawX - startX) * Math.abs(rawY - startY) > 81) {
-                isClick = false;
-            }
-            if (isClick && dragState == DRAG_SELF) {
-                if (System.currentTimeMillis() - touchStartTime > LONG_TOUCH_TIME) {
-                    dragState = DRAG_SELECT_CARD;
-                }
-            }
-
-            if (dragState == DRAG_CARD) {
-                float scaleGridSize = getScaleGridSize();
-                Action action = dragCard.getAction();
-                int dx = (int) ((rawX - dragX) / scaleGridSize);
-                if (dx != 0) {
-                    action.setX(action.getX() + dx);
-                    dragX += dx * scaleGridSize;
-                }
-                int dy = (int) ((rawY - dragY) / scaleGridSize);
-                if (dy != 0) {
-                    action.setY(action.getY() + dy);
-                    dragY += dy * scaleGridSize;
-                }
-                setCardPosition(dragCard);
-            } else if (dragState == DRAG_MULTI_CARD) {
-                float scaleGridSize = getScaleGridSize();
-                int dx = (int) ((rawX - dragX) / scaleGridSize);
-                int dy = (int) ((rawY - dragY) / scaleGridSize);
-
-                for (ActionCard<?> card : selectedCards) {
-                    Action action = card.getAction();
-                    if (dx != 0) action.setX(action.getX() + dx);
-                    if (dy != 0) action.setY(action.getY() + dy);
-                    setCardPosition(card);
-                }
-                dragX += dx * scaleGridSize;
-                dragY += dy * scaleGridSize;
-            } else if (dragState == DRAG_PIN) {
-                dragX = rawX;
-                dragY = rawY;
-                int width = getWidth();
-                int height = getHeight();
-                float offset = gridSize;
-                float areaSize = gridSize * 4;
-                if (rawX - location[0] < areaSize) {
-                    offsetX += offset;
-                } else if (rawX - location[0] > width - areaSize) {
-                    offsetX -= offset;
-                }
-                if (rawY - location[1] < areaSize) {
-                    offsetY += offset;
-                } else if (rawY - location[1] > height - areaSize) {
-                    offsetY -= offset;
-                }
-                setCardsPosition();
-
-                matchedPin = null;
-                for (ActionCard<?> baseCard : cardMap.values()) {
-                    int[] location = new int[2];
-                    baseCard.getLocationOnScreen(location);
-                    if (new Rect(location[0], location[1], location[0] + (int) (baseCard.getWidth() * scale), location[1] + (int) (baseCard.getHeight() * scale)).contains((int) rawX, (int) rawY)) {
-                        PinView pinBaseView = baseCard.getPinViewByPos(rawX, rawY);
-                        if (pinBaseView == null) continue;
-                        matchedPin = pinBaseView;
-                        break;
+                    case TOUCH_CARD -> {
+                        if (selectedCards.contains(touchedCard)) cleanSelectedCards();
+                        else addSelectedCard(touchedCard);
                     }
-                }
-            } else if (dragState == DRAG_SELF) {
-                offsetX += (rawX - dragX);
-                offsetY += (rawY - dragY);
-                dragX = rawX;
-                dragY = rawY;
-                setCardsPosition();
-            } else if (dragState == DRAG_SELECT_CARD) {
-                cleanSelectedCards();
-                selectedArea = new RectF(startX, startY, rawX, rawY);
-                selectedArea.sort();
-                for (ActionCard<?> baseCard : cardMap.values()) {
-                    int[] location = new int[2];
-                    baseCard.getLocationOnScreen(location);
-                    Rect rect = new Rect(location[0], location[1], location[0] + (int) (baseCard.getWidth() * scale), location[1] + (int) (baseCard.getHeight() * scale));
-                    if (RectF.intersects(selectedArea, new RectF(rect))) {
-                        addSelectedCard(baseCard);
+
+                    case TOUCH_PIN -> {
+                        Pin pin = touchedPinView.getPin();
+                        pin.cleanLinks(functionContext);
+                    }
+                    case TOUCH_DRAG_PIN -> {
+                        ActionCard<?> card = getCardInPos(x, y);
+                        if (card != null) {
+                            boolean next = true;
+                            // 看是否放到卡片针脚上了
+                            PinView pinView = card.getPinViewByPos(x - card.getX(), y - card.getY());
+                            if (pinView != null) {
+                                Pin pin = pinView.getPin();
+                                if (pin.addLinks(dragLinks, functionContext)) {
+                                    next = false;
+                                }
+                            }
+
+                            // 没放到针脚上，尝试直接连接卡片对应针脚
+                            if (next) tryLinkDragPin(card.getAction());
+
+                        } else {
+                            // 放到空白处了
+                            showSelectActionDialog();
+                        }
                     }
                 }
             }
@@ -889,16 +886,6 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         SaveRepository.getInstance().removeFunctionListener(this);
         SaveRepository.getInstance().removeVariableListener(this);
         super.onDetachedFromWindow();
-    }
-
-    private boolean pinAddLinks(PinView pinBaseView, HashMap<String, String> links) {
-        Pin pin = pinBaseView.getPin();
-        return pin.addLinks(links, functionContext);
-    }
-
-    private void pinRemoveLinks(PinView pinBaseView) {
-        Pin pin = pinBaseView.getPin();
-        pin.cleanLinks(functionContext);
     }
 
     public FunctionContext getFunctionContext() {

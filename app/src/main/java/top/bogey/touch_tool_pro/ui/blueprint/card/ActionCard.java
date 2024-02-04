@@ -2,8 +2,10 @@ package top.bogey.touch_tool_pro.ui.blueprint.card;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Rect;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -228,29 +230,41 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
         return pinViews.get(id);
     }
 
-    public PinView getPinViewByPos(float rawX, float rawY) {
+    public PinView getPinViewByPos(float x, float y) {
+        float scale = getScaleX();
         for (Map.Entry<String, PinView> entry : pinViews.entrySet()) {
             PinView pinView = entry.getValue();
             // 跳过隐藏的针脚
             if (pinView.getVisibility() != VISIBLE) continue;
             // 跳过添加针脚
             if (pinView.getPin().isSameValueType(PinAdd.class)) continue;
+
             boolean vertical = pinView.getPin().isVertical();
             boolean out = pinView.getPin().isOut();
-            int[] location = new int[2];
-            pinView.getLocationOnScreen(location);
-            int width = (int) (pinView.getWidth() * getScaleX());
-            int height = (int) (pinView.getHeight() * getScaleY());
+
+            PointF pos = getPinViewPosInCard(pinView);
+            int width = (int) (pinView.getWidth() * scale);
+            int height = (int) (pinView.getHeight() * scale);
             if (!vertical) {
-                int offset = (int) DisplayUtils.dp2px(getContext(), 32);
-                if (out) location[0] = location[0] + width - offset;
+                int offset = (int) DisplayUtils.dp2px(getContext(), 32 * scale);
+                if (out) pos.x = pos.x + width - offset;
                 width = offset;
             }
-            if (new Rect(location[0], location[1], location[0] + width, location[1] + height).contains((int) rawX, (int) rawY)) {
+            if (new RectF(pos.x, pos.y, pos.x + width, pos.y + height).contains(x, y)) {
                 return pinView;
             }
         }
         return null;
+    }
+
+    private PointF getPinViewPosInCard(PinView pinView) {
+        View parent = (View) pinView.getParent();
+        PointF point = new PointF(pinView.getX(), pinView.getY());
+        while (parent != binding.getRoot()) {
+            point.offset(parent.getX(), parent.getY());
+            parent = (View) parent.getParent();
+        }
+        return point;
     }
 
     public void refreshPinView() {
