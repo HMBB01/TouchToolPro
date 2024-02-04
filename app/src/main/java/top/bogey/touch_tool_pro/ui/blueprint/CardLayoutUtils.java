@@ -13,7 +13,7 @@ import top.bogey.touch_tool_pro.utils.DisplayUtils;
 
 public class CardLayoutUtils {
 
-    public static Path calculateLinePath(int[] outLocation, int[] inLocation, boolean v, float gridSize) {
+    public static Path calculateLinePath(PointF outLocation, PointF inLocation, boolean v, float gridSize) {
         Path path = new Path();
         if (outLocation == null || inLocation == null) return path;
 
@@ -21,11 +21,11 @@ public class CardLayoutUtils {
         PointF inLinkLinePoint;
 
         if (v) {
-            outLinkLinePoint = new PointF(outLocation[0], outLocation[1] + gridSize);
-            inLinkLinePoint = new PointF(inLocation[0], inLocation[1] - gridSize);
+            outLinkLinePoint = new PointF(outLocation.x, outLocation.y + gridSize);
+            inLinkLinePoint = new PointF(inLocation.x, inLocation.y - gridSize);
         } else {
-            outLinkLinePoint = new PointF(outLocation[0] + gridSize, outLocation[1]);
-            inLinkLinePoint = new PointF(inLocation[0] - gridSize, inLocation[1]);
+            outLinkLinePoint = new PointF(outLocation.x + gridSize, outLocation.y);
+            inLinkLinePoint = new PointF(inLocation.x - gridSize, inLocation.y);
         }
 
         // 结束点在右边，为正方向
@@ -33,7 +33,7 @@ public class CardLayoutUtils {
         // 结束点在下边，为正方向
         int yScale = outLinkLinePoint.y < inLinkLinePoint.y ? 1 : -1;
 
-        path.moveTo(outLocation[0], outLocation[1]);
+        path.moveTo(outLocation.x, outLocation.y);
         path.lineTo(outLinkLinePoint.x, outLinkLinePoint.y);
 
         float offsetX = Math.abs(outLinkLinePoint.x - inLinkLinePoint.x);
@@ -112,7 +112,7 @@ public class CardLayoutUtils {
         }
 
         path.lineTo(inLinkLinePoint.x, inLinkLinePoint.y);
-        path.lineTo(inLocation[0], inLocation[1]);
+        path.lineTo(inLocation.x, inLocation.y);
 
         return path;
     }

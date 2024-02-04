@@ -7,10 +7,12 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.TypedValue;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.WindowManager;
 
 import java.util.ArrayList;
@@ -79,6 +81,17 @@ public class DisplayUtils {
 
     public static float dp2px(Context context, float dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
+    }
+
+    public static PointF getLocationInParentView(View parent, View view) {
+        PointF pointF = new PointF(view.getX(), view.getY());
+        ViewParent viewParent = view.getParent();
+        while (viewParent != null && viewParent != parent) {
+            View parentView = (View) viewParent;
+            pointF.offset(parentView.getX(), parentView.getY());
+            viewParent = viewParent.getParent();
+        }
+        return pointF;
     }
 
     public static int[] getHsvColor(Bitmap bitmap, int x, int y) {

@@ -1,6 +1,7 @@
 package top.bogey.touch_tool_pro.ui.blueprint.pin;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -56,7 +57,7 @@ public abstract class PinView extends FrameLayout implements PinListener {
 
     public abstract void refreshPinUI();
 
-    public abstract int[] getSlotLocationOnScreen(float scale);
+    public abstract PointF getSlotLocationInCard();
 
     public abstract ViewGroup getPinViewBox();
 

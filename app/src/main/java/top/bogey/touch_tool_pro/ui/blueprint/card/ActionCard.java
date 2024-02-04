@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -148,7 +147,7 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
 
     public void flick() {
         AlphaAnimation animation = new AlphaAnimation(1, .5f);
-        animation.setDuration(500);
+        animation.setDuration(200);
         animation.setRepeatCount(3);
         animation.setRepeatMode(Animation.REVERSE);
         startAnimation(animation);
@@ -242,29 +241,21 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
             boolean vertical = pinView.getPin().isVertical();
             boolean out = pinView.getPin().isOut();
 
-            PointF pos = getPinViewPosInCard(pinView);
-            int width = (int) (pinView.getWidth() * scale);
-            int height = (int) (pinView.getHeight() * scale);
+            PointF pos = DisplayUtils.getLocationInParentView(binding.getRoot(), pinView);
+            float px = pos.x * scale;
+            float py = pos.y * scale;
+            float width = pinView.getWidth() * scale;
+            float height = pinView.getHeight() * scale;
             if (!vertical) {
-                int offset = (int) DisplayUtils.dp2px(getContext(), 32 * scale);
-                if (out) pos.x = pos.x + width - offset;
+                float offset = DisplayUtils.dp2px(getContext(), 32 * scale);
+                if (out) px = px + width - offset;
                 width = offset;
             }
-            if (new RectF(pos.x, pos.y, pos.x + width, pos.y + height).contains(x, y)) {
+            if (new RectF(px, py, px + width, py + height).contains(x, y)) {
                 return pinView;
             }
         }
         return null;
-    }
-
-    private PointF getPinViewPosInCard(PinView pinView) {
-        View parent = (View) pinView.getParent();
-        PointF point = new PointF(pinView.getX(), pinView.getY());
-        while (parent != binding.getRoot()) {
-            point.offset(parent.getX(), parent.getY());
-            parent = (View) parent.getParent();
-        }
-        return point;
     }
 
     public void refreshPinView() {

@@ -2,6 +2,7 @@ package top.bogey.touch_tool_pro.ui.blueprint.pin;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.PointF;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -35,10 +36,11 @@ public class PinTopView extends PinView {
     }
 
     @Override
-    public int[] getSlotLocationOnScreen(float scale) {
-        int[] location = new int[2];
-        binding.pinSlot.getLocationOnScreen(location);
-        location[0] += (binding.pinSlot.getWidth() * scale / 2);
+    public PointF getSlotLocationInCard() {
+        float scale = card.getScaleX();
+        PointF location = DisplayUtils.getLocationInParentView(card, binding.pinSlot);
+        location.x = (location.x + binding.pinSlot.getWidth() / 2f) * scale;
+        location.y = location.y * scale;
         return location;
     }
 
