@@ -130,6 +130,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
         binding = CardMultiSelectMenuBinding.inflate(LayoutInflater.from(context), this, true);
         binding.getRoot().setVisibility(GONE);
+        binding.getRoot().setPivotX(0);
+        binding.getRoot().setPivotY(0);
         binding.deleteButton.setOnClickListener(v -> {
             if (needDelete) {
                 for (ActionCard<?> card : selectedCards) {
@@ -211,6 +213,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                 offsetY += focusY * v;
 
                 setCardsPosition();
+                binding.getRoot().setScaleX(scale);
+                binding.getRoot().setScaleY(scale);
                 postInvalidate();
                 return true;
             }
@@ -475,7 +479,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
         if (includeBackground) drawBackground(canvas, offsetX, offsetY);
-        CornerPathEffect cornerPathEffect = new CornerPathEffect(getScaleGridSize() / 2);
+        float scaleGridSize = getScaleGridSize();
+        CornerPathEffect cornerPathEffect = new CornerPathEffect(scaleGridSize);
         linePaint.setPathEffect(cornerPathEffect);
 
         // 所有连接的线
@@ -559,7 +564,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
         // 选框
         if (touchState == TOUCH_SELECT_AREA) {
-            DashPathEffect dashPathEffect = new DashPathEffect(new float[]{getScaleGridSize(), getScaleGridSize()}, 0);
+            DashPathEffect dashPathEffect = new DashPathEffect(new float[]{scaleGridSize, scaleGridSize}, 0);
             linePaint.setPathEffect(new ComposePathEffect(cornerPathEffect, dashPathEffect));
             linePaint.setStrokeWidth(4 * scale);
             linePaint.setColor(DisplayUtils.getAttrColor(getContext(), com.google.android.material.R.attr.colorPrimary, 0));
@@ -567,18 +572,18 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
             canvas.drawRect(rect, linePaint);
         } else {
             if (selectedCards.size() > 1) {
-                DashPathEffect dashPathEffect = new DashPathEffect(new float[]{getScaleGridSize(), getScaleGridSize()}, 0);
+                DashPathEffect dashPathEffect = new DashPathEffect(new float[]{scaleGridSize, scaleGridSize}, 0);
                 linePaint.setPathEffect(new ComposePathEffect(cornerPathEffect, dashPathEffect));
                 linePaint.setStrokeWidth(4 * scale);
                 linePaint.setColor(DisplayUtils.getAttrColor(getContext(), com.google.android.material.R.attr.colorPrimary, 0));
                 Rect rect = CardLayoutUtils.getCardsArea(selectedCards, scale);
-                rect.left -= getScaleGridSize();
-                rect.top -= getScaleGridSize();
-                rect.right += getScaleGridSize();
-                rect.bottom += getScaleGridSize();
+                rect.left -= scaleGridSize;
+                rect.top -= scaleGridSize;
+                rect.right += scaleGridSize;
+                rect.bottom += scaleGridSize;
                 canvas.drawRect(rect, linePaint);
 
-                binding.getRoot().setX(rect.right);
+                binding.getRoot().setX(rect.right + scaleGridSize / 2);
                 binding.getRoot().setY(rect.top);
             }
         }
