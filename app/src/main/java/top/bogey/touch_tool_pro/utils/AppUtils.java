@@ -357,6 +357,10 @@ public class AppUtils {
 
         try (OutputStream outputStream = new FileOutputStream(file)) {
             image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            intent.setData(Uri.fromFile(file));
+            context.sendBroadcast(intent);
         } catch (IOException e) {
             e.printStackTrace();
         }

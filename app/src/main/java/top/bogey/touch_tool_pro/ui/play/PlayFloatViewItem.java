@@ -133,7 +133,7 @@ public class PlayFloatViewItem extends FrameLayout implements TaskRunningListene
     }
 
     @Override
-    public void onProgress(TaskRunnable runnable, Action action, int progress) {
+    public void onProgress(TaskRunnable runnable, Action action, int progress, boolean execute) {
         playing = true;
         refreshProgress(progress);
     }

@@ -273,7 +273,7 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
         if (runnable.isInterrupt() || context.isEnd()) return;
         if (!pin.isOut()) return;
 
-        runnable.addProgress(this);
+        runnable.addProgress(this, true);
         Pin linkedPin = pin.getLinkedPin(context);
         if (linkedPin == null) return;
         Action action = context.getActionById(linkedPin.getActionId());
@@ -283,7 +283,6 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
 
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
-
     }
 
     @Override
@@ -300,6 +299,7 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
         if (pin.isOut()) {
             resetReturnValue(pin);
             calculate(runnable, context, pin);
+            runnable.addProgress(this, false);
             return pin.getValue();
         }
 
@@ -307,7 +307,11 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
             Pin linkedPin = pin.getLinkedPin(context);
             if (linkedPin != null) {
                 ActionExecuteInterface action = context.getActionById(linkedPin.getActionId());
-                if (action != null) return action.getPinValue(runnable, context, linkedPin);
+                if (action != null) {
+                    PinObject value = action.getPinValue(runnable, context, linkedPin);
+                    pin.setValue(value.copy());
+                    return value;
+                }
             }
         }
         return pin.getValue();

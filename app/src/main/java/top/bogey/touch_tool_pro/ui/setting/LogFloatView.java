@@ -25,6 +25,9 @@ import java.util.Set;
 import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.Action;
+import top.bogey.touch_tool_pro.bean.pin.Pin;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinObject;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.task.Task;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
 import top.bogey.touch_tool_pro.bean.task.TaskRunningListener;
@@ -75,6 +78,7 @@ public class LogFloatView extends FrameLayout implements FloatViewInterface, Tas
             refreshUI(false);
         });
 
+
         adapter = new LogRecyclerViewAdapter();
         binding.recyclerView.setAdapter(adapter);
 
@@ -119,6 +123,11 @@ public class LogFloatView extends FrameLayout implements FloatViewInterface, Tas
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
+        });
+
+        binding.deleteButton.setOnClickListener(v -> {
+            logs.remove(selectedTaskId);
+            adapter.addLogs(selectedTaskId, new ArrayList<>());
         });
 
         MainAccessibilityService service = MainApplication.getInstance().getService();
@@ -224,22 +233,21 @@ public class LogFloatView extends FrameLayout implements FloatViewInterface, Tas
     }
 
     @Override
-    public void onProgress(TaskRunnable runnable, Action action, int progress) {
+    public void onProgress(TaskRunnable runnable, Action action, int progress, boolean execute) {
+        Task task = runnable.getTask();
+        RuntimeLogInfo logInfo = new RuntimeLogInfo(progress, action.getFullDescription(), action, execute);
+
+        ArrayList<RuntimeLogInfo> logInfoList = logs.computeIfAbsent(task.getId(), k -> new ArrayList<>());
+        logInfoList.add(logInfo);
+        tasks.put(task.getId(), task.getTitle());
+
         post(() -> {
-            Task task = runnable.getTask();
-            RuntimeLogInfo logInfo = new RuntimeLogInfo(progress, action.getFullDescription(), action);
-
-            ArrayList<RuntimeLogInfo> logInfoList = logs.computeIfAbsent(task.getId(), k -> new ArrayList<>());
-            logInfoList.add(logInfo);
-            tasks.put(task.getId(), task.getTitle());
-
+            adapter.addLog(task.getId(), logInfo);
             arrayAdapter.clear();
             arrayAdapter.addAll(tasks.values());
             if (selectedTaskId == null || selectedTaskId.isEmpty()) {
                 binding.spinner.setSelection(0);
             }
-
-            adapter.addLog(task.getId(), logInfo);
         });
     }
 

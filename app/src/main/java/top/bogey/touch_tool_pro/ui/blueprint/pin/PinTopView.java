@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import top.bogey.touch_tool_pro.bean.pin.Pin;
+import top.bogey.touch_tool_pro.databinding.PinDebugValueBinding;
 import top.bogey.touch_tool_pro.databinding.PinTopBinding;
 import top.bogey.touch_tool_pro.ui.blueprint.card.ActionCard;
 import top.bogey.touch_tool_pro.utils.DisplayUtils;
@@ -47,6 +48,11 @@ public class PinTopView extends PinView {
     @Override
     public ViewGroup getPinViewBox() {
         return binding.pinBox;
+    }
+
+    @Override
+    public PinDebugValueBinding getDebugValueView() {
+        return null;
     }
 
 }

@@ -261,7 +261,7 @@ public class MainAccessibilityService extends AccessibilityService {
             }
 
             @Override
-            public void onProgress(TaskRunnable runnable, Action action, int progress) {
+            public void onProgress(TaskRunnable runnable, Action action, int progress, boolean execute) {
             }
         });
         listeners.stream().filter(Objects::nonNull).forEach(runnable::addListener);

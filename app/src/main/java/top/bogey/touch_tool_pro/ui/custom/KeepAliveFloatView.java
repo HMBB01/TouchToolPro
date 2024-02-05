@@ -85,7 +85,7 @@ public class KeepAliveFloatView extends FrameLayout implements FloatViewInterfac
     }
 
     @Override
-    public void onProgress(TaskRunnable runnable, Action action, int progress) {
+    public void onProgress(TaskRunnable runnable, Action action, int progress, boolean execute) {
 
     }
 

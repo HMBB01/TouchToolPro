@@ -75,7 +75,7 @@ public class ParallelAction extends NormalAction implements ActionMorePinInterfa
                 }
 
                 @Override
-                public void onProgress(TaskRunnable run, Action action, int progress) {
+                public void onProgress(TaskRunnable run, Action action, int progress, boolean execute) {
                     if (runnable.isInterrupt()) run.stop();
                 }
             });

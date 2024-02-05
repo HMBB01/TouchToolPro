@@ -188,6 +188,9 @@
     <string name="action_network_start_title">网络变更时执行</string>
     <string name="action_network_start_subtitle_network">网络</string>
 
+    <string name="action_screen_start_title">屏幕状态变更时执行</string>
+    <string name="action_screen_start_subtitle_screen">状态</string>
+
     <string name="action_battery_start_title">电池状态变更时执行</string>
     <string name="action_battery_start_subtitle_state">状态</string>
     <string name="action_battery_start_subtitle_battery">电量</string>

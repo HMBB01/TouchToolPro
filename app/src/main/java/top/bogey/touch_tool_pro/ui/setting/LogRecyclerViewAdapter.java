@@ -73,7 +73,7 @@ public class LogRecyclerViewAdapter extends RecyclerView.Adapter<LogRecyclerView
             binding.showButton.setOnClickListener(v -> {
                 int index = getBindingAdapterPosition();
                 RuntimeLogInfo logInfo = showLogs.get(index);
-                BlueprintView.tryShowCard(logInfo.getX(), logInfo.getY(), logInfo.getActionClass());
+                BlueprintView.tryShowCard(logInfo.getActionId(), logInfo.getValues());
             });
         }
 

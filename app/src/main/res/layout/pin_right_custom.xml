@@ -28,6 +28,10 @@
         android:popupBackground="@drawable/shape_spinner_background"
         android:spinnerMode="dropdown" />
 
+    <include
+        android:id="@+id/debugValue"
+        layout="@layout/pin_debug_value" />
+
     <FrameLayout
         android:id="@+id/pinBox"
         android:layout_width="0dp"

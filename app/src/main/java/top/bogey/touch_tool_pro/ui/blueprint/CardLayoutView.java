@@ -340,20 +340,13 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         }
     }
 
-    public void showCard(int x, int y, Class<? extends Action> actionClass) {
-        ActionCard<?> card = null;
-        for (Map.Entry<String, ActionCard<?>> entry : cardMap.entrySet()) {
-            ActionCard<?> actionCard = entry.getValue();
-            Action action = actionCard.getAction();
-            if (action.getX() == x && action.getY() == y && actionClass.isInstance(action)) {
-                card = actionCard;
-                break;
-            }
-        }
-        if (card == null) return;
+    public ActionCard<?> showCard(String actionId) {
+        ActionCard<?> card = cardMap.get(actionId);
+        if (card == null) return null;
 
-        float targetX = -x * getScaleGridSize() + (getWidth() - card.getWidth() * scale) / 2f;
-        float targetY = -y * getScaleGridSize() + (getHeight() - card.getHeight() * scale) / 2f;
+        Action action = card.getAction();
+        float targetX = -action.getX() * getScaleGridSize() + (getWidth() - card.getWidth() * scale) / 2f;
+        float targetY = -action.getY() * getScaleGridSize() + (getHeight() - card.getHeight() * scale) / 2f;
         ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
         animator.addUpdateListener(animation -> {
             float percent = (float) animation.getAnimatedValue();
@@ -362,14 +355,14 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
             setCardsPosition();
         });
 
-        ActionCard<?> finalCard = card;
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                finalCard.flick();
+                card.flick();
             }
         });
         animator.start();
+        return card;
     }
 
     private void showSelectActionDialog() {
@@ -699,7 +692,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                         Pin linkedPin = pin.getLinkedPin(functionContext);
                         if (linkedPin == null) return;
                         Action action = functionContext.getActionById(linkedPin.getActionId());
-                        showCard(action.getX(), action.getY(), action.getClass());
+                        showCard(action.getId());
 
                         touchState = TOUCH_NONE;
                     }, LONG_TOUCH_TIME);

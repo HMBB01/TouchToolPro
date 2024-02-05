@@ -25,6 +25,7 @@ import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinAdd;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinExecute;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.databinding.CardBaseBinding;
 import top.bogey.touch_tool_pro.save.SaveRepository;
 import top.bogey.touch_tool_pro.ui.blueprint.BlueprintView;
@@ -159,6 +160,13 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
         } else {
             setStrokeWidth(0);
         }
+    }
+
+    public void showDebugValue(HashMap<String, PinValue> values) {
+        pinViews.forEach((id, pinView) -> {
+            PinValue value = values.get(id);
+            pinView.setDebugValue(value);
+        });
     }
 
     protected void addPinView(Pin pin) {

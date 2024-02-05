@@ -100,6 +100,7 @@ import top.bogey.touch_tool_pro.bean.action.start.NetworkStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.NormalStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.NotifyStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.OuterStartAction;
+import top.bogey.touch_tool_pro.bean.action.start.ScreenStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.TimeStartAction;
 import top.bogey.touch_tool_pro.bean.action.string.ExistTextAction;
 import top.bogey.touch_tool_pro.bean.action.string.ExistTextOcrAction;
@@ -134,6 +135,7 @@ public enum ActionType {
     NOTIFY_START,
     NETWORK_START,
     BATTERY_START,
+    SCREEN_START,
     OUTER_START,
     NORMAL_START,
     INNER_START,
@@ -264,6 +266,7 @@ public enum ActionType {
     private final static ActionConfigInfo TIME_START_CONFIG = new ActionConfigInfo(R.string.action_time_start_title, R.drawable.icon_time, TimeStartAction.class);
     private final static ActionConfigInfo NOTIFY_START_CONFIG = new ActionConfigInfo(R.string.action_notification_start_title, R.drawable.icon_notification, NotifyStartAction.class);
     private final static ActionConfigInfo NETWORK_START_CONFIG = new ActionConfigInfo(R.string.action_network_start_title, R.drawable.icon_network, NetworkStartAction.class);
+    private final static ActionConfigInfo SCREEN_START_CONFIG = new ActionConfigInfo(R.string.action_screen_start_title, R.drawable.icon_screen, ScreenStartAction.class);
     private final static ActionConfigInfo BATTERY_START_CONFIG = new ActionConfigInfo(R.string.action_battery_start_title, R.drawable.icon_battery, BatteryStartAction.class);
     private final static ActionConfigInfo OUTER_START_CONFIG = new ActionConfigInfo(R.string.action_outer_start_title, R.drawable.icon_auto_start, OuterStartAction.class);
     private final static ActionConfigInfo NORMAL_START_CONFIG = new ActionConfigInfo(R.string.action_normal_start_title, 0, NormalStartAction.class);
@@ -397,6 +400,7 @@ public enum ActionType {
             case NOTIFY_START -> NOTIFY_START_CONFIG;
             case NETWORK_START -> NETWORK_START_CONFIG;
             case BATTERY_START -> BATTERY_START_CONFIG;
+            case SCREEN_START -> SCREEN_START_CONFIG;
             case OUTER_START -> OUTER_START_CONFIG;
             case NORMAL_START -> NORMAL_START_CONFIG;
 

@@ -30,6 +30,10 @@
         android:layout_marginHorizontal="4dp"
         android:minHeight="24dp" />
 
+    <include
+        android:id="@+id/debugValue"
+        layout="@layout/pin_debug_value" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/removeButton"
         style="@style/Theme.TouchTool.IconButton.Outlined"

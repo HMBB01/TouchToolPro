@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import com.amrdeveloper.treeview.TreeNodeManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 import top.bogey.touch_tool_pro.MainApplication;
@@ -29,10 +30,12 @@ import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinImage;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.task.Task;
 import top.bogey.touch_tool_pro.databinding.ViewBlueprintBinding;
 import top.bogey.touch_tool_pro.save.SaveRepository;
 import top.bogey.touch_tool_pro.ui.MainActivity;
+import top.bogey.touch_tool_pro.ui.blueprint.card.ActionCard;
 import top.bogey.touch_tool_pro.utils.AppUtils;
 import top.bogey.touch_tool_pro.utils.SettingSave;
 
@@ -41,6 +44,8 @@ public class BlueprintView extends Fragment {
     private ViewBlueprintBinding binding;
     private ActionSideSheetDialog dialog;
     private Task task;
+
+    private ActionCard<?> showCard = null;
 
     public static void tryPushActionContext(FunctionContext functionContext) {
         MainActivity activity = MainApplication.getInstance().getMainActivity();
@@ -57,12 +62,18 @@ public class BlueprintView extends Fragment {
         }
     };
 
-    public static void tryShowCard(int x, int y, Class<? extends Action> actionClass) {
+    public static void tryShowCard(String actionId, HashMap<String, PinValue> values) {
         MainActivity activity = MainApplication.getInstance().getMainActivity();
         if (activity == null) return;
         BlueprintView currFragment = activity.getCurrFragment(BlueprintView.class);
         if (currFragment == null) return;
-        currFragment.binding.cardLayout.showCard(x, y, actionClass);
+        if (currFragment.showCard != null) {
+            currFragment.showCard.showDebugValue(new HashMap<>());
+        }
+        currFragment.showCard = currFragment.binding.cardLayout.showCard(actionId);
+        if (currFragment.showCard != null) {
+            currFragment.showCard.showDebugValue(values);
+        }
     }
 
     private final MenuProvider menuProvider = new MenuProvider() {

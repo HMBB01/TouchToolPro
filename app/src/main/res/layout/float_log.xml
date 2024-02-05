@@ -69,7 +69,7 @@
             android:layout_marginTop="28dp"
             android:layout_marginBottom="8dp"
             app:cardBackgroundColor="?attr/colorSurface"
-            app:layout_constraintBottom_toTopOf="@+id/spinner"
+            app:layout_constraintBottom_toTopOf="@+id/taskSpinner"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -85,20 +85,41 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <Spinner
-            android:id="@+id/spinner"
+        <LinearLayout
+            android:id="@+id/taskSpinner"
             android:layout_width="match_parent"
             android:layout_height="24dp"
-            android:layout_gravity="center_vertical"
             android:layout_marginHorizontal="8dp"
             android:layout_marginBottom="8dp"
-            android:background="@drawable/shape_spinner"
-            android:dropDownWidth="wrap_content"
-            android:popupBackground="@drawable/shape_spinner_background"
-            android:spinnerMode="dropdown"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@drawable/shape_spinner"
+                android:dropDownWidth="wrap_content"
+                android:popupBackground="@drawable/shape_spinner_background"
+                android:spinnerMode="dropdown" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deleteButton"
+                style="@style/Theme.TouchTool.IconButton.Outlined"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:icon="@drawable/icon_delete"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </LinearLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

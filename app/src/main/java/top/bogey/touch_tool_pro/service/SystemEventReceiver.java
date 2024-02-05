@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 
 import top.bogey.touch_tool_pro.bean.action.start.InnerStartAction;
+import top.bogey.touch_tool_pro.bean.action.start.ScreenStartAction;
 import top.bogey.touch_tool_pro.utils.SettingSave;
 
 public class SystemEventReceiver extends BroadcastReceiver {
@@ -29,6 +30,7 @@ public class SystemEventReceiver extends BroadcastReceiver {
 
             case Intent.ACTION_SCREEN_ON, Intent.ACTION_SCREEN_OFF, Intent.ACTION_USER_PRESENT -> {
                 WorldState.getInstance().checkAutoStartAction(InnerStartAction.class);
+                WorldState.getInstance().checkAutoStartAction(ScreenStartAction.class);
                 WorldState.getInstance().showManualActionDialog(SettingSave.getInstance().isPlayViewVisible(context));
             }
 

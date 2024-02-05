@@ -1,6 +1,7 @@
 package top.bogey.touch_tool_pro.ui.blueprint.pin;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.PointF;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -17,9 +18,14 @@ import java.lang.reflect.InvocationTargetException;
 import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
 import top.bogey.touch_tool_pro.bean.pin.PinListener;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinColor;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinImage;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinObject;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
+import top.bogey.touch_tool_pro.databinding.PinDebugValueBinding;
 import top.bogey.touch_tool_pro.ui.blueprint.card.ActionCard;
 import top.bogey.touch_tool_pro.ui.blueprint.pin_widget.PinWidget;
+import top.bogey.touch_tool_pro.utils.DisplayUtils;
 
 public abstract class PinView extends FrameLayout implements PinListener {
     protected final ActionCard<?> card;
@@ -60,6 +66,28 @@ public abstract class PinView extends FrameLayout implements PinListener {
     public abstract PointF getSlotLocationInCard();
 
     public abstract ViewGroup getPinViewBox();
+
+    public abstract PinDebugValueBinding getDebugValueView();
+
+    public void setDebugValue(PinValue value) {
+        PinDebugValueBinding debugValueView = getDebugValueView();
+        if (debugValueView == null) return;
+        debugValueView.text.setVisibility(GONE);
+        debugValueView.image.setVisibility(GONE);
+        if (value == null) return;
+        if (value instanceof PinImage pinImage) {
+            debugValueView.image.setVisibility(VISIBLE);
+            debugValueView.image.setImageBitmap(pinImage.getImage(getContext()));
+            debugValueView.image.setImageTintList(null);
+        } else if (value instanceof PinColor pinColor) {
+            debugValueView.image.setVisibility(VISIBLE);
+            debugValueView.image.setImageBitmap(null);
+            debugValueView.image.setImageTintList(ColorStateList.valueOf(DisplayUtils.getColorFromHsv(pinColor.getColor())));
+        } else {
+            debugValueView.text.setVisibility(VISIBLE);
+            debugValueView.text.setText(value.toString());
+        }
+    }
 
     public void refreshPinView() {
         ViewGroup viewGroup = getPinViewBox();

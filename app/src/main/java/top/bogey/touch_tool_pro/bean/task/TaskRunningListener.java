@@ -7,5 +7,5 @@ public interface TaskRunningListener {
 
     void onEnd(TaskRunnable runnable);
 
-    void onProgress(TaskRunnable runnable, Action action, int progress);
+    void onProgress(TaskRunnable runnable, Action action, int progress, boolean execute);
 }

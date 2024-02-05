@@ -20,6 +20,7 @@ import top.bogey.touch_tool_pro.bean.pin.PinType;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinObject;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValueArray;
+import top.bogey.touch_tool_pro.databinding.PinDebugValueBinding;
 import top.bogey.touch_tool_pro.databinding.PinRightCustomBinding;
 import top.bogey.touch_tool_pro.ui.blueprint.card.ActionCard;
 import top.bogey.touch_tool_pro.utils.DisplayUtils;
@@ -104,5 +105,10 @@ public class PinRightCustomView extends PinCustomView {
     @Override
     public ViewGroup getPinViewBox() {
         return binding.pinBox;
+    }
+
+    @Override
+    public PinDebugValueBinding getDebugValueView() {
+        return binding.debugValue;
     }
 }

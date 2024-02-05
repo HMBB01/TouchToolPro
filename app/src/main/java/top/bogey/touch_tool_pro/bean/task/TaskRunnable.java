@@ -48,9 +48,9 @@ public class TaskRunnable implements Runnable {
         interrupt = true;
     }
 
-    public void addProgress(Action action) {
+    public void addProgress(Action action, boolean execute) {
         progress++;
-        listeners.stream().filter(Objects::nonNull).forEach(listener -> listener.onProgress(this, action, progress));
+        listeners.stream().filter(Objects::nonNull).forEach(listener -> listener.onProgress(this, action, progress, execute));
         checkStop();
     }
 

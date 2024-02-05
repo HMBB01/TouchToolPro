@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 
 import top.bogey.touch_tool_pro.bean.pin.Pin;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValueArray;
+import top.bogey.touch_tool_pro.databinding.PinDebugValueBinding;
 import top.bogey.touch_tool_pro.databinding.PinLeftBinding;
 import top.bogey.touch_tool_pro.ui.blueprint.card.ActionCard;
 import top.bogey.touch_tool_pro.utils.DisplayUtils;
@@ -62,6 +63,11 @@ public class PinLeftView extends PinView {
     @Override
     public ViewGroup getPinViewBox() {
         return binding.pinBox;
+    }
+
+    @Override
+    public PinDebugValueBinding getDebugValueView() {
+        return binding.debugValue;
     }
 
 }

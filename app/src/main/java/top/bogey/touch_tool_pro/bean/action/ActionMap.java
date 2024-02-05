@@ -42,6 +42,7 @@ public enum ActionMap {
                     ActionType.TIME_START,
                     ActionType.NOTIFY_START,
                     ActionType.NETWORK_START,
+                    ActionType.SCREEN_START,
                     ActionType.BATTERY_START,
                     ActionType.OUTER_START
             ));

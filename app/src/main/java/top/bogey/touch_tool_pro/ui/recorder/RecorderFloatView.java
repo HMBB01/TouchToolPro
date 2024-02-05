@@ -256,7 +256,7 @@ public class RecorderFloatView extends BasePickerFloatView {
                 }
 
                 @Override
-                public void onProgress(TaskRunnable runnable, Action action, int progress) {
+                public void onProgress(TaskRunnable runnable, Action action, int progress, boolean execute) {
 
                 }
             }), 100);
