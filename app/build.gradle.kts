@@ -38,7 +38,7 @@ android {
 
         ndk {
             //noinspection ChromeOsAbiSupport
-            abiFilters += "arm64-v8a"
+            abiFilters.add("arm64-v8a")
         }
     }
 
@@ -104,6 +104,4 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
-
-    implementation(platform(libs.kotlin.bom))
 }

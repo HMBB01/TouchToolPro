@@ -125,6 +125,8 @@
     <string name="function_record">录制自定义卡片</string>
     <string name="function_record_tips">请先点击开始录制按钮</string>
 
+    <string name="no_action_help_tips">该卡片介绍正在准备中😂</string>
+
 
     <!-- 变量界面相关 -->
     <string name="attribute_title">任务内变量</string>
@@ -159,8 +161,8 @@
     <string name="function_fast_end">结束时中止内部执行</string>
 
     <!-- 变量 -->
-    <string name="action_set_value_action_title">设置 </string>
-    <string name="action_get_value_action_title">获取 </string>
+    <string name="action_set_value_action_title">设置-</string>
+    <string name="action_get_value_action_title">获取-</string>
     <string name="action_set_common_value_action_title">设置全局变量值</string>
     <string name="action_get_common_value_action_title">获取全局变量值</string>
 

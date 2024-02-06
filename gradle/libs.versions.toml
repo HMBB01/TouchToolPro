@@ -13,8 +13,6 @@ gson = "2.10.1"
 mmkv = "1.3.2"
 shizuku = "13.1.5"
 
-kotlin = "1.9.22"
-
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -30,8 +28,6 @@ mmkv = { group = "com.tencent", name = "mmkv", version.ref = "mmkv" }
 
 shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku"}
 shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku"}
-
-kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlin" }
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }

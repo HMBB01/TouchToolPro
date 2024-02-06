@@ -139,6 +139,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                     removeAction(card.getAction());
                 }
                 selectedCards.clear();
+                binding.getRoot().setVisibility(GONE);
             } else {
                 binding.deleteButton.setChecked(true);
                 needDelete = true;
@@ -149,11 +150,41 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
             }
         });
 
+        // 多选的复制需要保持卡片连接，且复制后需要框选复制出来的卡片
         binding.copyButton.setOnClickListener(v -> {
-            for (ActionCard<?> card : selectedCards) {
-                Action copy = (Action) card.getAction().copy();
+            HashSet<ActionCard<?>> cards = new HashSet<>(selectedCards);
+            cleanSelectedCards();
+            HashMap<String, Action> copiedActions = new HashMap<>();
+            HashMap<String, Action> actionsMap = new HashMap<>();
+            for (ActionCard<?> card : cards) {
+                Action action = card.getAction();
+                actionsMap.put(action.getId(), action);
+                Action copy = (Action) action.copy();
                 copy.newInfo();
-                addAction(copy);
+                copiedActions.put(copy.getUid(), copy);
+                addSelectedCard(addAction(copy));
+            }
+
+            for (ActionCard<?> card : cards) {
+                Action action = card.getAction();
+                Action copiedAction = copiedActions.get(action.getUid());
+                if (copiedAction == null) continue;
+                action.getPins().forEach(pin -> {
+                    if (pin.getLinks().isEmpty()) return;
+                    Pin copiedPin = copiedAction.getPinByUid(pin.getUid());
+                    if (copiedPin == null) return;
+                    pin.getLinks().forEach((pinId, actionId) -> {
+                        Action linkedAction = actionsMap.get(actionId);
+                        if (linkedAction == null) return;
+                        Pin linkedPin = linkedAction.getPinById(pinId);
+                        if (linkedPin == null) return;
+                        Action toLinkCopiedAction = copiedActions.get(linkedAction.getUid());
+                        if (toLinkCopiedAction == null) return;
+                        Pin copiedToLinkPin = toLinkCopiedAction.getPinByUid(linkedPin.getUid());
+                        if (copiedToLinkPin == null) return;
+                        copiedPin.addLink(copiedToLinkPin);
+                    });
+                });
             }
         });
 
@@ -254,12 +285,13 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         return new ActionCard<>(getContext(), functionContext, action);
     }
 
-    public void addAction(Action action) {
+    public ActionCard<?> addAction(Action action) {
         functionContext.addAction(action);
         ActionCard<?> card = newCard(functionContext, action);
         setCardPosition(card);
         cardMap.put(action.getId(), card);
         addView(card);
+        return card;
     }
 
     public void addAction(Class<? extends Action> actionClass) {
@@ -474,7 +506,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
     protected void dispatchDraw(@NonNull Canvas canvas) {
         if (includeBackground) drawBackground(canvas, offsetX, offsetY);
         float scaleGridSize = getScaleGridSize();
-        CornerPathEffect cornerPathEffect = new CornerPathEffect(scaleGridSize);
+        CornerPathEffect cornerPathEffect = new CornerPathEffect(scaleGridSize / 3 * 2);
         linePaint.setPathEffect(cornerPathEffect);
 
         // 所有连接的线
@@ -619,7 +651,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
     private ActionCard<?> getCardInPos(float x, float y) {
         ArrayList<ActionCard<?>> cards = new ArrayList<>(cardMap.values());
-        cards.sort((o1, o2) -> indexOfChild(o1) - indexOfChild(o2));
+        cards.sort((o1, o2) -> indexOfChild(o2) - indexOfChild(o1));
         for (ActionCard<?> card : cards) {
             float cardX = card.getX();
             float cardY = card.getY();

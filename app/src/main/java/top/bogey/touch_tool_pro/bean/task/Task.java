@@ -29,6 +29,11 @@ public class Task extends FunctionContext {
         createTime = System.currentTimeMillis();
     }
 
+    public Task(FunctionType type) {
+        super(type);
+        createTime = System.currentTimeMillis();
+    }
+
     public Task(JsonObject jsonObject) {
         super(jsonObject);
         functions.addAll(GsonUtils.getAsObject(jsonObject, "functions", TypeToken.getParameterized(HashSet.class, FunctionContext.class).getType(), new HashSet<>()));

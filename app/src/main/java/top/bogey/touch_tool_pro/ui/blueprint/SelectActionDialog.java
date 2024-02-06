@@ -84,6 +84,7 @@ public class SelectActionDialog extends FrameLayout {
         }
 
         if (!customFunctions.isEmpty()) {
+            customFunctions.sort((o1, o2) -> collator.compare(((Function) o1).getTitle(), ((Function) o2).getTitle()));
             types.put(ActionMap.CUSTOM, customFunctions);
         }
 

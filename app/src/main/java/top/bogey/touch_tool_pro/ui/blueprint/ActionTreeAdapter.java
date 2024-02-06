@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -12,6 +13,7 @@ import com.amrdeveloper.treeview.TreeNode;
 import com.amrdeveloper.treeview.TreeNodeManager;
 import com.amrdeveloper.treeview.TreeViewAdapter;
 import com.amrdeveloper.treeview.TreeViewHolder;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
@@ -21,6 +23,8 @@ import top.bogey.touch_tool_pro.bean.action.ActionMap;
 import top.bogey.touch_tool_pro.bean.action.ActionType;
 import top.bogey.touch_tool_pro.bean.function.Function;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
+import top.bogey.touch_tool_pro.bean.task.TaskExample;
+import top.bogey.touch_tool_pro.databinding.DialogActionHelpBinding;
 import top.bogey.touch_tool_pro.databinding.ViewCardListItemBinding;
 import top.bogey.touch_tool_pro.databinding.ViewCardListTypeItemBinding;
 import top.bogey.touch_tool_pro.super_user.SuperUser;
@@ -77,7 +81,7 @@ public class ActionTreeAdapter extends TreeViewAdapter {
         updateTreeNodes(treeNodes);
     }
 
-    protected static class ViewHolder extends TreeViewHolder {
+    protected class ViewHolder extends TreeViewHolder {
         private final Context context;
         private ViewCardListTypeItemBinding typeBinding;
         private ViewCardListItemBinding itemBinding;
@@ -95,6 +99,28 @@ public class ActionTreeAdapter extends TreeViewAdapter {
             context = binding.getRoot().getContext();
             setNodePadding(0);
             itemBinding.icon.setVisibility(View.VISIBLE);
+
+            itemBinding.helpButton.setVisibility(View.VISIBLE);
+            itemBinding.helpButton.setOnClickListener(v -> {
+                int index = getBindingAdapterPosition();
+                TreeNode treeNode = manager.get(index);
+                ActionType type = (ActionType) treeNode.getValue();
+                ActionConfigInfo config = type.getConfig();
+                TaskExample example = config.getExample(context);
+                if (example == null) {
+                    Toast.makeText(context, R.string.no_action_help_tips, Toast.LENGTH_SHORT).show();
+                } else {
+                    DialogActionHelpBinding helpBinding = DialogActionHelpBinding.inflate(LayoutInflater.from(context), itemBinding.getRoot(), false);
+                    helpBinding.cardLayout.setFunctionContext(example);
+                    helpBinding.cardLayout.setEditMode(false);
+                    helpBinding.cardLayout.setMinimumHeight((int) (DisplayUtils.getScreen(context) * 0.75));
+                    helpBinding.des.setText(config.getDescription());
+                    new MaterialAlertDialogBuilder(context)
+                            .setTitle(config.getTitle())
+                            .setView(helpBinding.getRoot())
+                            .show();
+                }
+            });
         }
 
         public void refreshItem(TreeNode node) {
