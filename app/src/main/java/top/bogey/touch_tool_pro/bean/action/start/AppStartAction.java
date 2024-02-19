@@ -20,7 +20,7 @@ import top.bogey.touch_tool_pro.service.WorldState;
 public class AppStartAction extends StartAction {
     private transient Pin appPin = new Pin(new PinApplication(PinSubType.MULTI_ALL_ACTIVITY), R.string.pin_app);
     private transient Pin autoBreakPin = new Pin(new PinBoolean(true), R.string.action_app_start_subtitle_break);
-    private transient Pin startAppPin = new Pin(new PinApplication(), R.string.action_app_start_subtitle_info, true);
+    private transient Pin startAppPin = new Pin(new PinApplication(PinSubType.SINGLE_ACTIVITY), R.string.action_app_start_subtitle_info, true);
 
     public AppStartAction() {
         super(ActionType.ENTER_APP_START);
@@ -43,6 +43,7 @@ public class AppStartAction extends StartAction {
         String activityName = state.getActivityName();
 
         PinApplication startApp = startAppPin.getValue(PinApplication.class);
+        startApp.getApps().clear();
         startApp.getApps().put(packageName, new ArrayList<>(Collections.singleton(activityName)));
 
         super.execute(runnable, context, pin);

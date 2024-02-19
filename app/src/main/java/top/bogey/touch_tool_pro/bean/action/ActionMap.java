@@ -97,7 +97,8 @@ public enum ActionMap {
                     ActionType.CHECK_EXIST_IMAGE,
                     ActionType.CHECK_IMAGE,
                     ActionType.IMAGE_STATE,
-                    ActionType.IMAGE_SUB_IMAGE
+                    ActionType.IMAGE_SUB_IMAGE,
+                    ActionType.SAVE_IMAGE
             ));
 
             case NODE -> new ArrayList<>(Arrays.asList(

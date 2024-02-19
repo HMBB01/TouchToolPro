@@ -2,6 +2,7 @@ package top.bogey.touch_tool_pro.bean.action.start;
 
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import top.bogey.touch_tool_pro.MainApplication;
@@ -19,12 +20,14 @@ import top.bogey.touch_tool_pro.service.WorldState;
 public class NotifyStartAction extends StartAction {
     private transient Pin appPin = new Pin(new PinApplication(PinSubType.MULTI), R.string.pin_app);
     private transient Pin matchPin = new Pin(new PinString(".+"), R.string.action_notification_start_subtitle_text);
+    private transient Pin noticeAppPin = new Pin(new PinApplication(PinSubType.SINGLE), R.string.action_notification_start_subtitle_notice_app, true);
     private transient Pin noticePin = new Pin(new PinString(), R.string.action_notification_start_subtitle_notice, true);
 
     public NotifyStartAction() {
         super(ActionType.NOTIFY_START);
         appPin = addPin(appPin);
         matchPin = addPin(matchPin);
+        noticeAppPin = addPin(noticeAppPin);
         noticePin = addPin(noticePin);
     }
 
@@ -32,18 +35,19 @@ public class NotifyStartAction extends StartAction {
         super(jsonObject);
         appPin = reAddPin(appPin);
         matchPin = reAddPin(matchPin);
+        noticeAppPin = reAddPin(noticeAppPin);
         noticePin = reAddPin(noticePin);
-    }
-
-    @Override
-    public void resetReturnValue(Pin pin) {
-
     }
 
     @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         PinString notice = noticePin.getValue(PinString.class);
         notice.setValue(WorldState.getInstance().getNotificationText());
+
+        PinApplication app = noticeAppPin.getValue(PinApplication.class);
+        app.getApps().clear();
+        app.getApps().put(WorldState.getInstance().getNotificationPackage(), new ArrayList<>());
+
         super.execute(runnable, context, pin);
     }
 

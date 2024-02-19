@@ -27,7 +27,6 @@ import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.task.Task;
 import top.bogey.touch_tool_pro.databinding.DialogSelectActionBinding;
 import top.bogey.touch_tool_pro.save.SaveRepository;
-import top.bogey.touch_tool_pro.super_user.SuperUser;
 import top.bogey.touch_tool_pro.ui.blueprint.card.ActionCard;
 
 @SuppressLint("ViewConstructor")
@@ -92,7 +91,7 @@ public class SelectActionDialog extends FrameLayout {
         for (ActionMap actionMap : ActionMap.values()) {
             ArrayList<Object> actionTypes = new ArrayList<>();
             for (ActionType actionType : actionMap.getTypes()) {
-                if (!SuperUser.isSuperUser() && actionType.getConfig().isSuperAction()) continue;
+                if (!actionType.getConfig().isValid()) continue;
                 Action action = tmpActions.get(actionType);
                 if (action == null) continue;
                 if (matchAction(action, pinClass, out)) {

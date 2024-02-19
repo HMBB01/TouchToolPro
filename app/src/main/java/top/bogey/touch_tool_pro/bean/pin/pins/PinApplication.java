@@ -15,6 +15,7 @@ import java.util.Map;
 import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.pin.PinSubType;
 import top.bogey.touch_tool_pro.bean.pin.PinType;
+import top.bogey.touch_tool_pro.service.WorldState;
 import top.bogey.touch_tool_pro.utils.GsonUtils;
 
 public class PinApplication extends PinValue {
@@ -135,7 +136,35 @@ public class PinApplication extends PinValue {
     @NonNull
     @Override
     public String toString() {
-        return apps.toString();
+        switch (getSubType()) {
+            case SINGLE -> {
+                for (Map.Entry<String, ArrayList<String>> entry : apps.entrySet()) {
+                    String packageName = entry.getKey();
+                    return WorldState.getInstance().getAppName(packageName);
+                }
+            }
+            case SINGLE_ACTIVITY -> {
+                for (Map.Entry<String, ArrayList<String>> entry : apps.entrySet()) {
+                    String packageName = entry.getKey();
+                    ArrayList<String> activities = entry.getValue();
+                    if (activities.isEmpty()) return WorldState.getInstance().getAppName(packageName);
+                    String activityName = activities.get(0);
+                    return WorldState.getInstance().getAppName(packageName) + "(" + activityName + ")";
+                }
+            }
+            case MULTI -> {
+                ArrayList<String> names = new ArrayList<>();
+                for (Map.Entry<String, ArrayList<String>> entry : apps.entrySet()) {
+                    String packageName = entry.getKey();
+                    names.add(WorldState.getInstance().getAppName(packageName));
+                }
+                return names.toString();
+            }
+            default -> {
+                return apps.toString();
+            }
+        }
+        return "";
     }
 
     public LinkedHashMap<String, ArrayList<String>> getApps() {

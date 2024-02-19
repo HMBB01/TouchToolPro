@@ -1,5 +1,7 @@
 package top.bogey.touch_tool_pro.bean.action;
 
+import android.os.Build;
+
 import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.array.ArrayAddAction;
 import top.bogey.touch_tool_pro.bean.action.array.ArrayAppendAction;
@@ -27,6 +29,7 @@ import top.bogey.touch_tool_pro.bean.action.function.FunctionStartAction;
 import top.bogey.touch_tool_pro.bean.action.image.ExistImageAction;
 import top.bogey.touch_tool_pro.bean.action.image.ImageContainAction;
 import top.bogey.touch_tool_pro.bean.action.image.ImageStateAction;
+import top.bogey.touch_tool_pro.bean.action.image.SaveImageAction;
 import top.bogey.touch_tool_pro.bean.action.image.SubImageAction;
 import top.bogey.touch_tool_pro.bean.action.logic.ForLogicAction;
 import top.bogey.touch_tool_pro.bean.action.logic.IfLogicAction;
@@ -115,6 +118,7 @@ import top.bogey.touch_tool_pro.bean.action.var.GetCommonVariableValue;
 import top.bogey.touch_tool_pro.bean.action.var.GetLocalVariableValue;
 import top.bogey.touch_tool_pro.bean.action.var.SetCommonVariableValue;
 import top.bogey.touch_tool_pro.bean.action.var.SetLocalVariableValue;
+import top.bogey.touch_tool_pro.super_user.SuperUser;
 
 public enum ActionType {
     BASE,
@@ -184,6 +188,7 @@ public enum ActionType {
     CHECK_IMAGE,
     IMAGE_STATE,
     IMAGE_SUB_IMAGE,
+    SAVE_IMAGE,
 
     CHECK_EXIST_NODE,
     CHECK_EXIST_NODES,
@@ -261,17 +266,17 @@ public enum ActionType {
     private final static ActionConfigInfo COMMON_VAR_GET_CONFIG = new ActionConfigInfo(COMMON_VAR_GET, R.string.action_get_common_value_action_title, R.drawable.icon_get_value, GetCommonVariableValue.class);
     private final static ActionConfigInfo COMMON_VAR_SET_CONFIG = new ActionConfigInfo(COMMON_VAR_SET, R.string.action_set_common_value_action_title, R.drawable.icon_set_value, SetCommonVariableValue.class);
 
-    private final static ActionConfigInfo MANUAL_START_CONFIG = new ActionConfigInfo(MANUAL_START, R.string.action_manual_start_title, R.drawable.icon_hand, ManualStartAction.class);
-    private final static ActionConfigInfo ENTER_APP_START_CONFIG = new ActionConfigInfo(ENTER_APP_START, R.string.action_app_start_title, R.drawable.icon_package_info, AppStartAction.class);
-    private final static ActionConfigInfo TIME_START_CONFIG = new ActionConfigInfo(TIME_START, R.string.action_time_start_title, R.drawable.icon_time, TimeStartAction.class);
-    private final static ActionConfigInfo NOTIFY_START_CONFIG = new ActionConfigInfo(NOTIFY_START, R.string.action_notification_start_title, R.drawable.icon_notification, NotifyStartAction.class);
-    private final static ActionConfigInfo NETWORK_START_CONFIG = new ActionConfigInfo(NETWORK_START, R.string.action_network_start_title, R.drawable.icon_network, NetworkStartAction.class);
-    private final static ActionConfigInfo SCREEN_START_CONFIG = new ActionConfigInfo(SCREEN_START, R.string.action_screen_start_title, R.drawable.icon_screen, ScreenStartAction.class);
-    private final static ActionConfigInfo BATTERY_START_CONFIG = new ActionConfigInfo(BATTERY_START, R.string.action_battery_start_title, R.drawable.icon_battery, BatteryStartAction.class);
-    private final static ActionConfigInfo OUTER_START_CONFIG = new ActionConfigInfo(OUTER_START, R.string.action_outer_start_title, R.drawable.icon_auto_start, OuterStartAction.class);
+    private final static ActionConfigInfo MANUAL_START_CONFIG = new ActionConfigInfo(MANUAL_START, R.string.action_manual_start_title, R.string.MANUAL_START, R.drawable.icon_hand, ManualStartAction.class);
+    private final static ActionConfigInfo ENTER_APP_START_CONFIG = new ActionConfigInfo(ENTER_APP_START, R.string.action_app_start_title, R.string.ENTER_APP_START, R.drawable.icon_package_info, AppStartAction.class);
+    private final static ActionConfigInfo TIME_START_CONFIG = new ActionConfigInfo(TIME_START, R.string.action_time_start_title, R.string.TIME_START, R.drawable.icon_time, TimeStartAction.class);
+    private final static ActionConfigInfo NOTIFY_START_CONFIG = new ActionConfigInfo(NOTIFY_START, R.string.action_notification_start_title, R.string.NOTIFY_START, R.drawable.icon_notification, NotifyStartAction.class);
+    private final static ActionConfigInfo NETWORK_START_CONFIG = new ActionConfigInfo(NETWORK_START, R.string.action_network_start_title, R.string.NETWORK_START, R.drawable.icon_network, NetworkStartAction.class);
+    private final static ActionConfigInfo SCREEN_START_CONFIG = new ActionConfigInfo(SCREEN_START, R.string.action_screen_start_title, R.string.SCREEN_START, R.drawable.icon_screen, ScreenStartAction.class);
+    private final static ActionConfigInfo BATTERY_START_CONFIG = new ActionConfigInfo(BATTERY_START, R.string.action_battery_start_title, R.string.BATTERY_START, R.drawable.icon_battery, BatteryStartAction.class);
+    private final static ActionConfigInfo OUTER_START_CONFIG = new ActionConfigInfo(OUTER_START, R.string.action_outer_start_title, R.string.OUTER_START, R.drawable.icon_auto_start, OuterStartAction.class);
     private final static ActionConfigInfo NORMAL_START_CONFIG = new ActionConfigInfo(NORMAL_START, R.string.action_normal_start_title, 0, NormalStartAction.class);
 
-    private final static ActionConfigInfo LOGIC_IF_CONFIG = new ActionConfigInfo(LOGIC_IF, R.string.action_condition_logic_title, R.drawable.icon_condition, IfLogicAction.class);
+    private final static ActionConfigInfo LOGIC_IF_CONFIG = new ActionConfigInfo(LOGIC_IF, R.string.action_condition_logic_title, R.string.LOGIC_IF, R.drawable.icon_condition, IfLogicAction.class);
     private final static ActionConfigInfo LOGIC_WAIT_IF_CONFIG = new ActionConfigInfo(LOGIC_WAIT_IF, R.string.action_wait_condition_logic_title, R.drawable.icon_wait_condition, WaitIfLogicAction.class);
     private final static ActionConfigInfo LOGIC_FOR_CONFIG = new ActionConfigInfo(LOGIC_FOR, R.string.action_for_loop_logic_title, R.drawable.icon_for_loop, ForLogicAction.class);
     private final static ActionConfigInfo LOGIC_WHILE_CONFIG = new ActionConfigInfo(LOGIC_WHILE, R.string.action_condition_while_logic_title, R.drawable.icon_condition_while, WhileLogicAction.class);
@@ -297,7 +302,12 @@ public enum ActionType {
     private final static ActionConfigInfo SNI_PASTE_CONFIG = new ActionConfigInfo(SNI_PASTE, R.string.action_sni_paste_action_title, R.drawable.icon_home, SniPasteAction.class);
     private final static ActionConfigInfo SHARE_CONFIG = new ActionConfigInfo(SHARE, R.string.action_share_action_title, R.drawable.icon_export, ShareAction.class);
     private final static ActionConfigInfo RUN_TASK_CONFIG = new ActionConfigInfo(RUN_TASK, R.string.action_do_task_action_title, R.drawable.icon_task, RunTaskAction.class);
-    private final static ActionConfigInfo SHELL_CONFIG = new ActionConfigInfo(SHELL, R.string.action_shell_action_title, R.drawable.icon_adb, ShellAction.class, true);
+    private final static ActionConfigInfo SHELL_CONFIG = new ActionConfigInfo(SHELL, R.string.action_shell_action_title, R.drawable.icon_adb, ShellAction.class) {
+        @Override
+        public boolean isValid() {
+            return SuperUser.isSuperUser();
+        }
+    };
     private final static ActionConfigInfo BREAK_TASK_CONFIG = new ActionConfigInfo(BREAK_TASK, R.string.action_break_task_action_title, R.drawable.icon_stop, BreakTaskAction.class);
 
     private final static ActionConfigInfo CHECK_EXIST_TEXT_CONFIG = new ActionConfigInfo(CHECK_EXIST_TEXT, R.string.action_exist_text_check_title, R.drawable.icon_text, ExistTextAction.class);
@@ -315,6 +325,12 @@ public enum ActionType {
     private final static ActionConfigInfo CHECK_IMAGE_CONFIG = new ActionConfigInfo(CHECK_IMAGE, R.string.action_image_check_title, R.drawable.icon_image, ImageContainAction.class);
     private final static ActionConfigInfo IMAGE_STATE_CONFIG = new ActionConfigInfo(IMAGE_STATE, R.string.action_image_state_title, R.drawable.icon_image, ImageStateAction.class);
     private final static ActionConfigInfo IMAGE_SUB_IMAGE_CONFIG = new ActionConfigInfo(IMAGE_SUB_IMAGE, R.string.action_image_sub_image_title, R.drawable.icon_image, SubImageAction.class);
+    private final static ActionConfigInfo SAVE_IMAGE_CONFIG = new ActionConfigInfo(SAVE_IMAGE, R.string.action_save_image_title, R.drawable.icon_image, SaveImageAction.class) {
+        @Override
+        public boolean isValid() {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
+        }
+    };
 
     private final static ActionConfigInfo CHECK_EXIST_NODE_CONFIG = new ActionConfigInfo(CHECK_EXIST_NODE, R.string.action_exist_node_check_title, R.drawable.icon_widget, ExistNodeAction.class);
     private final static ActionConfigInfo CHECK_EXIST_NODES_CONFIG = new ActionConfigInfo(CHECK_EXIST_NODES, R.string.action_exist_nodes_check_title, R.drawable.icon_widget, ExistNodesAction.class);
@@ -448,6 +464,7 @@ public enum ActionType {
             case CHECK_IMAGE -> CHECK_IMAGE_CONFIG;
             case IMAGE_STATE -> IMAGE_STATE_CONFIG;
             case IMAGE_SUB_IMAGE -> IMAGE_SUB_IMAGE_CONFIG;
+            case SAVE_IMAGE -> SAVE_IMAGE_CONFIG;
 
             case CHECK_EXIST_NODE -> CHECK_EXIST_NODE_CONFIG;
             case CHECK_EXIST_NODES -> CHECK_EXIST_NODES_CONFIG;

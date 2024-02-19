@@ -85,6 +85,12 @@ public class WorldState {
         return appMap.get(pkgName);
     }
 
+    public String getAppName(String pkgName) {
+        PackageInfo info = getPackage(pkgName);
+        CharSequence title = info.applicationInfo.loadLabel(MainApplication.getInstance().getPackageManager());
+        return title.toString();
+    }
+
     public ArrayList<PackageInfo> findPackageList(Context context, boolean system, CharSequence find, boolean single) {
         ArrayList<PackageInfo> packages = new ArrayList<>();
 

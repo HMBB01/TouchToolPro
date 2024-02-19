@@ -352,8 +352,15 @@ public class AppUtils {
     }
 
     public static void saveImage(Context context, Bitmap image) {
-        String fileName = "save" + formatDateLocalDate(context, System.currentTimeMillis()) + formatDateLocalMillisecond(context, System.currentTimeMillis()) + ".jpg";
+        String fileName = "save_" + formatDateLocalDate(context, System.currentTimeMillis()) + formatDateLocalMillisecond(context, System.currentTimeMillis()) + ".jpg";
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), fileName);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         try (OutputStream outputStream = new FileOutputStream(file)) {
             image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
