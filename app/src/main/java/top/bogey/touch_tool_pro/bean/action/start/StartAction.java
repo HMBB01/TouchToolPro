@@ -46,6 +46,11 @@ public abstract class StartAction extends Action {
         return bool.isBool();
     }
 
+    @Override
+    public void resetReturnValue(Pin pin) {
+
+    }
+
     public boolean isEnable() {
         return enablePin.getValue(PinBoolean.class).isBool();
     }

@@ -25,9 +25,6 @@ import java.util.Set;
 import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.Action;
-import top.bogey.touch_tool_pro.bean.pin.Pin;
-import top.bogey.touch_tool_pro.bean.pin.pins.PinObject;
-import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.task.Task;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
 import top.bogey.touch_tool_pro.bean.task.TaskRunningListener;
@@ -250,5 +247,4 @@ public class LogFloatView extends FrameLayout implements FloatViewInterface, Tas
             }
         });
     }
-
 }

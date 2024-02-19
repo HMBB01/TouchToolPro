@@ -26,11 +26,6 @@ public class ScreenStartAction extends StartAction {
     }
 
     @Override
-    public void resetReturnValue(Pin pin) {
-
-    }
-
-    @Override
     public void execute(TaskRunnable runnable, FunctionContext context, Pin pin) {
         ScreenStateAction.ScreenState state = AppUtils.getScreenState(MainApplication.getInstance());
         statePin.getValue(PinSpinner.class).setIndex(state.ordinal());

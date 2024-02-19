@@ -713,23 +713,21 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                             touchedPinView = pinView;
                         }
                     }
+
+                    switch (touchState) {
+                        case TOUCH_BACKGROUND -> longTouchHandler.postDelayed(() -> touchState = TOUCH_SELECT_AREA, LONG_TOUCH_TIME);
+
+                        case TOUCH_PIN -> longTouchHandler.postDelayed(() -> {
+                            Pin pin = touchedPinView.getPin();
+                            Pin linkedPin = pin.getLinkedPin(functionContext);
+                            if (linkedPin == null) return;
+                            Action action = functionContext.getActionById(linkedPin.getActionId());
+                            showCard(action.getId());
+
+                            touchState = TOUCH_NONE;
+                        }, LONG_TOUCH_TIME);
+                    }
                 }
-
-                switch (touchState) {
-                    case TOUCH_BACKGROUND ->
-                            longTouchHandler.postDelayed(() -> touchState = TOUCH_SELECT_AREA, LONG_TOUCH_TIME);
-
-                    case TOUCH_PIN -> longTouchHandler.postDelayed(() -> {
-                        Pin pin = touchedPinView.getPin();
-                        Pin linkedPin = pin.getLinkedPin(functionContext);
-                        if (linkedPin == null) return;
-                        Action action = functionContext.getActionById(linkedPin.getActionId());
-                        showCard(action.getId());
-
-                        touchState = TOUCH_NONE;
-                    }, LONG_TOUCH_TIME);
-                }
-
                 dragX = x;
                 dragY = y;
             }
