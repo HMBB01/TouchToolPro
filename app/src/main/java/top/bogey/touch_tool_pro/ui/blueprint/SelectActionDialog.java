@@ -50,6 +50,13 @@ public class SelectActionDialog extends FrameLayout {
                 customFunctions.add(id);
             }
         });
+        customFunctions.sort(((o1, o2) -> {
+            String id1 = (String) o1;
+            String id2 = (String) o2;
+            Function function1 = SaveRepository.getInstance().getFunctionById(id1);
+            Function function2 = SaveRepository.getInstance().getFunctionById(id2);
+            return collator.compare(function1.getTitle(), function2.getTitle());
+        }));
 
         HashMap<String, PinValue> allVariables = SaveRepository.getInstance().getAllVariables();
         allVariables.forEach((key, value) -> {
@@ -84,7 +91,6 @@ public class SelectActionDialog extends FrameLayout {
         }
 
         if (!customFunctions.isEmpty()) {
-            customFunctions.sort((o1, o2) -> collator.compare(((Function) o1).getTitle(), ((Function) o2).getTitle()));
             types.put(ActionMap.CUSTOM, customFunctions);
         }
 
