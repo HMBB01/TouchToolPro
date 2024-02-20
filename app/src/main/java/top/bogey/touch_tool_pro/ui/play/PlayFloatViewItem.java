@@ -35,6 +35,8 @@ public class PlayFloatViewItem extends FrameLayout implements TaskRunningListene
     private boolean playing = false;
     private boolean needRemove = false;
 
+    private long lastRefreshTime;
+
     public PlayFloatViewItem(@NonNull Context context, Task task, ManualStartAction startAction) {
         super(context);
         this.task = task;
@@ -108,6 +110,8 @@ public class PlayFloatViewItem extends FrameLayout implements TaskRunningListene
     }
 
     private void refreshProgress(int progress) {
+        if (System.currentTimeMillis() - lastRefreshTime < 100) return;
+        lastRefreshTime = System.currentTimeMillis();
         post(() -> {
             binding.playButton.setIndeterminate(playing);
             binding.percent.setText(progress == 0 ? title : String.valueOf(progress));
@@ -117,12 +121,14 @@ public class PlayFloatViewItem extends FrameLayout implements TaskRunningListene
     @Override
     public void onStart(TaskRunnable runnable) {
         playing = true;
+        lastRefreshTime = 0;
         refreshProgress(0);
     }
 
     @Override
     public void onEnd(TaskRunnable runnable) {
         playing = false;
+        lastRefreshTime = 0;
         refreshProgress(0);
         if (needRemove) {
             post(() -> {

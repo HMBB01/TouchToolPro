@@ -9,9 +9,11 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -264,6 +266,31 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
             }
         }
         return null;
+    }
+
+    public boolean touchedEmpty(float x, float y) {
+        float scale = getScaleX();
+        for (Map.Entry<String, PinView> entry : pinViews.entrySet()) {
+            PinView pinView = entry.getValue();
+            PointF pos = DisplayUtils.getLocationInParentView(binding.getRoot(), pinView);
+            float px = pos.x * scale;
+            float py = pos.y * scale;
+            float width = pinView.getWidth() * scale;
+            float height = pinView.getHeight() * scale;
+            if (new RectF(px, py, px + width, py + height).contains(x, y)) return false;
+        }
+
+        ArrayList<MaterialButton> buttons = new ArrayList<>(Arrays.asList(binding.editButton, binding.copyButton, binding.expandButton, binding.removeButton));
+        if (binding.functionButton.getVisibility() == VISIBLE) buttons.add(binding.functionButton);
+        for (MaterialButton button : buttons) {
+            PointF pos = DisplayUtils.getLocationInParentView(binding.getRoot(), button);
+            float px = pos.x * scale;
+            float py = pos.y * scale;
+            float width = button.getWidth() * scale;
+            float height = button.getHeight() * scale;
+            if (new RectF(px, py, px + width, py + height).contains(x, y)) return false;
+        }
+        return true;
     }
 
     public void refreshPinView() {

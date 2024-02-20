@@ -212,6 +212,14 @@ public class Function extends FunctionContext implements ActionExecuteInterface 
         return pins;
     }
 
+    public Pin getPinByUid(String uid) {
+        for (Action action : getActionsByClass(FunctionInnerAction.class)) {
+            Pin pinByUid = action.getPinByUid(uid);
+            if (pinByUid != null) return pinByUid;
+        }
+        return null;
+    }
+
     public FunctionPinsAction getAction() {
         return action;
     }

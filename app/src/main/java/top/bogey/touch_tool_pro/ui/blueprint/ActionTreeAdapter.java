@@ -2,9 +2,11 @@ package top.bogey.touch_tool_pro.ui.blueprint;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Point;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -110,8 +112,23 @@ public class ActionTreeAdapter extends TreeViewAdapter {
                     Toast.makeText(context, R.string.no_action_help_tips, Toast.LENGTH_SHORT).show();
                 } else {
                     DialogActionHelpBinding helpBinding = DialogActionHelpBinding.inflate(LayoutInflater.from(context), itemBinding.getRoot(), false);
+                    Point size = DisplayUtils.getScreenSize(context);
+                    if (size.x > size.y) {
+                        helpBinding.getRoot().setOrientation(LinearLayout.HORIZONTAL);
+                        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) helpBinding.scrollView.getLayoutParams();
+                        layoutParams.width = 0;
+                        layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
+                        helpBinding.scrollView.setLayoutParams(layoutParams);
+
+                        layoutParams = (LinearLayout.LayoutParams) helpBinding.cardLayout.getLayoutParams();
+                        layoutParams.width = 0;
+                        layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
+                        layoutParams.weight = 1;
+                        helpBinding.cardLayout.setLayoutParams(layoutParams);
+                    }
                     helpBinding.cardLayout.setFunctionContext(example);
                     helpBinding.cardLayout.setEditMode(false);
+                    helpBinding.cardLayout.setScale(0.75f);
                     helpBinding.cardLayout.setMinimumHeight((int) (DisplayUtils.getScreen(context) * 0.75));
                     helpBinding.des.setText(config.getDescription());
                     new MaterialAlertDialogBuilder(context)

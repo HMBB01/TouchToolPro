@@ -9,15 +9,13 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/deleteButton"
             style="@style/Theme.TouchTool.IconButton.Filled"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginVertical="2dp"
             android:backgroundTint="@color/fill_button_background_error_check"
             android:checkable="true"
             app:icon="@drawable/icon_delete"
@@ -26,18 +24,16 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/copyButton"
             style="@style/Theme.TouchTool.IconButton"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="4dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             app:icon="@drawable/icon_copy"
             app:iconSize="16dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/expandButton"
             style="@style/Theme.TouchTool.IconButton"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="4dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             app:icon="@drawable/icon_zoom_in"
             app:iconSize="16dp" />
 
@@ -46,9 +42,8 @@
             style="@style/Theme.TouchTool.IconButton"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginVertical="2dp"
-            android:visibility="gone"
-            app:icon="@drawable/icon_refresh" />
+            app:icon="@drawable/icon_refresh"
+            app:iconSize="16dp" />
 
     </LinearLayout>
 

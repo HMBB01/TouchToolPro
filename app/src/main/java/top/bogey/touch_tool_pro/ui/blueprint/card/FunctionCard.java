@@ -2,9 +2,13 @@ package top.bogey.touch_tool_pro.ui.blueprint.card;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.action.function.FunctionEndAction;
@@ -22,9 +26,11 @@ import top.bogey.touch_tool_pro.ui.blueprint.pin.PinLeftCustomView;
 import top.bogey.touch_tool_pro.ui.blueprint.pin.PinRightCustomView;
 import top.bogey.touch_tool_pro.ui.blueprint.pin.PinTopCustomView;
 import top.bogey.touch_tool_pro.ui.blueprint.pin.PinView;
+import top.bogey.touch_tool_pro.utils.DisplayUtils;
 
 @SuppressLint("ViewConstructor")
 public class FunctionCard extends ActionCard<FunctionInnerAction> {
+    private final CardCustomBinding cardBinding;
 
     public FunctionCard(Context context, Function function, FunctionInnerAction action) {
         super(context, function, action);
@@ -57,7 +63,7 @@ public class FunctionCard extends ActionCard<FunctionInnerAction> {
         boolean isStart = action instanceof FunctionStartAction;
         if (!isStart) binding.editButton.setVisibility(GONE);
 
-        CardCustomBinding cardBinding = CardCustomBinding.inflate(LayoutInflater.from(context), isStart ? binding.topBox : binding.bottomBox, true);
+        cardBinding = CardCustomBinding.inflate(LayoutInflater.from(context), isStart ? binding.topBox : binding.bottomBox, true);
         cardBinding.addPinButton.setOnClickListener(v -> {
             Pin pin = new Pin(new PinString(), !isStart);
             function.getAction().addPin(pin);
@@ -106,5 +112,22 @@ public class FunctionCard extends ActionCard<FunctionInnerAction> {
     public void removePin(Pin pin) {
         FunctionPinsAction action = ((Function) functionContext).getAction();
         action.removePin(action.getPinByUid(pin.getUid()));
+    }
+
+    @Override
+    public boolean touchedEmpty(float x, float y) {
+        float scale = getScaleX();
+        ArrayList<View> views = new ArrayList<>(Arrays.asList(cardBinding.addExecuteButton, cardBinding.addPinButton));
+        if (cardBinding.stateBox.getVisibility() == VISIBLE) views.add(cardBinding.justCallSwitch);
+        if (cardBinding.fastEndBox.getVisibility() == VISIBLE) views.add(cardBinding.fastEndSwitch);
+        for (View view : views) {
+            PointF pos = DisplayUtils.getLocationInParentView(binding.getRoot(), view);
+            float px = pos.x * scale;
+            float py = pos.y * scale;
+            float width = view.getWidth() * scale;
+            float height = view.getHeight() * scale;
+            if (new RectF(px, py, px + width, py + height).contains(x, y)) return false;
+        }
+        return super.touchedEmpty(x, y);
     }
 }

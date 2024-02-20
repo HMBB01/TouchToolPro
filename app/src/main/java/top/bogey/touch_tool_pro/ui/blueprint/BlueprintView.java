@@ -27,7 +27,6 @@ import java.util.Stack;
 
 import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.R;
-import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinImage;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
@@ -158,12 +157,14 @@ public class BlueprintView extends Fragment {
         binding = ViewBlueprintBinding.inflate(inflater, container, false);
 
         binding.addButton.setOnClickListener(v -> {
+            binding.cardLayout.centerDragPos();
             ActionTreeAdapter adapter = new ActionTreeAdapter(binding.cardLayout, new TreeNodeManager());
             dialog = new ActionSideSheetDialog(requireContext(), adapter);
             dialog.show();
         });
 
         binding.attrButton.setOnClickListener(v -> {
+            binding.cardLayout.centerDragPos();
             CustomTreeAdapter adapter = new CustomTreeAdapter(this, binding.cardLayout, new TreeNodeManager());
             dialog = new ActionSideSheetDialog(requireContext(), adapter);
             dialog.show();

@@ -1,6 +1,7 @@
 package top.bogey.touch_tool_pro.bean.task;
 
 import android.graphics.Bitmap;
+import android.view.View;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,9 @@ import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.action.start.StartAction;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.service.MainAccessibilityService;
+import top.bogey.touch_tool_pro.ui.setting.LogFloatView;
+import top.bogey.touch_tool_pro.utils.easy_float.EasyFloat;
+import top.bogey.touch_tool_pro.utils.easy_float.FloatViewHelper;
 
 public class TaskRunnable implements Runnable {
     private final Task task;
@@ -48,10 +52,17 @@ public class TaskRunnable implements Runnable {
         interrupt = true;
     }
 
-    public void addProgress(Action action, boolean execute) {
+    public void addExecuteProgress(Action action) {
         progress++;
-        listeners.stream().filter(Objects::nonNull).forEach(listener -> listener.onProgress(this, action, progress, execute));
+        listeners.stream().filter(Objects::nonNull).forEach(listener -> listener.onProgress(this, action, progress, true));
         checkStop();
+    }
+
+    public void addCalculateProgress(Action action) {
+        FloatViewHelper helper = EasyFloat.getHelper(LogFloatView.class.getName());
+        if (helper != null) {
+            listeners.stream().filter(Objects::nonNull).forEach(listener -> listener.onProgress(this, action, progress + 1, false));
+        }
     }
 
     public Bitmap getCurrImage(MainAccessibilityService service) {

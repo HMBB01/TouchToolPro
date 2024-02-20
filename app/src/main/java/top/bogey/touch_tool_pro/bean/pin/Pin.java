@@ -79,7 +79,7 @@ public class Pin extends IdentityInfo {
 
     public Pin getLinkedPin(FunctionContext context) {
         for (Map.Entry<String, String> entry : links.entrySet()) {
-            ActionInterface action = (ActionInterface) context.getActionById(entry.getValue());
+            ActionInterface action = context.getActionById(entry.getValue());
             if (action == null) continue;
             Pin pin = action.getPinById(entry.getKey());
             if (pin == null) continue;
@@ -201,6 +201,11 @@ public class Pin extends IdentityInfo {
         if (value == null) return;
         this.value = value;
         listeners.stream().filter(Objects::nonNull).forEach(listener -> listener.onValueChanged(value));
+    }
+
+    public void innerSetValue(PinObject value) {
+        if (value == null) return;
+        this.value = value;
     }
 
     public <T extends PinObject> T getValue(Class<T> tClass) {
