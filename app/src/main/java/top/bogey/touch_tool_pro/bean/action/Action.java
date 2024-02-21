@@ -115,6 +115,34 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
         return addPin(pin);
     }
 
+    @SafeVarargs
+    @Override
+    public final Pin reAddPin(Pin def, Class<? extends PinObject>... classes) {
+        Pin pin = null;
+        if (tmpPins.size() > 0) {
+            Pin tmpPin = tmpPins.get(0);
+            if (tmpPin.isSameValueType(def)) pin = tmpPins.remove(0);
+            for (Class<? extends PinObject> pinObjectClass : classes) {
+                if (tmpPin.isSameValueType(pinObjectClass)) {
+                    pin = tmpPins.remove(0);
+                    break;
+                }
+            }
+        }
+        if (pin == null) return addPin(def);
+
+        // 设置标题
+        pin.setTitleId(def.getTitleId());
+        if (pin.isSameValueType(PinAdd.class)) {
+            pin.getValue(PinAdd.class).getPin().setTitleId(def.getValue(PinAdd.class).getPin().getTitleId());
+        }
+
+        if (pin.isSameValueType(PinSpinner.class)) {
+            pin.getValue(PinSpinner.class).setArray(def.getValue(PinSpinner.class).getArray());
+        }
+        return addPin(pin);
+    }
+
     @Override
     public Pin reAddPin(Pin def, PinType type) {
         Pin pin = null;

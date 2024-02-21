@@ -14,6 +14,8 @@ public interface ActionInterface {
 
     Pin reAddPin(Pin def);
 
+    Pin reAddPin(Pin def, Class<? extends PinObject>... classes);
+
     Pin reAddPin(Pin def, PinType type);
 
     ArrayList<Pin> reAddPin(Pin def, int remain);

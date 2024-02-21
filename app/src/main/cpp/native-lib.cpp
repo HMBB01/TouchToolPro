@@ -82,6 +82,48 @@ Java_top_bogey_touch_1tool_1pro_utils_DisplayUtils_nativeMatchTemplate(JNIEnv *e
 
 extern "C"
 JNIEXPORT jobject JNICALL
+Java_top_bogey_touch_1tool_1pro_utils_DisplayUtils_nativeMatchAllTemplate(JNIEnv *env, jclass clazz, jobject bitmap, jobject temp, jint match_value) {
+    int scale = 1;
+
+    Mat src = bitmap_to_cv_mat(env, bitmap);
+    Mat tmp = bitmap_to_cv_mat(env, temp);
+    if (src.empty() || tmp.empty()) return createMatchResult(env, 0, 0, 0, 0, 0);
+
+    cvtColor(src, src, COLOR_BGR2GRAY);
+    cvtColor(tmp, tmp, COLOR_BGR2GRAY);
+
+    resize(src, src, Size(src.cols / scale, src.rows / scale));
+    resize(tmp, tmp, Size(tmp.cols / scale, tmp.rows / scale));
+    int resultCol = src.cols - tmp.cols + 1;
+    int resultRow = src.rows - tmp.rows + 1;
+
+    Mat result;
+    result.create(resultCol, resultRow, CV_32FC1);
+
+    matchTemplate(src, tmp, result, TM_CCOEFF_NORMED);
+
+    jclass listCls = env->FindClass("java/util/ArrayList");
+    jmethodID listInit = env->GetMethodID(listCls, "<init>", "()V");
+    jobject listObj = env->NewObject(listCls, listInit);
+    jmethodID listAdd = env->GetMethodID(listCls, "add", "(Ljava/lang/Object;)Z");
+
+    for (int i = 0; i < result.rows; ++i) {
+        for (int j = 0; j < result.cols; ++j) {
+            float currValue = result.at<float>(i, j) * 100;
+            if (currValue >= match_value) {
+                env->CallBooleanMethod(listObj, listAdd, createMatchResult(env, currValue, j * scale, i * scale, tmp.cols * scale, tmp.rows * scale));
+            }
+        }
+    }
+
+    src.release();
+    tmp.release();
+    result.release();
+    return listObj;
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
 Java_top_bogey_touch_1tool_1pro_utils_DisplayUtils_nativeMatchColor(JNIEnv *env, jclass clazz, jobject bitmap, jintArray hsvColor, jint offset) {
     Mat src = bitmap_to_cv_mat(env, bitmap);
     if (src.empty()) return nullptr;

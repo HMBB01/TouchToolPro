@@ -12,21 +12,11 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/deleteButton"
-            style="@style/Theme.TouchTool.IconButton.Filled"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:backgroundTint="@color/fill_button_background_error_check"
-            android:checkable="true"
-            app:icon="@drawable/icon_delete"
-            app:iconTint="@color/button_container_check" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/copyButton"
+            android:id="@+id/changeButton"
             style="@style/Theme.TouchTool.IconButton"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            app:icon="@drawable/icon_copy"
+            app:icon="@drawable/icon_refresh"
             app:iconSize="16dp" />
 
         <com.google.android.material.button.MaterialButton
@@ -38,12 +28,22 @@
             app:iconSize="16dp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/changeButton"
+            android:id="@+id/copyButton"
             style="@style/Theme.TouchTool.IconButton"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            app:icon="@drawable/icon_refresh"
+            app:icon="@drawable/icon_copy"
             app:iconSize="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/deleteButton"
+            style="@style/Theme.TouchTool.IconButton.Filled"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:backgroundTint="@color/fill_button_background_error_check"
+            android:checkable="true"
+            app:icon="@drawable/icon_delete"
+            app:iconTint="@color/button_container_check" />
 
     </LinearLayout>
 

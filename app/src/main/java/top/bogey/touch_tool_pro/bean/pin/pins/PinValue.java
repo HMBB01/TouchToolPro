@@ -9,7 +9,11 @@ import top.bogey.touch_tool_pro.bean.pin.PinType;
 
 public class PinValue extends PinObject {
     public PinValue() {
-        this(PinType.VALUE);
+        super(PinType.VALUE);
+    }
+
+    public PinValue(PinSubType subType) {
+        super(PinType.VALUE, subType);
     }
 
     public PinValue(PinType type) {

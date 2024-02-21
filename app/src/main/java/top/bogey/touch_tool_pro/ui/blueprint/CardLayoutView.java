@@ -157,6 +157,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         binding.copyButton.setOnClickListener(v -> {
             HashSet<ActionCard<?>> cards = new HashSet<>(selectedCards);
             cleanSelectedCards();
+            binding.getRoot().setVisibility(VISIBLE);
             HashMap<String, Action> copiedActions = new HashMap<>();
             HashMap<String, Action> actionsMap = new HashMap<>();
             for (ActionCard<?> card : cards) {
@@ -359,14 +360,35 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         return card;
     }
 
+    public ActionCard<?> addNewAction(Action action) {
+        ActionCard<?> card = addAction(action);
+
+        int widthSpec = View.MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.AT_MOST);
+        int heightSpec = View.MeasureSpec.makeMeasureSpec(getHeight(), MeasureSpec.AT_MOST);
+        measureChildWithMargins(card, widthSpec, 0, heightSpec, 0);
+
+        float width = card.getMeasuredWidth() * scale;
+        float height = card.getMeasuredHeight() * scale;
+        if (dragX < 0 && dragY < 0) {
+            dragX = (getWidth() - width) / 3f;
+            dragY = (getHeight() - height) / 2f;
+        } else {
+            dragX -= width / 3f;
+            dragY -= height / 3f;
+        }
+        action.setX((int) ((dragX - offsetX) / getScaleGridSize()));
+        action.setY((int) ((dragY - offsetY) / getScaleGridSize()));
+        setCardPosition(card);
+
+        return card;
+    }
+
     public void addAction(Class<? extends Action> actionClass) {
         try {
             Constructor<? extends Action> constructor = actionClass.getConstructor();
             Action action = constructor.newInstance();
-            action.setX((int) ((dragX - offsetX) / getScaleGridSize()) + 1);
-            action.setY((int) ((dragY - offsetY) / getScaleGridSize()) + 1);
             tryLinkDragPin(action);
-            addAction(action);
+            addNewAction(action);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException |
                  InstantiationException e) {
             e.printStackTrace();
@@ -377,10 +399,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         try {
             Constructor<? extends Action> constructor = actionClass.getConstructor(String.class, PinValue.class);
             Action action = constructor.newInstance(key, value);
-            action.setX((int) ((dragX - offsetX) / getScaleGridSize()) + 1);
-            action.setY((int) ((dragY - offsetY) / getScaleGridSize()) + 1);
             tryLinkDragPin(action);
-            addAction(action);
+            addNewAction(action);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException |
                  InstantiationException e) {
             e.printStackTrace();
@@ -396,10 +416,8 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         if (function != null) {
             FunctionReferenceAction referenceAction = new FunctionReferenceAction(function);
             referenceAction.sync(functionContext);
-            referenceAction.setX((int) ((dragX - offsetX) / getScaleGridSize()) + 1);
-            referenceAction.setY((int) ((dragY - offsetY) / getScaleGridSize()) + 1);
             tryLinkDragPin(referenceAction);
-            return addAction(referenceAction);
+            return addNewAction(referenceAction);
         }
         return null;
     }
@@ -675,7 +693,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                 rect.bottom += scaleGridSize;
                 canvas.drawRect(rect, linePaint);
 
-                binding.getRoot().setX(rect.centerX() - binding.getRoot().getWidth() / 2f);
+                binding.getRoot().setX(rect.centerX() - binding.getRoot().getWidth() * scale / 2f);
                 binding.getRoot().setY(rect.bottom + scaleGridSize / 2);
             }
         }
@@ -756,11 +774,6 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
             ActionCard<?> card = getCardInPos(x, y);
             if (card != null) {
-                PinView pinView = card.getPinViewByPos(x - card.getX(), y - card.getY());
-                if (pinView != null) {
-                    return true;
-                }
-
                 if (card.touchedEmpty(x - card.getX(), y - card.getY())) {
                     return true;
                 }
@@ -924,8 +937,9 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                     case TOUCH_BACKGROUND -> cleanSelectedCards();
 
                     case TOUCH_CARD -> {
-                        if (selectedCards.contains(touchedCard)) cleanSelectedCards();
-                        addSelectedCard(touchedCard);
+                        boolean contained = selectedCards.contains(touchedCard);
+                        cleanSelectedCards();
+                        if (!contained) addSelectedCard(touchedCard);
                     }
 
                     case TOUCH_PIN -> {
@@ -1064,10 +1078,9 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
         checkCards();
     }
 
-    public void centerDragPos() {
-        float scaleGridSize = getScaleGridSize();
-        dragX = scaleGridSize * 10;
-        dragY = getHeight() / 2f - 10 * scaleGridSize;
+    public void resetDragPos() {
+        dragX = -1;
+        dragY = -1;
     }
 
     public HashMap<ActionType, Action> getCacheActions() {

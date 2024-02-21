@@ -27,6 +27,7 @@ import top.bogey.touch_tool_pro.bean.action.function.FunctionPinsAction;
 import top.bogey.touch_tool_pro.bean.action.function.FunctionReferenceAction;
 import top.bogey.touch_tool_pro.bean.action.function.FunctionStartAction;
 import top.bogey.touch_tool_pro.bean.action.image.ExistImageAction;
+import top.bogey.touch_tool_pro.bean.action.image.ExistImagesAction;
 import top.bogey.touch_tool_pro.bean.action.image.ImageContainAction;
 import top.bogey.touch_tool_pro.bean.action.image.ImageStateAction;
 import top.bogey.touch_tool_pro.bean.action.image.SaveImageAction;
@@ -185,6 +186,7 @@ public enum ActionType {
     STRING_REGEX,
 
     CHECK_EXIST_IMAGE,
+    CHECK_EXIST_IMAGES,
     CHECK_IMAGE,
     IMAGE_STATE,
     IMAGE_SUB_IMAGE,
@@ -322,6 +324,7 @@ public enum ActionType {
     private final static ActionConfigInfo STRING_REGEX_CONFIG = new ActionConfigInfo(STRING_REGEX, R.string.action_string_regex_title, R.drawable.icon_text, StringRegexAction.class);
 
     private final static ActionConfigInfo CHECK_EXIST_IMAGE_CONFIG = new ActionConfigInfo(CHECK_EXIST_IMAGE, R.string.action_exist_image_check_title, R.drawable.icon_image, ExistImageAction.class);
+    private final static ActionConfigInfo CHECK_EXIST_IMAGES_CONFIG = new ActionConfigInfo(CHECK_EXIST_IMAGES, R.string.action_exist_images_check_title, R.drawable.icon_image, ExistImagesAction.class);
     private final static ActionConfigInfo CHECK_IMAGE_CONFIG = new ActionConfigInfo(CHECK_IMAGE, R.string.action_image_check_title, R.drawable.icon_image, ImageContainAction.class);
     private final static ActionConfigInfo IMAGE_STATE_CONFIG = new ActionConfigInfo(IMAGE_STATE, R.string.action_image_state_title, R.drawable.icon_image, ImageStateAction.class);
     private final static ActionConfigInfo IMAGE_SUB_IMAGE_CONFIG = new ActionConfigInfo(IMAGE_SUB_IMAGE, R.string.action_image_sub_image_title, R.drawable.icon_image, SubImageAction.class);
@@ -461,6 +464,7 @@ public enum ActionType {
             case STRING_REGEX -> STRING_REGEX_CONFIG;
 
             case CHECK_EXIST_IMAGE -> CHECK_EXIST_IMAGE_CONFIG;
+            case CHECK_EXIST_IMAGES -> CHECK_EXIST_IMAGES_CONFIG;
             case CHECK_IMAGE -> CHECK_IMAGE_CONFIG;
             case IMAGE_STATE -> IMAGE_STATE_CONFIG;
             case IMAGE_SUB_IMAGE -> IMAGE_SUB_IMAGE_CONFIG;

@@ -157,14 +157,14 @@ public class BlueprintView extends Fragment {
         binding = ViewBlueprintBinding.inflate(inflater, container, false);
 
         binding.addButton.setOnClickListener(v -> {
-            binding.cardLayout.centerDragPos();
+            binding.cardLayout.resetDragPos();
             ActionTreeAdapter adapter = new ActionTreeAdapter(binding.cardLayout, new TreeNodeManager());
             dialog = new ActionSideSheetDialog(requireContext(), adapter);
             dialog.show();
         });
 
         binding.attrButton.setOnClickListener(v -> {
-            binding.cardLayout.centerDragPos();
+            binding.cardLayout.resetDragPos();
             CustomTreeAdapter adapter = new CustomTreeAdapter(this, binding.cardLayout, new TreeNodeManager());
             dialog = new ActionSideSheetDialog(requireContext(), adapter);
             dialog.show();

@@ -5,6 +5,9 @@ import android.graphics.Rect;
 
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.ActionCheckResult;
@@ -12,41 +15,41 @@ import top.bogey.touch_tool_pro.bean.action.ActionType;
 import top.bogey.touch_tool_pro.bean.action.other.CheckAction;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
+import top.bogey.touch_tool_pro.bean.pin.PinType;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinArea;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinBoolean;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinImage;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinInteger;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinPoint;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinValueArray;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
 import top.bogey.touch_tool_pro.service.MainAccessibilityService;
 import top.bogey.touch_tool_pro.utils.DisplayUtils;
 import top.bogey.touch_tool_pro.utils.MatchResult;
 
-public class ExistImageAction extends CheckAction {
+public class ExistImagesAction extends CheckAction {
     private transient Pin imagePin = new Pin(new PinImage(), R.string.pin_image);
     private transient Pin similarPin = new Pin(new PinInteger(85), R.string.action_exist_image_check_subtitle_similar);
     private transient Pin areaPin = new Pin(new PinArea(), R.string.pin_area);
-    private transient Pin posPin = new Pin(new PinPoint(), R.string.pin_point, true);
-    private transient Pin realSimilarPin = new Pin(new PinInteger(), R.string.action_exist_image_check_subtitle_result, true);
+    private transient Pin posPin = new Pin(new PinValueArray(PinType.POINT), R.string.pin_point, true);
 
-    public ExistImageAction() {
-        super(ActionType.CHECK_EXIST_IMAGE);
+    public ExistImagesAction() {
+        super(ActionType.CHECK_EXIST_IMAGES);
         needCapture = true;
         imagePin = addPin(imagePin);
         similarPin = addPin(similarPin);
         areaPin = addPin(areaPin);
         posPin = addPin(posPin);
-        realSimilarPin = addPin(realSimilarPin);
     }
 
-    public ExistImageAction(JsonObject jsonObject) {
+    public ExistImagesAction(JsonObject jsonObject) {
         super(jsonObject);
         needCapture = true;
         imagePin = reAddPin(imagePin);
         similarPin = reAddPin(similarPin);
         areaPin = reAddPin(areaPin);
         posPin = reAddPin(posPin);
-        realSimilarPin = reAddPin(realSimilarPin);
     }
 
     @Override
@@ -71,31 +74,26 @@ public class ExistImageAction extends CheckAction {
         PinInteger similar = (PinInteger) getPinValue(runnable, context, similarPin);
         PinArea area = (PinArea) getPinValue(runnable, context, areaPin);
         Rect rect = area.getArea(service);
-        MatchResult matchResult = DisplayUtils.matchImage(currImage, bitmap, rect);
-        if (matchResult == null) return;
-        if (matchResult.value >= Math.min(100, similar.getValue())) {
-            result.setBool(true);
-            matchResult.rect.offset(rect.left, rect.top);
-            posPin.getValue(PinPoint.class).setPoint(service, matchResult.rect.centerX(), matchResult.rect.centerY());
-            realSimilarPin.getValue(PinInteger.class).setValue(matchResult.value);
+        List<MatchResult> matchResults = DisplayUtils.matchImages(currImage, bitmap, similar.getValue(), rect);
+        if (matchResults == null) return;
+        PinValueArray valueArray = posPin.getValue(PinValueArray.class);
+        ArrayList<PinValue> values = valueArray.getValues();
+        for (MatchResult matchResult : matchResults) {
+            if (matchResult.value >= Math.min(100, similar.getValue())) {
+                result.setBool(true);
+                matchResult.rect.offset(rect.left, rect.top);
+                values.add(new PinPoint(service, matchResult.rect.centerX(), matchResult.rect.centerY()));
+            }
         }
     }
 
     @Override
     public ActionCheckResult check(FunctionContext context) {
         if (resultPin.getLinks().isEmpty()) {
-            if (!posPin.getLinks().isEmpty() || !realSimilarPin.getLinks().isEmpty()) {
+            if (!posPin.getLinks().isEmpty()) {
                 return new ActionCheckResult(ActionCheckResult.ActionResultType.ERROR, R.string.error_result_pin_no_use);
             }
         }
         return super.check(context);
-    }
-
-    public Pin getImagePin() {
-        return imagePin;
-    }
-
-    public Pin getPosPin() {
-        return posPin;
     }
 }

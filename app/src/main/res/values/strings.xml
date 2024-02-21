@@ -327,7 +327,11 @@
 
     <!-- 任务 - 图片 -->
     <string name="action_exist_image_check_title">界面内存在图片</string>
-    <string name="action_exist_image_check_subtitle_similar">相似度</string>
+    <string name="action_exist_image_check_subtitle_similar">相似阈值</string>
+    <string name="action_exist_image_check_subtitle_result">相似度</string>
+
+    <string name="action_exist_images_check_title">界面内存在的所有图片</string>
+    <string name="action_exist_images_check_subtitle_similar">相似阈值</string>
 
     <string name="action_image_check_title">图片内存在图片</string>
     <string name="action_image_check_subtitle_other">匹配图片</string>

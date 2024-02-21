@@ -170,9 +170,10 @@ public class DisplayUtils {
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
+
     public static native MatchResult nativeMatchTemplate(Bitmap bitmap, Bitmap temp);
 
-    public static synchronized Rect matchImage(Bitmap sourceBitmap, Bitmap matchBitmap, int matchValue, Rect area) {
+    public static synchronized MatchResult matchImage(Bitmap sourceBitmap, Bitmap matchBitmap, Rect area) {
         if (sourceBitmap == null || matchBitmap == null) return null;
 
         Bitmap bitmap = null;
@@ -184,11 +185,35 @@ public class DisplayUtils {
 
         MatchResult matchResult = nativeMatchTemplate(sourceBitmap, matchBitmap);
         if (bitmap != null) bitmap.recycle();
+        return matchResult;
+    }
 
+    public static synchronized Rect matchImage(Bitmap sourceBitmap, Bitmap matchBitmap, int matchValue, Rect area) {
+        MatchResult matchResult = matchImage(sourceBitmap, matchBitmap, area);
+        if (matchResult == null) return null;
         if (Math.min(100, matchValue) > matchResult.value) return null;
         matchResult.rect.offset(area.left, area.top);
         return matchResult.rect;
     }
+
+
+    public static native List<MatchResult> nativeMatchAllTemplate(Bitmap bitmap, Bitmap temp, int matchValue);
+
+    public static synchronized List<MatchResult> matchImages(Bitmap sourceBitmap, Bitmap matchBitmap, int matchValue, Rect area) {
+        if (sourceBitmap == null || matchBitmap == null) return null;
+
+        Bitmap bitmap = null;
+        if (!(area.isEmpty())) {
+            sourceBitmap = safeCreateBitmap(sourceBitmap, area);
+            bitmap = sourceBitmap;
+            if (bitmap == null) return null;
+        }
+
+        List<MatchResult> matchResults = nativeMatchAllTemplate(sourceBitmap, matchBitmap, matchValue);
+        if (bitmap != null) bitmap.recycle();
+        return matchResults;
+    }
+
 
     public static native List<MatchResult> nativeMatchColor(Bitmap bitmap, int[] hsvColor, int offset);
 
