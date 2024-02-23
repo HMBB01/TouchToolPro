@@ -21,7 +21,6 @@ import top.bogey.touch_tool_pro.bean.action.ActionType;
 import top.bogey.touch_tool_pro.bean.action.function.FunctionPinsAction;
 import top.bogey.touch_tool_pro.bean.function.Function;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
-import top.bogey.touch_tool_pro.bean.pin.Pin;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinObject;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.task.Task;
@@ -33,7 +32,7 @@ import top.bogey.touch_tool_pro.ui.blueprint.card.ActionCard;
 public class SelectActionDialog extends FrameLayout {
     private final LinkedHashMap<ActionMap, ArrayList<Object>> types;
 
-    public SelectActionDialog(@NonNull Context context, CardLayoutView layoutView, Class<? extends PinObject> pinClass, boolean out) {
+    public SelectActionDialog(@NonNull Context context, CardLayoutView layoutView, PinObject pinObject, boolean out) {
         super(context);
         DialogSelectActionBinding binding = DialogSelectActionBinding.inflate(LayoutInflater.from(context), this, true);
 
@@ -45,7 +44,7 @@ public class SelectActionDialog extends FrameLayout {
 
         LinkedHashMap<String, FunctionPinsAction> actions = SaveRepository.getInstance().getAllFunctionActions();
         actions.forEach((id, action) -> {
-            if (matchAction(action, pinClass, out)) {
+            if (matchAction(action, pinObject, out)) {
                 customFunctions.add(id);
             }
         });
@@ -59,7 +58,7 @@ public class SelectActionDialog extends FrameLayout {
 
         HashMap<String, PinValue> allVariables = SaveRepository.getInstance().getAllVariables();
         allVariables.forEach((key, value) -> {
-            if (value.getClass().isAssignableFrom(pinClass) || pinClass.isAssignableFrom(value.getClass())) {
+            if (matchVariable(pinObject, out, value)) {
                 variables.add(new VariableInfo(key, value, 1, out));
             }
         });
@@ -69,7 +68,7 @@ public class SelectActionDialog extends FrameLayout {
             functionContext = function.getParent();
 
             function.getVars().forEach((key, value) -> {
-                if (value.getClass().isAssignableFrom(pinClass) || pinClass.isAssignableFrom(value.getClass())) {
+                if (matchVariable(pinObject, out, value)) {
                     variables.add(new VariableInfo(key, value, 3, out));
                 }
             });
@@ -77,13 +76,13 @@ public class SelectActionDialog extends FrameLayout {
         if (functionContext instanceof Task task) {
             ArrayList<Object> objects = new ArrayList<>();
             task.getFunctions().forEach(function -> {
-                if (matchAction(function.getAction(), pinClass, out)) objects.add(function);
+                if (matchAction(function.getAction(), pinObject, out)) objects.add(function);
             });
             objects.sort((o1, o2) -> collator.compare(((Function) o1).getTitle(), ((Function) o2).getTitle()));
             customFunctions.addAll(objects);
 
             task.getVars().forEach((key, value) -> {
-                if (value.getClass().isAssignableFrom(pinClass) || pinClass.isAssignableFrom(value.getClass())) {
+                if (matchVariable(pinObject, out, value)) {
                     variables.add(new VariableInfo(key, value, 2, out));
                 }
             });
@@ -100,7 +99,7 @@ public class SelectActionDialog extends FrameLayout {
                 if (!actionType.getConfig().isValid()) continue;
                 Action action = tmpActions.get(actionType);
                 if (action == null) continue;
-                if (matchAction(action, pinClass, out)) {
+                if (matchAction(action, pinObject, out)) {
                     actionTypes.add(actionType);
                 }
             }
@@ -115,7 +114,7 @@ public class SelectActionDialog extends FrameLayout {
 
         ArrayList<Object> cards = new ArrayList<>();
         layoutView.getCardMap().forEach((id, card) -> {
-            if (matchAction(card.getAction(), pinClass, out)) {
+            if (matchAction(card.getAction(), pinObject, out)) {
                 cards.add(card);
             }
         });
@@ -137,11 +136,13 @@ public class SelectActionDialog extends FrameLayout {
         binding.activityBox.setAdapter(adapter);
     }
 
-    private boolean matchAction(Action action, Class<? extends PinObject> pinClass, boolean out) {
-        for (Pin pin : action.getPins()) {
-            if ((pin.getPinClass().isAssignableFrom(pinClass) || pinClass.isAssignableFrom(pin.getPinClass())) && pin.isOut() == out) return true;
-        }
-        return false;
+    private boolean matchVariable(PinObject pinObject, boolean out, PinValue value) {
+        if (out) return value.contain(pinObject);
+        return pinObject.contain(value);
+    }
+
+    private boolean matchAction(Action action, PinObject pinObject, boolean out) {
+        return action.getFirstMatchedPin(pinObject, out) != null;
     }
 
     public boolean isEmpty() {

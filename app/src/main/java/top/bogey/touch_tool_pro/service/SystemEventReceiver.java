@@ -1,5 +1,7 @@
 package top.bogey.touch_tool_pro.service;
 
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +42,23 @@ public class SystemEventReceiver extends BroadcastReceiver {
                 if (packageName == null) return;
                 WorldState.getInstance().resetAppMap(context);
             }
+
+            case BluetoothDevice.ACTION_ACL_CONNECTED -> {
+                if (SettingSave.getInstance().getUseBluetooth(context)) {
+                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    if (device == null) return;
+                    @SuppressLint("MissingPermission") String name = device.getName();
+                    WorldState.getInstance().addBluetoothDevices(device.getAddress(), name);
+                }
+            }
+
+            case BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                if (SettingSave.getInstance().getUseBluetooth(context)) {
+                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    if (device == null) return;
+                    WorldState.getInstance().removeBluetoothDevices(device.getAddress());
+                }
+            }
         }
     }
 
@@ -55,6 +74,9 @@ public class SystemEventReceiver extends BroadcastReceiver {
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
+
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         return filter;
     }
 }

@@ -20,7 +20,6 @@ import top.bogey.touch_tool_pro.bean.pin.pins.PinArea;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinBoolean;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinImage;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinInteger;
-import top.bogey.touch_tool_pro.bean.pin.pins.PinPoint;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValue;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinValueArray;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
@@ -32,7 +31,7 @@ public class ExistImagesAction extends CheckAction {
     private transient Pin imagePin = new Pin(new PinImage(), R.string.pin_image);
     private transient Pin similarPin = new Pin(new PinInteger(85), R.string.action_exist_image_check_subtitle_similar);
     private transient Pin areaPin = new Pin(new PinArea(), R.string.pin_area);
-    private transient Pin posPin = new Pin(new PinValueArray(PinType.POINT), R.string.pin_point, true);
+    private transient Pin posPin = new Pin(new PinValueArray(PinType.AREA, false), R.string.pin_value_array, true);
 
     public ExistImagesAction() {
         super(ActionType.CHECK_EXIST_IMAGES);
@@ -82,7 +81,7 @@ public class ExistImagesAction extends CheckAction {
             if (matchResult.value >= Math.min(100, similar.getValue())) {
                 result.setBool(true);
                 matchResult.rect.offset(rect.left, rect.top);
-                values.add(new PinPoint(service, matchResult.rect.centerX(), matchResult.rect.centerY()));
+                values.add(new PinArea(service, matchResult.rect));
             }
         }
     }

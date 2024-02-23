@@ -169,6 +169,15 @@
             android:textSize="11sp"
             android:visibility="gone" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/hideButton"
+            style="@style/Theme.TouchTool.IconButton"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:visibility="gone"
+            app:icon="@drawable/icon_down"
+            app:iconSize="16dp" />
+
         <LinearLayout
             android:id="@+id/bottomBox"
             android:layout_width="match_parent"

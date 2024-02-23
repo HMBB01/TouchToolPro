@@ -72,53 +72,6 @@ public class SettingView extends Fragment {
         binding.keepAliveSwitch.setOnClickListener(v -> SettingSave.getInstance().setKeepAlive(requireContext(), binding.keepAliveSwitch.isChecked()));
         binding.keepAliveSwitch.setChecked(SettingSave.getInstance().isKeepAlive());
 
-        binding.superUserGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (isChecked) {
-                View view = group.findViewById(checkedId);
-                int type = group.indexOfChild(view);
-                switch (type) {
-                    case 1 -> {
-                        if (ShizukuSuperUser.existShizuku()) {
-                            SettingSave.getInstance().setSuperUserType(type);
-                            if (SuperUser.getSuperUserType() != type) {
-                                SuperUser.exit();
-                                if (!SuperUser.init()) {
-                                    SettingSave.getInstance().setSuperUserType(0);
-                                    binding.superUserGroup.check(R.id.noSuperUserButton);
-                                }
-                            }
-                        } else {
-                            binding.superUserGroup.check(R.id.noSuperUserButton);
-                            Toast.makeText(requireContext(), R.string.app_setting_super_user_no_shizuku, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    case 2 -> {
-                        if (RootSuperUser.existRoot()) {
-                            SettingSave.getInstance().setSuperUserType(type);
-                            if (SuperUser.getSuperUserType() != type) SuperUser.tryInit();
-                        } else {
-                            binding.superUserGroup.check(R.id.noSuperUserButton);
-                            Toast.makeText(requireContext(), R.string.app_setting_super_user_no_root, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    default -> {
-                        SuperUser.exit();
-                        SettingSave.getInstance().setSuperUserType(type);
-                    }
-                }
-            }
-        });
-        int superUserType = SettingSave.getInstance().getSuperUserType();
-        switch (superUserType) {
-            case 1 -> {
-                if (!ShizukuSuperUser.existShizuku()) superUserType = 0;
-            }
-            case 2 -> {
-                if (!RootSuperUser.existRoot()) superUserType = 0;
-            }
-        }
-        binding.superUserGroup.check(binding.superUserGroup.getChildAt(superUserType).getId());
-        binding.superUserGroup.setSaveEnabled(false);
 
         binding.cleanCache.setOnClickListener(v -> {
             AppUtils.deleteFile(requireContext().getCacheDir());
@@ -159,6 +112,98 @@ public class SettingView extends Fragment {
         });
         refreshSwitchState();
 
+
+        // 权限
+        binding.superUserGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                View view = group.findViewById(checkedId);
+                int type = group.indexOfChild(view);
+                switch (type) {
+                    case 1 -> {
+                        if (ShizukuSuperUser.existShizuku()) {
+                            SettingSave.getInstance().setSuperUserType(type);
+                            if (SuperUser.getSuperUserType() != type) {
+                                SuperUser.exit();
+                                if (!SuperUser.init()) {
+                                    SettingSave.getInstance().setSuperUserType(0);
+                                    binding.superUserGroup.check(R.id.noSuperUserButton);
+                                }
+                            }
+                        } else {
+                            binding.superUserGroup.check(R.id.noSuperUserButton);
+                            Toast.makeText(requireContext(), R.string.permission_setting_super_user_no_shizuku, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    case 2 -> {
+                        if (RootSuperUser.existRoot()) {
+                            SettingSave.getInstance().setSuperUserType(type);
+                            if (SuperUser.getSuperUserType() != type) SuperUser.tryInit();
+                        } else {
+                            binding.superUserGroup.check(R.id.noSuperUserButton);
+                            Toast.makeText(requireContext(), R.string.permission_setting_super_user_no_root, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    default -> {
+                        SuperUser.exit();
+                        SettingSave.getInstance().setSuperUserType(type);
+                    }
+                }
+            }
+        });
+        int superUserType = SettingSave.getInstance().getSuperUserType();
+        switch (superUserType) {
+            case 1 -> {
+                if (!ShizukuSuperUser.existShizuku()) superUserType = 0;
+            }
+            case 2 -> {
+                if (!RootSuperUser.existRoot()) superUserType = 0;
+            }
+        }
+        binding.superUserGroup.check(binding.superUserGroup.getChildAt(superUserType).getId());
+        binding.superUserGroup.setSaveEnabled(false);
+
+
+        AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+        binding.useExactAlarmSwitch.setOnClickListener(v -> {
+            if (binding.useExactAlarmSwitch.isChecked()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (alarmManager.canScheduleExactAlarms()) {
+                        SettingSave.getInstance().setUseExactAlarm(true);
+                    } else {
+                        Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                        startActivity(intent);
+                        binding.useExactAlarmSwitch.setChecked(false);
+                    }
+                } else {
+                    SettingSave.getInstance().setUseExactAlarm(true);
+                }
+            } else {
+                SettingSave.getInstance().setUseExactAlarm(false);
+            }
+            MainAccessibilityService service = MainApplication.getInstance().getService();
+            if (service != null && service.isServiceEnabled()) {
+                service.resetAlarm();
+            }
+        });
+
+        boolean useExactAlarm = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms();
+        binding.useExactAlarmSwitch.setChecked(SettingSave.getInstance().isUseExactAlarm() && useExactAlarm);
+        binding.useExactAlarmSwitch.setSaveEnabled(false);
+
+
+        binding.useBluetoothSwitch.setOnClickListener(v -> {
+            MainActivity activity = (MainActivity) requireActivity();
+            if (binding.useBluetoothSwitch.isChecked()) {
+                binding.useBluetoothSwitch.setChecked(false);
+                activity.launcherBluetooth((code, intent) -> {
+                    SettingSave.getInstance().setUseBluetooth(activity, code == Activity.RESULT_OK);
+                    binding.useBluetoothSwitch.setChecked(code == Activity.RESULT_OK);
+                });
+            } else {
+                SettingSave.getInstance().setUseBluetooth(activity, false);
+            }
+        });
+        binding.useBluetoothSwitch.setChecked(SettingSave.getInstance().getUseBluetooth(requireContext()));
 
         // 任务设置
         binding.taskBackupButton.setOnClickListener(v -> {
@@ -217,32 +262,6 @@ public class SettingView extends Fragment {
 
         binding.useTakeCaptureSwitch.setOnClickListener(v -> SettingSave.getInstance().setUseTakeCapture(binding.useTakeCaptureSwitch.isChecked()));
         binding.useTakeCaptureSwitch.setChecked(SettingSave.getInstance().isUseTakeCapture());
-
-        AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
-        binding.useExactAlarmSwitch.setOnClickListener(v -> {
-            if (binding.useExactAlarmSwitch.isChecked()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    if (alarmManager.canScheduleExactAlarms()) {
-                        SettingSave.getInstance().setUseExactAlarm(true);
-                    } else {
-                        Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                        startActivity(intent);
-                        binding.useExactAlarmSwitch.setChecked(false);
-                    }
-                } else {
-                    SettingSave.getInstance().setUseExactAlarm(true);
-                }
-            } else {
-                SettingSave.getInstance().setUseExactAlarm(false);
-            }
-            MainAccessibilityService service = MainApplication.getInstance().getService();
-            if (service != null && service.isServiceEnabled()) {
-                service.resetAlarm();
-            }
-        });
-        boolean useExactAlarm = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms();
-        binding.useExactAlarmSwitch.setChecked(SettingSave.getInstance().isUseExactAlarm() && useExactAlarm);
-        binding.useExactAlarmSwitch.setSaveEnabled(false);
 
 
         // 界面外观

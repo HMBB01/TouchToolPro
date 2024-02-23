@@ -26,7 +26,7 @@ import top.bogey.touch_tool_pro.service.MainAccessibilityService;
 
 public class ExistNodeAction extends CheckAction {
     private transient Pin pathPin = new Pin(new PinNodePath(), R.string.pin_node_path);
-    private transient Pin idPin = new Pin(new PinString(PinSubType.NODE_ID), R.string.pin_string_node_id);
+    private transient Pin idPin = new Pin(new PinString(PinSubType.NODE_ID), R.string.pin_string_node_id, false, false, true);
     private transient Pin posPin = new Pin(new PinPoint(), R.string.pin_point, true);
     private transient Pin nodePin = new Pin(new PinNode(), R.string.pin_node, true);
 

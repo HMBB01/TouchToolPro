@@ -144,6 +144,9 @@
     <string name="error_variable_no_find">未找到引用的变量</string>
     <string name="error_super_user_no_permission">需要超级用户权限</string>
     <string name="error_save_image_no_permission">Android 10以下无法直接保存图片</string>
+    <string name="error_no_alarm_permission">需要开启精确定时</string>
+    <string name="error_no_bluetooth_permission">需要开启蓝牙权限</string>
+    <string name="error_math_expression_linked">表达式不能连接</string>
 
     <!-- 警告 -->
     <string name="warning_check_time_too_short">检查间隔过短，可能引起卡顿</string>
@@ -199,6 +202,10 @@
     <string name="action_battery_start_title">电池状态变更时执行</string>
     <string name="action_battery_start_subtitle_state">状态</string>
     <string name="action_battery_start_subtitle_battery">电量</string>
+
+    <string name="action_bluetooth_start_title">蓝牙连接变动时执行</string>
+    <string name="action_bluetooth_start_subtitle_devices">设备名</string>
+    <string name="action_bluetooth_start_subtitle_state">连接或断开</string>
 
     <string name="action_outer_start_title">应用外调用</string>
     <string name="action_outer_start_subtitle_url">链接</string>
@@ -330,7 +337,7 @@
     <string name="action_exist_image_check_subtitle_similar">相似阈值</string>
     <string name="action_exist_image_check_subtitle_result">相似度</string>
 
-    <string name="action_exist_images_check_title">界面内存在的所有图片</string>
+    <string name="action_exist_images_check_title">界面内所有相似图片</string>
     <string name="action_exist_images_check_subtitle_similar">相似阈值</string>
 
     <string name="action_image_check_title">图片内存在图片</string>
@@ -390,6 +397,13 @@
     <string name="action_int_random_title">随机数值</string>
     <string name="action_int_to_value_area_title">数值组合为数值区域</string>
 
+    <string name="action_math_expression_title">数学表达式</string>
+    <string name="action_math_expression_subtitle_expression">表达式</string>
+    <string name="action_math_expression_subtitle_result">结果</string>
+    <string name="action_math_expression_subtitle_expression_error">表达式错误</string>
+
+    <string name="action_float_to_int_title">小数转为整数</string>
+    <string name="action_float_to_int_subtitle_type">转换方式</string>
 
     <!-- 任务 - 位置 -->
     <string name="action_position_to_int_title">位置拆分为数值</string>
@@ -408,6 +422,7 @@
     <!-- 任务 - 区域 -->
     <string name="action_area_to_int_title">区域拆分为数值</string>
     <string name="action_area_pick_title">选择区域</string>
+    <string name="action_area_center_pos_title">区域中心位置</string>
 
     <!-- 任务 - 数组 -->
     <string name="action_array_subtitle_element">成员</string>
@@ -454,6 +469,10 @@
 
     <string name="action_network_state_title">网络状态</string>
     <string name="action_network_state_subtitle_network">网络</string>
+
+    <string name="action_bluetooth_state_title">蓝牙状态</string>
+    <string name="action_bluetooth_state_subtitle_devices">设备名</string>
+    <string name="action_bluetooth_state_subtitle_state">连接或断开</string>
 
     <string name="action_capture_state_title">录屏状态</string>
     <string name="action_capture_state_subtitle_state">开启</string>
@@ -570,14 +589,6 @@
     <string name="app_setting_keep_alive">前台服务</string>
     <string name="app_setting_keep_alive_tips">在通知栏显示一条前台服务通知加强应用后台存活能力</string>
 
-    <string name="app_setting_super_user">超级用户</string>
-    <string name="app_setting_super_user_tips">使用超级用户可以使用Shell命令及卡片</string>
-    <string name="app_setting_super_user_none">不使用</string>
-    <string name="app_setting_super_user_shizuku">Shizuku模式</string>
-    <string name="app_setting_super_user_no_shizuku">未开启/安装Shizuku</string>
-    <string name="app_setting_super_user_root">Root模式</string>
-    <string name="app_setting_super_user_no_root">没有Root权限</string>
-
     <string name="app_setting_clean_cache">清理缓存</string>
     <string name="app_setting_clean_cache_tips">点击清理缓存。当前: %s</string>
 
@@ -591,6 +602,22 @@
     <string name="tool_setting_log">实时任务日志</string>
     <string name="tool_setting_log_tips">显示一个实时日志悬浮窗，任务中的每张执行卡片的执行都会被记录下来</string>
 
+    <!-- 设置 - 权限 -->
+    <string name="permission_setting_title">权限配置</string>
+
+    <string name="permission_setting_super_user">超级用户</string>
+    <string name="permission_setting_super_user_tips">使用超级用户可以使用“执行Shell指令”卡片</string>
+    <string name="permission_setting_super_user_none">不使用</string>
+    <string name="permission_setting_super_user_shizuku">Shizuku模式</string>
+    <string name="permission_setting_super_user_no_shizuku">未开启/安装Shizuku</string>
+    <string name="permission_setting_super_user_root">Root模式</string>
+    <string name="permission_setting_super_user_no_root">没有Root权限</string>
+
+    <string name="permission_setting_first_use_exact_alarm">精确定时</string>
+    <string name="permission_setting_first_use_exact_alarm_tips">使用精确定时可以使用“定时执行”卡片</string>
+
+    <string name="permission_setting_bluetooth">蓝牙权限</string>
+    <string name="permission_setting_bluetooth_tips">使用蓝牙权限可以使用“蓝牙连接变动时执行”、“蓝牙状态”卡片</string>
 
     <!-- 设置 - 任务设置 -->
     <string name="task_setting_title">任务设置</string>
@@ -625,8 +652,6 @@
     <string name="profile_setting_first_use_take_capture">优先使用无障碍截屏</string>
     <string name="profile_setting_first_use_take_capture_tips">在支持的Android版本上优先使用无障碍截屏，可以不需要提前申请录屏权限</string>
 
-    <string name="profile_setting_first_use_exact_alarm">使用精确定时</string>
-    <string name="profile_setting_first_use_exact_alarm_tips">优先使用精确定时，但是可能会更耗电</string>
 
 
     <!-- 设置 - 界面外观 -->

@@ -26,10 +26,17 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.R;
+import top.bogey.touch_tool_pro.bean.action.number.MathExpressionAction;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
 import top.bogey.touch_tool_pro.bean.pin.PinSubType;
+import top.bogey.touch_tool_pro.bean.pin.pins.PinFloat;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinString;
 import top.bogey.touch_tool_pro.databinding.PinWidgetInputBinding;
 import top.bogey.touch_tool_pro.ui.InstantActivity;
@@ -153,6 +160,18 @@ public class PinWidgetString extends PinWidget<PinString> {
                 });
                 binding.pickButton.setVisibility(GONE);
             }
+            case AUTO_PIN -> {
+                binding.editText.setEnabled(true);
+                binding.editText.setText(pinObject.getValue());
+                binding.editText.addTextChangedListener(new TextChangedListener() {
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        pinObject.setValue(s.toString());
+                        refreshMathExpressionDynamicPin(s.toString());
+                    }
+                });
+                binding.pickButton.setVisibility(GONE);
+            }
         }
     }
 
@@ -161,6 +180,34 @@ public class PinWidgetString extends PinWidget<PinString> {
         Ringtone ringtone = RingtoneManager.getRingtone(getContext(), uri);
         if (ringtone == null) return null;
         return ringtone.getTitle(getContext());
+    }
+
+    private void refreshMathExpressionDynamicPin(String path) {
+        if (card.getAction() instanceof MathExpressionAction expressionAction) {
+            Pattern pattern = Pattern.compile("\\b([a-zA-Z])\\b");
+            Matcher matcher = pattern.matcher(path);
+            HashSet<String> keys = new HashSet<>();
+            while (matcher.find()) {
+                keys.add(matcher.group(1));
+            }
+            ArrayList<Pin> removePins = new ArrayList<>();
+
+            for (Pin pin : expressionAction.calculateMorePins()) {
+                String title = pin.getTitle();
+                if (keys.isEmpty()) {
+                    removePins.add(pin);
+                } else if (!keys.remove(title)) {
+                    removePins.add(pin);
+                }
+            }
+            removePins.forEach(card::removePin);
+
+            for (String key : keys) {
+                Pin paramsPin = new Pin(new PinFloat(), 0, false, true, false);
+                paramsPin.setTitle(key);
+                card.addPin(paramsPin, 0);
+            }
+        }
     }
 
     @Override

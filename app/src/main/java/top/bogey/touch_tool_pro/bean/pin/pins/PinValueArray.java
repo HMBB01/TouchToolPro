@@ -90,12 +90,11 @@ public class PinValueArray extends PinValue {
     }
 
     @Override
-    public boolean match(PinObject pinObject) {
-        if (super.match(pinObject)) {
+    public boolean contain(PinObject pinObject) {
+        if (super.contain(pinObject)) {
             if (pinObject instanceof PinValueArray array) {
                 return array.pinType == pinType;
             }
-            return true;
         }
         return false;
     }

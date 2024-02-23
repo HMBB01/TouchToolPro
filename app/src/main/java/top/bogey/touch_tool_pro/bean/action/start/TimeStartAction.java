@@ -3,6 +3,7 @@ package top.bogey.touch_tool_pro.bean.action.start;
 import com.google.gson.JsonObject;
 
 import top.bogey.touch_tool_pro.R;
+import top.bogey.touch_tool_pro.bean.action.ActionCheckResult;
 import top.bogey.touch_tool_pro.bean.action.ActionType;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
@@ -10,6 +11,7 @@ import top.bogey.touch_tool_pro.bean.pin.PinSubType;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinLong;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
 import top.bogey.touch_tool_pro.utils.AppUtils;
+import top.bogey.touch_tool_pro.utils.SettingSave;
 
 public class TimeStartAction extends StartAction {
     private transient Pin datePin = new Pin(new PinLong(PinSubType.DATE, System.currentTimeMillis()), R.string.action_time_start_subtitle_date);
@@ -43,5 +45,13 @@ public class TimeStartAction extends StartAction {
 
     public long getPeriodic() {
         return ((PinLong) periodicPin.getValue()).getValue();
+    }
+
+    @Override
+    public ActionCheckResult check(FunctionContext context) {
+        if (!SettingSave.getInstance().isUseExactAlarm()) {
+            return new ActionCheckResult(ActionCheckResult.ActionResultType.ERROR, R.string.error_no_alarm_permission);
+        }
+        return super.check(context);
     }
 }

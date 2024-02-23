@@ -72,6 +72,7 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
         binding.des.setText(action.getDescription());
         binding.des.setVisibility((action.getDescription() == null || action.getDescription().isEmpty()) ? GONE : VISIBLE);
         binding.expandButton.setIconResource(action.isExpand() ? R.drawable.icon_zoom_in : R.drawable.icon_zoom_out);
+        binding.hideButton.setIconResource(action.isShowHide() ? R.drawable.icon_up : R.drawable.icon_down);
         binding.functionButton.setVisibility(action instanceof FunctionReferenceAction ? VISIBLE : GONE);
 
         binding.editButton.setOnClickListener(v -> AppUtils.showEditDialog(context, R.string.action_subtitle_add_des, action.getDescription(), result -> {
@@ -90,7 +91,7 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
         binding.expandButton.setOnClickListener(v -> {
             action.setExpand(!action.isExpand());
             binding.expandButton.setIconResource(action.isExpand() ? R.drawable.icon_zoom_in : R.drawable.icon_zoom_out);
-            pinViews.forEach((id, pinView) -> pinView.setExpand(action.isExpand()));
+            pinViews.forEach((id, pinView) -> pinView.setExpand(action.isExpand(), action.isShowHide()));
         });
 
         binding.copyButton.setOnClickListener(v -> {
@@ -112,7 +113,16 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
             }
         });
 
-        action.getPins().forEach(this::addPinView);
+        binding.hideButton.setOnClickListener(v -> {
+            action.setShowHide(!action.isShowHide());
+            binding.hideButton.setIconResource(action.isShowHide() ? R.drawable.icon_up : R.drawable.icon_down);
+            pinViews.forEach((id, pinView) -> pinView.setExpand(action.isExpand(), action.isShowHide()));
+        });
+
+        action.getPins().forEach(pin -> {
+            addPinView(pin);
+            if (pin.isHide()) binding.hideButton.setVisibility(VISIBLE);
+        });
         action.addListener(this);
     }
 
@@ -194,7 +204,7 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
                 binding.inBox.addView(pinView, binding.inBox.getChildCount() - offset);
             }
         }
-        pinView.setExpand(action.isExpand());
+        pinView.setExpand(action.isExpand(), action.isShowHide());
         pinViews.put(pin.getId(), pinView);
     }
 
@@ -231,7 +241,7 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
     public void onPinChanged(Pin pin) {
         PinView pinView = pinViews.get(pin.getId());
         if (pinView != null) pinView.refreshPinUI();
-        pinViews.forEach((id, view) -> view.setExpand(action.isExpand()));
+        pinViews.forEach((id, view) -> view.setExpand(action.isExpand(), action.isShowHide()));
         check();
     }
 
@@ -282,6 +292,7 @@ public class ActionCard<A extends Action> extends MaterialCardView implements Ac
 
         ArrayList<MaterialButton> buttons = new ArrayList<>(Arrays.asList(binding.editButton, binding.copyButton, binding.expandButton, binding.removeButton));
         if (binding.functionButton.getVisibility() == VISIBLE) buttons.add(binding.functionButton);
+        if (binding.hideButton.getVisibility() == VISIBLE) buttons.add(binding.hideButton);
         for (MaterialButton button : buttons) {
             PointF pos = DisplayUtils.getLocationInParentView(binding.getRoot(), button);
             float px = pos.x * scale;

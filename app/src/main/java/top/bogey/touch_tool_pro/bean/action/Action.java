@@ -35,6 +35,7 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
     private int x;
     private int y;
     private boolean expand = true;
+    private boolean showHide = false;
 
     public Action() {
         this(ActionType.BASE);
@@ -54,6 +55,7 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
         x = GsonUtils.getAsInt(jsonObject, "x", 0);
         y = GsonUtils.getAsInt(jsonObject, "y", 0);
         expand = GsonUtils.getAsBoolean(jsonObject, "expand", true);
+        showHide = GsonUtils.getAsBoolean(jsonObject, "showHide", true);
     }
 
     @Override
@@ -225,9 +227,9 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
     }
 
     @Override
-    public Pin getFirstPinByClass(Class<? extends PinObject> pinClass, boolean out) {
+    public Pin getFirstMatchedPin(PinObject pinObject, boolean out) {
         for (Pin pin : pins) {
-            if (pin.getPinClass().isAssignableFrom(pinClass) || pinClass.isAssignableFrom(pin.getPinClass())) {
+            if (pin.isValueMatched(pinObject)) {
                 if (pin.isOut() == out) {
                     return pin;
                 }
@@ -269,6 +271,16 @@ public class Action extends IdentityInfo implements ActionInterface, ActionExecu
     @Override
     public void setExpand(boolean expand) {
         this.expand = expand;
+    }
+
+    @Override
+    public boolean isShowHide() {
+        return showHide;
+    }
+
+    @Override
+    public void setShowHide(boolean showHide) {
+        this.showHide = showHide;
     }
 
     @Override

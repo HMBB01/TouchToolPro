@@ -10,8 +10,10 @@ treeview = "1.1.4"
 flexbox = "3.0.0"
 
 gson = "2.10.1"
-mmkv = "1.3.2"
+mmkv = "1.3.3"
 shizuku = "13.1.5"
+
+exp4j = "0.4.8"
 
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -28,6 +30,8 @@ mmkv = { group = "com.tencent", name = "mmkv", version.ref = "mmkv" }
 
 shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku"}
 shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku"}
+
+exp4j = {group = "net.objecthunter", name = "exp4j", version.ref = "exp4j"}
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }

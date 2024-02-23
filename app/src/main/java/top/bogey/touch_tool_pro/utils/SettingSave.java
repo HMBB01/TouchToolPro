@@ -1,10 +1,13 @@
 package top.bogey.touch_tool_pro.utils;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.os.Build;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -33,7 +36,10 @@ public class SettingSave {
 
     private static final String HIDE_BACKGROUND = "HIDE_BACKGROUND";                            // 隐藏后台
     private static final String KEEP_ALIVE = "KEEP_ALIVE";                                      // 前台服务保活
+
     private static final String SUPER_USER_TYPE = "SUPER_USER_TYPE";                            // 超级用户类型
+    private static final String USE_EXACT_ALARM = "USE_EXACT_ALARM";                            // 使用精确计时
+    private static final String USE_BLUETOOTH = "USE_BLUETOOTH";                                // 使用蓝牙
 
     private static final String PLAY_VIEW_VISIBLE_TYPE = "PLAY_VIEW_VISIBLE_TYPE";              // 显示手动执行悬浮窗
     private static final String SHOW_TOUCH = "SHOW_TOUCH";                                      // 显示手势轨迹
@@ -42,7 +48,6 @@ public class SettingSave {
     private static final String FIRST_SHOW_TASK = "FIRST_SHOW_TASK";                            // 主页改为任务标签页
     private static final String FIRST_LOOK_BLUEPRINT = "FIRST_LOOK_BLUEPRINT";                  // 蓝图界面进去时默认查看蓝图
     private static final String USE_TAKE_CAPTURE = "USE_TAKE_CAPTURE";                          // 使用无障碍的TakeCapture
-    private static final String USE_EXACT_ALARM = "USE_EXACT_ALARM";                            // 使用精确计时
 
     private static final String NIGHT_MODE = "NIGHT_MODE";                                      // 夜间模式
     private static final String DYNAMIC_COLOR = "DYNAMIC_COLOR";                                // 动态颜色
@@ -171,6 +176,7 @@ public class SettingSave {
         settingMMKV.encode(KEEP_ALIVE, keepAlive);
     }
 
+
     public int getSuperUserType() {
         return settingMMKV.decodeInt(SUPER_USER_TYPE, 0);
     }
@@ -179,6 +185,33 @@ public class SettingSave {
         settingMMKV.encode(SUPER_USER_TYPE, type);
     }
 
+    public boolean isUseExactAlarm() {
+        return settingMMKV.decodeBool(USE_EXACT_ALARM, false);
+    }
+
+    public void setUseExactAlarm(boolean useExactAlarm) {
+        settingMMKV.encode(USE_EXACT_ALARM, useExactAlarm);
+    }
+
+    public boolean getUseBluetooth(Context context) {
+        boolean bluetooth;
+        if (Build.VERSION_CODES.S > Build.VERSION.SDK_INT) {
+            bluetooth = context.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            bluetooth = context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+        }
+        return bluetooth & settingMMKV.decodeBool(USE_BLUETOOTH, false);
+    }
+
+    public void setUseBluetooth(Context context, boolean useBluetooth) {
+        boolean bluetooth;
+        if (Build.VERSION_CODES.S > Build.VERSION.SDK_INT) {
+            bluetooth = context.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            bluetooth = context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+        }
+        settingMMKV.encode(USE_BLUETOOTH, useBluetooth & bluetooth);
+    }
 
     public int getPlayViewVisibleType() {
         return settingMMKV.decodeInt(PLAY_VIEW_VISIBLE_TYPE, 2);
@@ -245,13 +278,6 @@ public class SettingSave {
         settingMMKV.encode(USE_TAKE_CAPTURE, useTakeCapture);
     }
 
-    public boolean isUseExactAlarm() {
-        return settingMMKV.decodeBool(USE_EXACT_ALARM, false);
-    }
-
-    public void setUseExactAlarm(boolean useExactAlarm) {
-        settingMMKV.encode(USE_EXACT_ALARM, useExactAlarm);
-    }
 
 
     public int getNightMode() {

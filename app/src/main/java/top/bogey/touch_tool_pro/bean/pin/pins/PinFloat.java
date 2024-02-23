@@ -24,6 +24,12 @@ public class PinFloat extends PinNumber<Float> {
     }
 
     @Override
+    public boolean contain(PinObject pinObject) {
+        if (super.contain(pinObject)) return true;
+        return pinObject.getType() == PinType.INT;
+    }
+
+    @Override
     public boolean cast(String value) {
         try {
             this.value = Float.parseFloat(value);
@@ -36,5 +42,11 @@ public class PinFloat extends PinNumber<Float> {
     @Override
     public int getPinColor(Context context) {
         return context.getColor(R.color.FloatPinColor);
+    }
+
+    public static float getFloatValue(PinObject pinObject) {
+        if (pinObject instanceof PinFloat pinFloat) return pinFloat.value;
+        else if (pinObject instanceof PinInteger pinInteger) return pinInteger.value;
+        else return 0;
     }
 }

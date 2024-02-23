@@ -2,6 +2,7 @@ package top.bogey.touch_tool_pro.bean.action;
 
 import android.os.Build;
 
+import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.array.ArrayAddAction;
 import top.bogey.touch_tool_pro.bean.action.array.ArrayAppendAction;
@@ -67,6 +68,7 @@ import top.bogey.touch_tool_pro.bean.action.normal.ShellAction;
 import top.bogey.touch_tool_pro.bean.action.normal.SniPasteAction;
 import top.bogey.touch_tool_pro.bean.action.normal.StopRingtoneAction;
 import top.bogey.touch_tool_pro.bean.action.normal.TouchAction;
+import top.bogey.touch_tool_pro.bean.action.number.FloatToIntAction;
 import top.bogey.touch_tool_pro.bean.action.number.IntAddAction;
 import top.bogey.touch_tool_pro.bean.action.number.IntDivAction;
 import top.bogey.touch_tool_pro.bean.action.number.IntEqualAction;
@@ -78,8 +80,10 @@ import top.bogey.touch_tool_pro.bean.action.number.IntRandomAction;
 import top.bogey.touch_tool_pro.bean.action.number.IntReduceAction;
 import top.bogey.touch_tool_pro.bean.action.number.IntSmallAction;
 import top.bogey.touch_tool_pro.bean.action.number.IntToValueAreaAction;
+import top.bogey.touch_tool_pro.bean.action.number.MathExpressionAction;
 import top.bogey.touch_tool_pro.bean.action.other.AppStateAction;
 import top.bogey.touch_tool_pro.bean.action.other.BatteryStateAction;
+import top.bogey.touch_tool_pro.bean.action.other.BluetoothStateAction;
 import top.bogey.touch_tool_pro.bean.action.other.CaptureStateAction;
 import top.bogey.touch_tool_pro.bean.action.other.DateStateAction;
 import top.bogey.touch_tool_pro.bean.action.other.InAppCheckAction;
@@ -89,6 +93,7 @@ import top.bogey.touch_tool_pro.bean.action.other.OnBatteryStateAction;
 import top.bogey.touch_tool_pro.bean.action.other.OnScreenStateAction;
 import top.bogey.touch_tool_pro.bean.action.other.ScreenStateAction;
 import top.bogey.touch_tool_pro.bean.action.other.TimeStateAction;
+import top.bogey.touch_tool_pro.bean.action.pos.AreaCenterPosAction;
 import top.bogey.touch_tool_pro.bean.action.pos.AreaPickAction;
 import top.bogey.touch_tool_pro.bean.action.pos.AreaToIntAction;
 import top.bogey.touch_tool_pro.bean.action.pos.PosFromIntAction;
@@ -99,6 +104,7 @@ import top.bogey.touch_tool_pro.bean.action.pos.PosToIntAction;
 import top.bogey.touch_tool_pro.bean.action.pos.PosToTouchAction;
 import top.bogey.touch_tool_pro.bean.action.start.AppStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.BatteryStartAction;
+import top.bogey.touch_tool_pro.bean.action.start.BluetoothStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.ManualStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.NetworkStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.NormalStartAction;
@@ -120,6 +126,7 @@ import top.bogey.touch_tool_pro.bean.action.var.GetLocalVariableValue;
 import top.bogey.touch_tool_pro.bean.action.var.SetCommonVariableValue;
 import top.bogey.touch_tool_pro.bean.action.var.SetLocalVariableValue;
 import top.bogey.touch_tool_pro.super_user.SuperUser;
+import top.bogey.touch_tool_pro.utils.SettingSave;
 
 public enum ActionType {
     BASE,
@@ -141,6 +148,7 @@ public enum ActionType {
     NETWORK_START,
     BATTERY_START,
     SCREEN_START,
+    BLUETOOTH_START,
     OUTER_START,
     NORMAL_START,
     INNER_START,
@@ -222,6 +230,10 @@ public enum ActionType {
     INT_RANDOM,
     INT_TO_VALUE_AREA,
 
+    MATH_EXPRESSION,
+    FLOAT_TO_INT,
+
+
     POS_FROM_INT,
     POS_TO_INT,
     POS_OFFSET,
@@ -231,6 +243,7 @@ public enum ActionType {
 
     AREA_TO_INT,
     AREA_PICK,
+    AREA_CENTER_POS,
 
     ARRAY_GET,
     ARRAY_SET,
@@ -253,6 +266,7 @@ public enum ActionType {
     BATTERY_STATE,
     SCREEN_STATE,
     NETWORK_STATE,
+    BLUETOOTH_STATE,
     CAPTURE_STATE,
     DATE_STATE,
     TIME_STATE,
@@ -270,11 +284,22 @@ public enum ActionType {
 
     private final static ActionConfigInfo MANUAL_START_CONFIG = new ActionConfigInfo(MANUAL_START, R.string.action_manual_start_title, R.string.MANUAL_START, R.drawable.icon_hand, ManualStartAction.class);
     private final static ActionConfigInfo ENTER_APP_START_CONFIG = new ActionConfigInfo(ENTER_APP_START, R.string.action_app_start_title, R.string.ENTER_APP_START, R.drawable.icon_package_info, AppStartAction.class);
-    private final static ActionConfigInfo TIME_START_CONFIG = new ActionConfigInfo(TIME_START, R.string.action_time_start_title, R.string.TIME_START, R.drawable.icon_time, TimeStartAction.class);
+    private final static ActionConfigInfo TIME_START_CONFIG = new ActionConfigInfo(TIME_START, R.string.action_time_start_title, R.string.TIME_START, R.drawable.icon_time, TimeStartAction.class) {
+        @Override
+        public boolean isValid() {
+            return SettingSave.getInstance().isUseExactAlarm();
+        }
+    };
     private final static ActionConfigInfo NOTIFY_START_CONFIG = new ActionConfigInfo(NOTIFY_START, R.string.action_notification_start_title, R.string.NOTIFY_START, R.drawable.icon_notification, NotifyStartAction.class);
     private final static ActionConfigInfo NETWORK_START_CONFIG = new ActionConfigInfo(NETWORK_START, R.string.action_network_start_title, R.string.NETWORK_START, R.drawable.icon_network, NetworkStartAction.class);
     private final static ActionConfigInfo SCREEN_START_CONFIG = new ActionConfigInfo(SCREEN_START, R.string.action_screen_start_title, R.string.SCREEN_START, R.drawable.icon_screen, ScreenStartAction.class);
     private final static ActionConfigInfo BATTERY_START_CONFIG = new ActionConfigInfo(BATTERY_START, R.string.action_battery_start_title, R.string.BATTERY_START, R.drawable.icon_battery, BatteryStartAction.class);
+    private final static ActionConfigInfo BLUETOOTH_START_CONFIG = new ActionConfigInfo(BLUETOOTH_START, R.string.action_bluetooth_start_title, R.drawable.icon_bluetooth, BluetoothStartAction.class) {
+        @Override
+        public boolean isValid() {
+            return SettingSave.getInstance().getUseBluetooth(MainApplication.getInstance());
+        }
+    };
     private final static ActionConfigInfo OUTER_START_CONFIG = new ActionConfigInfo(OUTER_START, R.string.action_outer_start_title, R.string.OUTER_START, R.drawable.icon_auto_start, OuterStartAction.class);
     private final static ActionConfigInfo NORMAL_START_CONFIG = new ActionConfigInfo(NORMAL_START, R.string.action_normal_start_title, 0, NormalStartAction.class);
 
@@ -365,6 +390,9 @@ public enum ActionType {
     private final static ActionConfigInfo INT_RANDOM_CONFIG = new ActionConfigInfo(INT_RANDOM, R.string.action_int_random_title, R.drawable.icon_number, IntRandomAction.class);
     private final static ActionConfigInfo INT_TO_VALUE_AREA_CONFIG = new ActionConfigInfo(INT_TO_VALUE_AREA, R.string.action_int_to_value_area_title, R.drawable.icon_number, IntToValueAreaAction.class);
 
+    private final static ActionConfigInfo MATH_EXPRESSION_CONFIG = new ActionConfigInfo(MATH_EXPRESSION, R.string.action_math_expression_title, R.drawable.icon_number, MathExpressionAction.class);
+    private final static ActionConfigInfo FLOAT_TO_INT_CONFIG = new ActionConfigInfo(FLOAT_TO_INT, R.string.action_float_to_int_title, R.drawable.icon_number, FloatToIntAction.class);
+
     private final static ActionConfigInfo POS_FROM_INT_CONFIG = new ActionConfigInfo(POS_FROM_INT, R.string.action_position_from_int_title, R.drawable.icon_position, PosFromIntAction.class);
     private final static ActionConfigInfo POS_TO_INT_CONFIG = new ActionConfigInfo(POS_TO_INT, R.string.action_position_to_int_title, R.drawable.icon_position, PosToIntAction.class);
     private final static ActionConfigInfo POS_OFFSET_CONFIG = new ActionConfigInfo(POS_OFFSET, R.string.action_position_offset_title, R.drawable.icon_position, PosOffsetAction.class);
@@ -374,6 +402,7 @@ public enum ActionType {
 
     private final static ActionConfigInfo AREA_TO_INT_CONFIG = new ActionConfigInfo(AREA_TO_INT, R.string.action_area_to_int_title, R.drawable.icon_position, AreaToIntAction.class);
     private final static ActionConfigInfo AREA_PICK_CONFIG = new ActionConfigInfo(AREA_PICK, R.string.action_area_pick_title, R.drawable.icon_position, AreaPickAction.class);
+    private final static ActionConfigInfo AREA_CENTER_POS_CONFIG = new ActionConfigInfo(AREA_CENTER_POS, R.string.action_area_center_pos_title, R.drawable.icon_position, AreaCenterPosAction.class);
 
     private final static ActionConfigInfo ARRAY_GET_CONFIG = new ActionConfigInfo(ARRAY_GET, R.string.action_array_get_title, R.drawable.icon_array, ArrayGetAction.class);
     private final static ActionConfigInfo ARRAY_SET_CONFIG = new ActionConfigInfo(ARRAY_SET, R.string.action_array_set_title, R.drawable.icon_array, ArraySetAction.class);
@@ -396,6 +425,7 @@ public enum ActionType {
     private final static ActionConfigInfo BATTERY_STATE_CONFIG = new ActionConfigInfo(BATTERY_STATE, R.string.action_battery_state_title, R.drawable.icon_battery, BatteryStateAction.class);
     private final static ActionConfigInfo SCREEN_STATE_CONFIG = new ActionConfigInfo(SCREEN_STATE, R.string.action_screen_state_title, R.drawable.icon_screen, ScreenStateAction.class);
     private final static ActionConfigInfo NETWORK_STATE_CONFIG = new ActionConfigInfo(NETWORK_STATE, R.string.action_network_state_title, R.drawable.icon_network, NetworkStateAction.class);
+    private final static ActionConfigInfo BLUETOOTH_STATE_CONFIG = new ActionConfigInfo(BLUETOOTH_STATE, R.string.action_bluetooth_state_title, R.drawable.icon_bluetooth, BluetoothStateAction.class);
     private final static ActionConfigInfo CAPTURE_STATE_CONFIG = new ActionConfigInfo(CAPTURE_STATE, R.string.action_capture_state_title, R.drawable.icon_capture, CaptureStateAction.class);
     private final static ActionConfigInfo DATE_STATE_CONFIG = new ActionConfigInfo(DATE_STATE, R.string.action_date_state_title, R.drawable.icon_date, DateStateAction.class);
     private final static ActionConfigInfo TIME_STATE_CONFIG = new ActionConfigInfo(TIME_STATE, R.string.action_time_state_title, R.drawable.icon_time, TimeStateAction.class);
@@ -420,6 +450,7 @@ public enum ActionType {
             case NETWORK_START -> NETWORK_START_CONFIG;
             case BATTERY_START -> BATTERY_START_CONFIG;
             case SCREEN_START -> SCREEN_START_CONFIG;
+            case BLUETOOTH_START -> BLUETOOTH_START_CONFIG;
             case OUTER_START -> OUTER_START_CONFIG;
             case NORMAL_START -> NORMAL_START_CONFIG;
 
@@ -500,6 +531,9 @@ public enum ActionType {
             case INT_RANDOM -> INT_RANDOM_CONFIG;
             case INT_TO_VALUE_AREA -> INT_TO_VALUE_AREA_CONFIG;
 
+            case MATH_EXPRESSION -> MATH_EXPRESSION_CONFIG;
+            case FLOAT_TO_INT -> FLOAT_TO_INT_CONFIG;
+
             case POS_FROM_INT -> POS_FROM_INT_CONFIG;
             case POS_TO_INT -> POS_TO_INT_CONFIG;
             case POS_OFFSET -> POS_OFFSET_CONFIG;
@@ -509,6 +543,7 @@ public enum ActionType {
 
             case AREA_TO_INT -> AREA_TO_INT_CONFIG;
             case AREA_PICK -> AREA_PICK_CONFIG;
+            case AREA_CENTER_POS -> AREA_CENTER_POS_CONFIG;
 
             case ARRAY_GET -> ARRAY_GET_CONFIG;
             case ARRAY_SET -> ARRAY_SET_CONFIG;
@@ -531,6 +566,7 @@ public enum ActionType {
             case BATTERY_STATE -> BATTERY_STATE_CONFIG;
             case SCREEN_STATE -> SCREEN_STATE_CONFIG;
             case NETWORK_STATE -> NETWORK_STATE_CONFIG;
+            case BLUETOOTH_STATE -> BLUETOOTH_STATE_CONFIG;
             case CAPTURE_STATE -> CAPTURE_STATE_CONFIG;
             case DATE_STATE -> DATE_STATE_CONFIG;
             case TIME_STATE -> TIME_STATE_CONFIG;

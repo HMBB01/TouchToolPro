@@ -76,4 +76,10 @@
         <item>文件</item>
     </string-array>
 
+    <string-array name="float_to_int_type">
+        <item>四舍五入</item>
+        <item>向下取整</item>
+        <item>向上取整</item>
+    </string-array>
+
 </resources>

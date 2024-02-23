@@ -32,6 +32,7 @@ public class Pin extends IdentityInfo {
     private PinObject value;
     private boolean out;
     private boolean removeAble;
+    private final boolean hide;
     private transient String actionId;
     private transient int titleId;
 
@@ -48,15 +49,16 @@ public class Pin extends IdentityInfo {
     }
 
     public Pin(PinObject value, @StringRes int titleId, boolean out) {
-        this(value, titleId, out, false);
+        this(value, titleId, out, false, false);
     }
 
-    public Pin(PinObject value, @StringRes int titleId, boolean out, boolean removeAble) {
+    public Pin(PinObject value, @StringRes int titleId, boolean out, boolean removeAble, boolean hide) {
         super();
         this.value = value;
         this.titleId = titleId;
         this.out = out;
         this.removeAble = removeAble;
+        this.hide = hide;
     }
 
     public Pin(JsonObject jsonObject) {
@@ -64,6 +66,7 @@ public class Pin extends IdentityInfo {
         value = GsonUtils.getAsObject(jsonObject, "value", PinObject.class, null);
         out = GsonUtils.getAsBoolean(jsonObject, "out", false);
         removeAble = GsonUtils.getAsBoolean(jsonObject, "removeAble", false);
+        hide = GsonUtils.getAsBoolean(jsonObject, "hide", false);
         links.putAll(GsonUtils.getAsObject(jsonObject, "links", TypeToken.getParameterized(HashMap.class, String.class, String.class).getType(), new HashMap<>()));
     }
 
@@ -176,7 +179,12 @@ public class Pin extends IdentityInfo {
     }
 
     public boolean isValueMatched(Pin pin) {
-        return value.match(pin.getValue());
+        return isValueMatched(pin.value);
+    }
+
+    public boolean isValueMatched(PinObject pinObject) {
+        if (out) return pinObject.contain(value);
+        return value.contain(pinObject);
     }
 
     public boolean isCanLink(Pin pin) {
@@ -226,6 +234,10 @@ public class Pin extends IdentityInfo {
 
     public void setRemoveAble(boolean removeAble) {
         this.removeAble = removeAble;
+    }
+
+    public boolean isHide() {
+        return hide;
     }
 
     public HashMap<String, String> getLinks() {

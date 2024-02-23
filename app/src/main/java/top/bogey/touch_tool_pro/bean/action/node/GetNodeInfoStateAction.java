@@ -20,11 +20,11 @@ import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
 
 public class GetNodeInfoStateAction extends Action {
     private transient Pin textPin = new Pin(new PinString(), R.string.pin_string, true);
-    private transient Pin idPin = new Pin(new PinString(), R.string.pin_string_node_id, true);
-    private transient Pin pathPin = new Pin(new PinNodePath(), R.string.pin_node_path, true);
+    private transient Pin idPin = new Pin(new PinString(), R.string.pin_string_node_id, true, false, true);
+    private transient Pin pathPin = new Pin(new PinNodePath(), R.string.pin_node_path, true, false, true);
     private transient Pin areaPin = new Pin(new PinArea(), R.string.pin_area, true);
     private transient Pin posPin = new Pin(new PinPoint(), R.string.pin_point, true);
-    private transient Pin typePin = new Pin(new PinString(), R.string.action_get_node_info_subtitle_type, true);
+    private transient Pin typePin = new Pin(new PinString(), R.string.action_get_node_info_subtitle_type, true, false, true);
     private transient Pin nodePin = new Pin(new PinNode(), R.string.pin_node);
 
     public GetNodeInfoStateAction() {

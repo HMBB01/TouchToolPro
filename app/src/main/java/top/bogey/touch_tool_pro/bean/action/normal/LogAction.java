@@ -17,8 +17,8 @@ import top.bogey.touch_tool_pro.service.MainAccessibilityService;
 public class LogAction extends NormalAction {
     private transient Pin logPin = new Pin(new PinString(), R.string.action_log_action_subtitle_log);
     private transient Pin logValuePin = new Pin(new PinValue(), R.string.pin_value);
-    private transient Pin toastPin = new Pin(new PinBoolean(true), R.string.action_log_action_subtitle_toast);
-    private transient Pin savePin = new Pin(new PinBoolean(true), R.string.action_log_action_subtitle_save);
+    private transient Pin toastPin = new Pin(new PinBoolean(true), R.string.action_log_action_subtitle_toast, false, false, true);
+    private transient Pin savePin = new Pin(new PinBoolean(true), R.string.action_log_action_subtitle_save, false, false, true);
 
     public LogAction() {
         super(ActionType.LOG);

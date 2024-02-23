@@ -29,11 +29,9 @@ public class PinLong extends PinNumber<Long> {
     }
 
     @Override
-    public boolean match(PinObject pinObject) {
-        if (getType() == pinObject.getType()) {
-            return getSubType() == pinObject.getSubType();
-        }
-        return super.match(pinObject);
+    public boolean contain(PinObject pinObject) {
+        if (super.contain(pinObject)) return getSubType() == pinObject.getSubType();
+        return false;
     }
 
     @Override

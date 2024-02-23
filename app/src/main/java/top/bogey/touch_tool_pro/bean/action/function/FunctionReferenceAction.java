@@ -123,7 +123,7 @@ public class FunctionReferenceAction extends Action {
                 continue;
             }
             // 如果之前有，但值不对，断开所有连接，并复制值
-            if (!functionPin.isValueMatched(pin)) {
+            if (!functionPin.isSameValueType(pin)) {
                 pin.cleanLinks(context);
                 pin.setValue(functionPin.getValue().copy());
             }

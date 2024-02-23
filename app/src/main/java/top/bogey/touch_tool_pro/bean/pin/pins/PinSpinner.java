@@ -45,13 +45,14 @@ public class PinSpinner extends PinValue {
     }
 
     @Override
-    public boolean match(PinObject pinObject) {
-        if (getType() == pinObject.getType()) {
-            PinSpinner spinner = (PinSpinner) pinObject;
-            if (array == spinner.array && array != 0) return true;
-            return arrays.equals(spinner.arrays);
+    public boolean contain(PinObject pinObject) {
+        if (super.contain(pinObject)) {
+            if (pinObject instanceof PinSpinner spinner) {
+                if (array == spinner.array && array != 0) return true;
+                return arrays.equals(spinner.arrays);
+            }
         }
-        return super.match(pinObject);
+        return false;
     }
 
     @NonNull

@@ -104,7 +104,7 @@ public class FunctionCard extends ActionCard<FunctionInnerAction> {
                 binding.inBox.addView(pinView, binding.inBox.getChildCount() - offset);
             }
         }
-        pinView.setExpand(action.isExpand());
+        pinView.setExpand(action.isExpand(), action.isShowHide());
         pinViews.put(pin.getId(), pinView);
     }
 

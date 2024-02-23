@@ -23,6 +23,7 @@ import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.action.start.AppStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.BatteryStartAction;
+import top.bogey.touch_tool_pro.bean.action.start.BluetoothStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.ManualStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.NetworkStartAction;
 import top.bogey.touch_tool_pro.bean.action.start.NormalStartAction;
@@ -42,6 +43,7 @@ public class WorldState {
 
     private final ConcurrentHashMap<String, PackageInfo> appMap = new ConcurrentHashMap<>();
     private final LinkedHashMap<ManualStartAction, Task> manualStartActions = new LinkedHashMap<>();
+    private final ConcurrentHashMap<String, String> bluetoothDevices = new ConcurrentHashMap<>();
     private String packageName;
     private String activityName;
     private String notificationPackage;
@@ -49,6 +51,8 @@ public class WorldState {
     private int batteryPercent;
     private int batteryState;
     private int networkType;
+    private String bluetoothName;
+    private boolean newBluetoothDevice;
 
     public static WorldState getInstance() {
         if (helper == null) helper = new WorldState();
@@ -289,6 +293,40 @@ public class WorldState {
         if (networkType == this.networkType) return;
         this.networkType = networkType;
         checkAutoStartAction(NetworkStartAction.class);
+    }
+
+    public void addBluetoothDevices(String address, String name) {
+        bluetoothDevices.put(address, name);
+        bluetoothName = name;
+        newBluetoothDevice = true;
+        checkAutoStartAction(BluetoothStartAction.class);
+    }
+
+    public void removeBluetoothDevices(String address) {
+        bluetoothName = bluetoothDevices.remove(address);
+        newBluetoothDevice = false;
+        if (bluetoothName != null) {
+            checkAutoStartAction(BluetoothStartAction.class);
+        }
+    }
+
+    public String getBluetoothName() {
+        return bluetoothName;
+    }
+
+    public boolean isNewBluetoothDevice() {
+        return newBluetoothDevice;
+    }
+
+    public boolean existBluetoothDevice(String name) {
+        try {
+            Pattern pattern = Pattern.compile(name);
+            for (String value : bluetoothDevices.values()) {
+                if (pattern.matcher(value).find()) return true;
+            }
+        } catch (PatternSyntaxException ignored) {
+        }
+        return false;
     }
 
     public LinkedHashMap<ManualStartAction, Task> getManualStartActions() {

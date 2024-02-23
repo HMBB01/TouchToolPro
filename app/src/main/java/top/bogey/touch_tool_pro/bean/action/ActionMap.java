@@ -44,6 +44,7 @@ public enum ActionMap {
                     ActionType.NETWORK_START,
                     ActionType.SCREEN_START,
                     ActionType.BATTERY_START,
+                    ActionType.BLUETOOTH_START,
                     ActionType.OUTER_START
             ));
 
@@ -138,7 +139,10 @@ public enum ActionMap {
                     ActionType.INT_IN_AREA,
                     ActionType.INT_RANDOM,
 
-                    ActionType.INT_TO_VALUE_AREA
+                    ActionType.INT_TO_VALUE_AREA,
+
+                    ActionType.MATH_EXPRESSION,
+                    ActionType.FLOAT_TO_INT
             ));
 
             case POINT -> new ArrayList<>(Arrays.asList(
@@ -150,7 +154,8 @@ public enum ActionMap {
                     ActionType.POS_TO_TOUCH,
 
                     ActionType.AREA_TO_INT,
-                    ActionType.AREA_PICK
+                    ActionType.AREA_PICK,
+                    ActionType.AREA_CENTER_POS
             ));
 
             case ARRAY -> new ArrayList<>(Arrays.asList(
@@ -177,6 +182,7 @@ public enum ActionMap {
                     ActionType.BATTERY_STATE,
                     ActionType.SCREEN_STATE,
                     ActionType.NETWORK_STATE,
+                    ActionType.BLUETOOTH_STATE,
                     ActionType.CAPTURE_STATE,
                     ActionType.DATE_STATE,
                     ActionType.TIME_STATE

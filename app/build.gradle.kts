@@ -20,7 +20,7 @@ android {
         applicationId = "top.bogey.touch_tool_pro"
         minSdk = 24
         targetSdk = 34
-        versionCode = 56
+        versionCode = 59
         versionName = now
 
         externalNativeBuild {
@@ -104,4 +104,6 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
+
+    implementation(libs.exp4j)
 }

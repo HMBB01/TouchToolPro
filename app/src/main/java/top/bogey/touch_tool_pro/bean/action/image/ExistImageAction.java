@@ -26,6 +26,7 @@ public class ExistImageAction extends CheckAction {
     private transient Pin imagePin = new Pin(new PinImage(), R.string.pin_image);
     private transient Pin similarPin = new Pin(new PinInteger(85), R.string.action_exist_image_check_subtitle_similar);
     private transient Pin areaPin = new Pin(new PinArea(), R.string.pin_area);
+    private transient Pin rectPin = new Pin(new PinArea(), R.string.pin_area, true);
     private transient Pin posPin = new Pin(new PinPoint(), R.string.pin_point, true);
     private transient Pin realSimilarPin = new Pin(new PinInteger(), R.string.action_exist_image_check_subtitle_result, true);
 
@@ -35,6 +36,7 @@ public class ExistImageAction extends CheckAction {
         imagePin = addPin(imagePin);
         similarPin = addPin(similarPin);
         areaPin = addPin(areaPin);
+        rectPin = addPin(rectPin);
         posPin = addPin(posPin);
         realSimilarPin = addPin(realSimilarPin);
     }
@@ -45,6 +47,7 @@ public class ExistImageAction extends CheckAction {
         imagePin = reAddPin(imagePin);
         similarPin = reAddPin(similarPin);
         areaPin = reAddPin(areaPin);
+        rectPin = reAddPin(rectPin);
         posPin = reAddPin(posPin);
         realSimilarPin = reAddPin(realSimilarPin);
     }
@@ -76,6 +79,7 @@ public class ExistImageAction extends CheckAction {
         if (matchResult.value >= Math.min(100, similar.getValue())) {
             result.setBool(true);
             matchResult.rect.offset(rect.left, rect.top);
+            rectPin.getValue(PinArea.class).setArea(service, matchResult.rect);
             posPin.getValue(PinPoint.class).setPoint(service, matchResult.rect.centerX(), matchResult.rect.centerY());
             realSimilarPin.getValue(PinInteger.class).setValue(matchResult.value);
         }

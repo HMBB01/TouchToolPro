@@ -52,13 +52,14 @@ public abstract class PinView extends FrameLayout implements PinListener {
         button.setOnClickListener(view -> card.removePin(pin));
     }
 
-    public void setExpand(boolean expand) {
+    public void setExpand(boolean expand, boolean showHide) {
         if (pin.isVertical()) return;
-        if (pin.getLinks().isEmpty() && !expand) {
-            setVisibility(GONE);
-        } else {
-            setVisibility(VISIBLE);
-        }
+        // 连接不为空，必须显示
+        if (!pin.getLinks().isEmpty()) setVisibility(VISIBLE);
+        // 如果针脚隐藏且不展示隐藏
+        else if (pin.isHide() && !showHide) setVisibility(GONE);
+        // 否则就看展开状态
+        else setVisibility(expand ? VISIBLE : GONE);
     }
 
     public abstract void refreshPinUI();

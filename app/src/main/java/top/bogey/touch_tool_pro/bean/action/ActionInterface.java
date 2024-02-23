@@ -30,7 +30,7 @@ public interface ActionInterface {
 
     Pin getPinByUid(String uid);
 
-    Pin getFirstPinByClass(Class<? extends PinObject> pinClass, boolean out);
+    Pin getFirstMatchedPin(PinObject pinObject, boolean out);
 
     ArrayList<Pin> getPins();
 
@@ -45,6 +45,10 @@ public interface ActionInterface {
     boolean isExpand();
 
     void setExpand(boolean expand);
+
+    boolean isShowHide();
+
+    void setShowHide(boolean showHide);
 
     void addListener(ActionListener listener);
 

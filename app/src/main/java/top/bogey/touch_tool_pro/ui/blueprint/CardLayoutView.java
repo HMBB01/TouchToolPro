@@ -198,7 +198,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                 action.setExpand(!action.isExpand());
                 for (Pin pin : action.getPins()) {
                     PinView pinView = card.getPinViewById(pin.getId());
-                    if (pinView != null) pinView.setExpand(action.isExpand());
+                    if (pinView != null) pinView.setExpand(action.isExpand(), action.isShowHide());
                 }
             }
         });
@@ -483,7 +483,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
     private void showSelectActionDialog() {
         if (touchedPinView == null) return;
-        SelectActionDialog actionDialog = new SelectActionDialog(getContext(), this, touchedPinView.getPin().getPinClass(), dragOut);
+        SelectActionDialog actionDialog = new SelectActionDialog(getContext(), this, touchedPinView.getPin().getValue(), dragOut);
         if (actionDialog.isEmpty()) return;
         dialog = new MaterialAlertDialogBuilder(getContext())
                 .setView(actionDialog)
@@ -506,7 +506,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
 
     public void tryLinkDragPin(Action action) {
         if (touchedPinView != null) {
-            Pin pin = action.getFirstPinByClass(touchedPinView.getPin().getPinClass(), dragOut);
+            Pin pin = action.getFirstMatchedPin(touchedPinView.getPin().getValue(), dragOut);
             if (pin != null) {
                 if (action instanceof ArrayAction arrayAction && touchedPinView.getPin().getValue() instanceof PinValueArray array) {
                     arrayAction.setValueType(functionContext, array.getPinType());
@@ -657,7 +657,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                         next = false;
                     }
 
-                    if (next && !toLink && touchedPinView.getPin().isSameValueType(pinInDragPos.getPin())) {
+                    if (next && !toLink && touchedPinView.getPin().isValueMatched(pinInDragPos.getPin())) {
                         linePaint.setColor(touchedPinView.getPin().getValue().getPinColor(getContext()));
                         next = false;
                     }
