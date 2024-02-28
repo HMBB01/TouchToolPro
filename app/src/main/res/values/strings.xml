@@ -398,7 +398,7 @@
     <string name="action_int_to_value_area_title">数值组合为数值区域</string>
 
     <string name="action_math_expression_title">数学表达式</string>
-    <string name="action_math_expression_subtitle_expression">表达式</string>
+    <string name="action_math_expression_subtitle_expression">⨍()=</string>
     <string name="action_math_expression_subtitle_result">结果</string>
     <string name="action_math_expression_subtitle_expression_error">表达式错误</string>
 
