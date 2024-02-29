@@ -109,8 +109,8 @@ namespace ClipperLib {
     };
 //------------------------------------------------------------------------------
 
-    typedef std::vector <IntPoint> Path;
-    typedef std::vector <Path> Paths;
+    typedef std::vector<IntPoint> Path;
+    typedef std::vector<Path> Paths;
 
     inline Path &operator<<(Path &poly, const IntPoint &p) {
         poly.push_back(p);
@@ -330,7 +330,7 @@ namespace ClipperLib {
 
         void UpdateEdgeIntoAEL(TEdge *&e);
 
-        typedef std::vector <LocalMinimum> MinimaList;
+        typedef std::vector<LocalMinimum> MinimaList;
         MinimaList::iterator m_CurrentLM;
         MinimaList m_MinimaList;
 
@@ -341,7 +341,7 @@ namespace ClipperLib {
         PolyOutList m_PolyOuts;
         TEdge *m_ActiveEdges;
 
-        typedef std::priority_queue <cInt> ScanbeamList;
+        typedef std::priority_queue<cInt> ScanbeamList;
         ScanbeamList m_Scanbeam;
     };
 //------------------------------------------------------------------------------
@@ -382,7 +382,7 @@ namespace ClipperLib {
         JoinList m_GhostJoins;
         IntersectList m_IntersectList;
         ClipType m_ClipType;
-        typedef std::list <cInt> MaximaList;
+        typedef std::list<cInt> MaximaList;
         MaximaList m_Maxima;
         TEdge *m_SortedEdges;
         bool m_ExecuteLocked;
@@ -516,7 +516,7 @@ namespace ClipperLib {
         Paths m_destPolys;
         Path m_srcPoly;
         Path m_destPoly;
-        std::vector <DoublePoint> m_normals;
+        std::vector<DoublePoint> m_normals;
         double m_delta, m_sinA, m_sin, m_cos;
         double m_miterLim, m_StepsPerRad;
         IntPoint m_lowest;

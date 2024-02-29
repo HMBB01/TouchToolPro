@@ -2,7 +2,7 @@
 
 namespace ppredictor {
 
-    void PredictorInput::set_dims(std::vector <int64_t> dims) {
+    void PredictorInput::set_dims(std::vector<int64_t> dims) {
         // yolov3
         if (_net_flag == 101 && _index == 1) {
             _tensor->Resize({1, 2});

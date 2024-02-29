@@ -9,7 +9,7 @@ namespace ppredictor {
         return _tensor->data<int>();
     }
 
-    const std::vector <std::vector<uint64_t>> PredictorOutput::get_lod() const {
+    const std::vector<std::vector<uint64_t>> PredictorOutput::get_lod() const {
         return _tensor->lod();
     }
 
@@ -21,7 +21,7 @@ namespace ppredictor {
         }
     }
 
-    const std::vector <int64_t> PredictorOutput::get_shape() const {
+    const std::vector<int64_t> PredictorOutput::get_shape() const {
         return _tensor->shape();
     }
 }

@@ -51,17 +51,7 @@ public class AreaPickerFloatPreview extends BasePickerFloatView {
                         if (result != null) {
                             Bitmap bitmap = DisplayUtils.safeCreateBitmap(result, rect);
                             if (bitmap != null) {
-                                ArrayList<OcrResult> ocrResults = Predictor.getInstance().runOcr(bitmap);
-
-                                ocrResults.sort((o1, o2) -> {
-                                    int topOffset = -(o1.getArea().top - o2.getArea().top);
-                                    if (Math.abs(topOffset) <= 10) {
-                                        return -(o1.getArea().left - o2.getArea().left);
-                                    } else {
-                                        return topOffset;
-                                    }
-                                });
-
+                                ArrayList<OcrResult> ocrResults = Predictor.runOcr(bitmap);
                                 StringBuilder builder = new StringBuilder();
                                 for (int i = ocrResults.size() - 1; i >= 0; i--) {
                                     OcrResult ocrResult = ocrResults.get(i);

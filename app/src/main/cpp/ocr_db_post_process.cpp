@@ -53,7 +53,7 @@ static cv::RotatedRect unclip(float **box) {
 
     ClipperLib::Paths soln;
     offset.Execute(soln, distance);
-    std::vector <cv::Point2f> points;
+    std::vector<cv::Point2f> points;
 
     for (int j = 0; j < soln.size(); j++) {
         for (int i = 0; i < soln[soln.size() - 1].size(); i++) {
@@ -104,7 +104,7 @@ static void quickSort(float **s, int l, int r) {
     }
 }
 
-static void quickSort_vector(std::vector <std::vector<int>> &box, int l, int r,
+static void quickSort_vector(std::vector<std::vector<int>> &box, int l, int r,
                              int axis) {
     if (l < r) {
         int i = l, j = r;
@@ -130,12 +130,12 @@ static void quickSort_vector(std::vector <std::vector<int>> &box, int l, int r,
     }
 }
 
-static std::vector <std::vector<int>>
-order_points_clockwise(std::vector <std::vector<int>> pts) {
-    std::vector <std::vector<int>> box = pts;
+static std::vector<std::vector<int>>
+order_points_clockwise(std::vector<std::vector<int>> pts) {
+    std::vector<std::vector<int>> box = pts;
     quickSort_vector(box, 0, int(box.size() - 1), 0);
-    std::vector <std::vector<int>> leftmost = {box[0], box[1]};
-    std::vector <std::vector<int>> rightmost = {box[2], box[3]};
+    std::vector<std::vector<int>> leftmost = {box[0], box[1]};
+    std::vector<std::vector<int>> rightmost = {box[2], box[3]};
 
     if (leftmost[0][1] > leftmost[1][1]) {
         std::swap(leftmost[0], leftmost[1]);
@@ -145,8 +145,8 @@ order_points_clockwise(std::vector <std::vector<int>> pts) {
         std::swap(rightmost[0], rightmost[1]);
     }
 
-    std::vector <std::vector<int>> rect = {leftmost[0], rightmost[0], rightmost[1],
-                                           leftmost[1]};
+    std::vector<std::vector<int>> rect = {leftmost[0], rightmost[0], rightmost[1],
+                                          leftmost[1]};
     return rect;
 }
 
@@ -239,8 +239,7 @@ float box_score_fast(float **box_array, cv::Mat pred) {
     return score;
 }
 
-std::vector <std::vector<std::vector < int>>>
-
+std::vector<std::vector<std::vector<int>>>
 boxes_from_bitmap(const cv::Mat &pred, const cv::Mat &bitmap) {
     const int min_size = 3;
     const int max_candidates = 1000;
@@ -249,8 +248,8 @@ boxes_from_bitmap(const cv::Mat &pred, const cv::Mat &bitmap) {
     int width = bitmap.cols;
     int height = bitmap.rows;
 
-    std::vector <std::vector<cv::Point>> contours;
-    std::vector <cv::Vec4i> hierarchy;
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
 
     cv::findContours(bitmap, contours, hierarchy, cv::RETR_LIST,
                      cv::CHAIN_APPROX_SIMPLE);
@@ -258,7 +257,7 @@ boxes_from_bitmap(const cv::Mat &pred, const cv::Mat &bitmap) {
     int num_contours =
             contours.size() >= max_candidates ? max_candidates : contours.size();
 
-    std::vector < std::vector < std::vector < int>>> boxes;
+    std::vector<std::vector<std::vector<int>>> boxes;
 
     for (int _i = 0; _i < num_contours; _i++) {
         float ssid;
@@ -291,7 +290,7 @@ boxes_from_bitmap(const cv::Mat &pred, const cv::Mat &bitmap) {
 
         int dest_width = pred.cols;
         int dest_height = pred.rows;
-        std::vector <std::vector<int>> intcliparray;
+        std::vector<std::vector<int>> intcliparray;
 
         for (int num_pt = 0; num_pt < 4; num_pt++) {
             std::vector<int> a{int(clampf(roundf(cliparray[num_pt][0] / float(width) *
@@ -312,68 +311,33 @@ int _max(int a, int b) { return a >= b ? a : b; }
 
 int _min(int a, int b) { return a >= b ? b : a; }
 
-std::vector <std::vector<std::vector < int>>>
+std::vector<std::vector<std::vector<int>>>
+filter_tag_det_res(const std::vector<std::vector<std::vector<int>>> &o_boxes,
+                   float ratio_h, float ratio_w, const cv::Mat &srcimg) {
+    int oriimg_h = srcimg.rows;
+    int oriimg_w = srcimg.cols;
+    std::vector<std::vector<std::vector<int>>> boxes{o_boxes};
+    std::vector<std::vector<std::vector<int>>> root_points;
+    for (int n = 0; n < boxes.size(); n++) {
+        boxes[n] = order_points_clockwise(boxes[n]);
+        for (int m = 0; m < boxes[0].size(); m++) {
+            boxes[n][m][0] /= ratio_w;
+            boxes[n][m][1] /= ratio_h;
 
-filter_tag_det_res(const std::vector <std::vector<std::vector < int>>
+            boxes[n][m][0] = int(_min(_max(boxes[n][m][0], 0), oriimg_w - 1));
+            boxes[n][m][1] = int(_min(_max(boxes[n][m][1], 0), oriimg_h - 1));
+        }
+    }
 
-> &o_boxes,
-float ratio_h,
-float ratio_w,
-const cv::Mat &srcimg
-) {
-int oriimg_h = srcimg.rows;
-int oriimg_w = srcimg.cols;
-std::vector <std::vector<std::vector < int>>> boxes{
-o_boxes};
-std::vector <std::vector<std::vector < int>>>
-root_points;
-for (
-int n = 0;
-n<boxes.
-
-size();
-
-n++) {
-boxes[n] =
-order_points_clockwise(boxes[n]);
-for (
-int m = 0;
-m<boxes[0].
-
-size();
-
-m++) {
-boxes[n][m][0] /=
-ratio_w;
-boxes[n][m][1] /=
-ratio_h;
-
-boxes[n][m][0] =
-int(_min(_max(boxes[n][m][0], 0), oriimg_w - 1)
-);
-boxes[n][m][1] =
-int(_min(_max(boxes[n][m][1], 0), oriimg_h - 1)
-);
-}
-}
-
-for (
-int n = 0;
-n<boxes.
-
-size();
-
-n++) {
-int rect_width, rect_height;
-rect_width = int(sqrt(pow(boxes[n][0][0] - boxes[n][1][0], 2) +
-                      pow(boxes[n][0][1] - boxes[n][1][1], 2)));
-rect_height = int(sqrt(pow(boxes[n][0][0] - boxes[n][3][0], 2) +
-                       pow(boxes[n][0][1] - boxes[n][3][1], 2)));
-if (rect_width <= 10 || rect_height <= 10)
-continue;
-root_points.
-push_back(boxes[n]);
-}
-return
-root_points;
+    for (int n = 0; n < boxes.size(); n++) {
+        int rect_width, rect_height;
+        rect_width = int(sqrt(pow(boxes[n][0][0] - boxes[n][1][0], 2) +
+                              pow(boxes[n][0][1] - boxes[n][1][1], 2)));
+        rect_height = int(sqrt(pow(boxes[n][0][0] - boxes[n][3][0], 2) +
+                               pow(boxes[n][0][1] - boxes[n][3][1], 2)));
+        if (rect_width <= 10 || rect_height <= 10)
+            continue;
+        root_points.push_back(boxes[n]);
+    }
+    return root_points;
 }

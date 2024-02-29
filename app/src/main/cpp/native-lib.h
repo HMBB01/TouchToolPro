@@ -4,13 +4,12 @@
 
 #pragma once
 
+#include "common.h"
+#include <android/bitmap.h>
 #include <jni.h>
+#include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
-
-#include "common.h"
-#include "android/bitmap.h"
-#include <opencv2/opencv.hpp>
 
 inline std::string jstring_to_cpp_string(JNIEnv *env, jstring jstr) {
     // In java, a unicode char will be encoded using 2 bytes (utf16).
@@ -48,7 +47,7 @@ inline jstring cpp_string_to_jstring(JNIEnv *env, std::string str) {
                             reinterpret_cast<const jbyte *>(data));
 
     jstring encoding = env->NewStringUTF("UTF-8");
-    jstring res = (jstring)(
+    jstring res = (jstring) (
             env->NewObject(strClass, strClassInitMethodID, bytes, encoding));
 
     env->DeleteLocalRef(strClass);
@@ -83,7 +82,7 @@ inline jbyteArray cpp_array_to_jbytearray(JNIEnv *env, const int8_t *buf,
 }
 
 inline jlongArray int64_vector_to_jlongarray(JNIEnv *env,
-                                             const std::vector <int64_t> &vec) {
+                                             const std::vector<int64_t> &vec) {
     jlongArray result = env->NewLongArray(vec.size());
     jlong *buf = new jlong[vec.size()];
     for (size_t i = 0; i < vec.size(); ++i) {
@@ -94,11 +93,11 @@ inline jlongArray int64_vector_to_jlongarray(JNIEnv *env,
     return result;
 }
 
-inline std::vector <int64_t> jlongarray_to_int64_vector(JNIEnv *env,
-                                                        jlongArray data) {
+inline std::vector<int64_t> jlongarray_to_int64_vector(JNIEnv *env,
+                                                       jlongArray data) {
     int data_size = env->GetArrayLength(data);
     jlong *data_ptr = env->GetLongArrayElements(data, nullptr);
-    std::vector <int64_t> data_vec(data_ptr, data_ptr + data_size);
+    std::vector<int64_t> data_vec(data_ptr, data_ptr + data_size);
     env->ReleaseLongArrayElements(data, data_ptr, 0);
     return data_vec;
 }

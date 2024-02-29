@@ -72,8 +72,8 @@ public class ExistTextOcrAction extends CheckAction {
         Rect areaArea = area.getArea(service);
         Bitmap currImage = runnable.getCurrImage(service);
         Bitmap bitmap = DisplayUtils.safeCreateBitmap(currImage, areaArea);
-        ArrayList<OcrResult> results = Predictor.getInstance().runOcr(bitmap);
-        if (results == null) return;
+        ArrayList<OcrResult> results = Predictor.runOcr(bitmap);
+        if (results.isEmpty()) return;
 
         Pattern pattern = Pattern.compile(text.getValue());
         for (OcrResult ocrResult : results) {
@@ -91,6 +91,9 @@ public class ExistTextOcrAction extends CheckAction {
 
     @Override
     public ActionCheckResult check(FunctionContext context) {
+        if (!Predictor.ocrReady()) {
+            return new ActionCheckResult(ActionCheckResult.ActionResultType.ERROR, R.string.error_ocr_not_ready);
+        }
         if (resultPin.getLinks().isEmpty()) {
             if (!posPin.getLinks().isEmpty()) {
                 return new ActionCheckResult(ActionCheckResult.ActionResultType.ERROR, R.string.error_result_pin_no_use);

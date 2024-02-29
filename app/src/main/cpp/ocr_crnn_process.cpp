@@ -83,9 +83,9 @@ cv::Mat crnn_resize_img(const cv::Mat &img, float wh_ratio) {
 }
 
 cv::Mat get_rotate_crop_image(const cv::Mat &srcimage,
-                              const std::vector <std::vector<int>> &box) {
+                              const std::vector<std::vector<int>> &box) {
 
-    std::vector <std::vector<int>> points = box;
+    std::vector<std::vector<int>> points = box;
 
     int x_collect[4] = {box[0][0], box[1][0], box[2][0], box[3][0]};
     int y_collect[4] = {box[0][1], box[1][1], box[2][1], box[3][1]};

@@ -66,7 +66,8 @@ import top.bogey.touch_tool_pro.utils.SettingSave;
 import top.bogey.touch_tool_pro.utils.TaskQueue;
 import top.bogey.touch_tool_pro.utils.TaskThreadPoolExecutor;
 import top.bogey.touch_tool_pro.utils.easy_float.EasyFloat;
-import top.bogey.touch_tool_pro.utils.ocr.BitmapResultCallback;
+import top.bogey.touch_tool_pro.utils.BitmapResultCallback;
+import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 
 public class MainAccessibilityService extends AccessibilityService {
     public static final MutableLiveData<Boolean> serviceConnected = new MutableLiveData<>(false);
@@ -200,10 +201,12 @@ public class MainAccessibilityService extends AccessibilityService {
         if (isServiceEnabled()) {
             WorldState.getInstance().resetAppMap(this);
             SuperUser.tryInit();
+            Predictor.tryInitOcr();
             resetAlarm();
         } else {
             cancelAllAlarm();
             stopAllTask();
+            Predictor.destroy();
             SuperUser.exit();
         }
     }

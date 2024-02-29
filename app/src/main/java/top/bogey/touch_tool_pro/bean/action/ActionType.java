@@ -127,6 +127,7 @@ import top.bogey.touch_tool_pro.bean.action.var.SetCommonVariableValue;
 import top.bogey.touch_tool_pro.bean.action.var.SetLocalVariableValue;
 import top.bogey.touch_tool_pro.super_user.SuperUser;
 import top.bogey.touch_tool_pro.utils.SettingSave;
+import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 
 public enum ActionType {
     BASE,
@@ -339,8 +340,18 @@ public enum ActionType {
 
     private final static ActionConfigInfo CHECK_EXIST_TEXT_CONFIG = new ActionConfigInfo(CHECK_EXIST_TEXT, R.string.action_exist_text_check_title, R.drawable.icon_text, ExistTextAction.class);
     private final static ActionConfigInfo CHECK_EXIST_TEXTS_CONFIG = new ActionConfigInfo(CHECK_EXIST_TEXTS, R.string.action_exist_texts_check_title, R.drawable.icon_text, ExistTextsAction.class);
-    private final static ActionConfigInfo CHECK_EXIST_TEXT_OCR_CONFIG = new ActionConfigInfo(CHECK_EXIST_TEXT_OCR, R.string.action_exist_text_ocr_check_title, R.drawable.icon_text, ExistTextOcrAction.class);
-    private final static ActionConfigInfo OCR_TEXT_STATE_CONFIG = new ActionConfigInfo(OCR_TEXT_STATE, R.string.action_ocr_text_state_title, R.drawable.icon_text, OcrTextStateAction.class);
+    private final static ActionConfigInfo CHECK_EXIST_TEXT_OCR_CONFIG = new ActionConfigInfo(CHECK_EXIST_TEXT_OCR, R.string.action_exist_text_ocr_check_title, R.drawable.icon_text, ExistTextOcrAction.class) {
+        @Override
+        public boolean isValid() {
+            return Predictor.ocrReady();
+        }
+    };
+    private final static ActionConfigInfo OCR_TEXT_STATE_CONFIG = new ActionConfigInfo(OCR_TEXT_STATE, R.string.action_ocr_text_state_title, R.drawable.icon_text, OcrTextStateAction.class) {
+        @Override
+        public boolean isValid() {
+            return Predictor.ocrReady();
+        }
+    };
 
     private final static ActionConfigInfo STRING_FROM_VALUE_CONFIG = new ActionConfigInfo(STRING_FROM_VALUE, R.string.action_string_from_value_title, R.drawable.icon_text, StringFromValueAction.class);
     private final static ActionConfigInfo STRING_TO_INT_CONFIG = new ActionConfigInfo(STRING_TO_INT, R.string.action_string_to_int_title, R.drawable.icon_text, StringToIntAction.class);

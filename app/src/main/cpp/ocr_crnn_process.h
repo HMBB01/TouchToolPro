@@ -10,7 +10,7 @@
 extern const std::vector<int> REC_IMAGE_SHAPE;
 
 cv::Mat get_rotate_crop_image(const cv::Mat &srcimage,
-                              const std::vector <std::vector<int>> &box);
+                              const std::vector<std::vector<int>> &box);
 
 cv::Mat crnn_resize_img(const cv::Mat &img, float wh_ratio);
 

@@ -63,8 +63,8 @@ namespace ppredictor {
         return input;
     }
 
-    std::vector <PredictorInput> PPredictor::get_inputs(int num) {
-        std::vector <PredictorInput> results;
+    std::vector<PredictorInput> PPredictor::get_inputs(int num) {
+        std::vector<PredictorInput> results;
         for (int i = 0; i < num; i++) {
             results.emplace_back(get_input(i));
         }
@@ -73,9 +73,9 @@ namespace ppredictor {
 
     PredictorInput PPredictor::get_first_input() { return get_input(0); }
 
-    std::vector <PredictorOutput> PPredictor::infer() {
+    std::vector<PredictorOutput> PPredictor::infer() {
         LOGI("ocr cpp infer Run start %d", _net_flag);
-        std::vector <PredictorOutput> results;
+        std::vector<PredictorOutput> results;
         if (!_is_input_get) {
             return results;
         }

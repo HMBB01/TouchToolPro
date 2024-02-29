@@ -46,7 +46,6 @@ import top.bogey.touch_tool_pro.utils.AppUtils;
 import top.bogey.touch_tool_pro.utils.GsonUtils;
 import top.bogey.touch_tool_pro.utils.SettingSave;
 import top.bogey.touch_tool_pro.utils.easy_float.EasyFloat;
-import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 
 public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
@@ -62,7 +61,6 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(binding.toolBar);
 
         runFirstTimes();
-        Predictor.getInstance();
     }
 
     @Override

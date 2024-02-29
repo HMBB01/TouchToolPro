@@ -2,6 +2,7 @@ package top.bogey.touch_tool_pro.ui.setting;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -22,6 +23,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import top.bogey.touch_tool_pro.MainApplication;
@@ -36,6 +38,7 @@ import top.bogey.touch_tool_pro.ui.MainActivity;
 import top.bogey.touch_tool_pro.utils.AppUtils;
 import top.bogey.touch_tool_pro.utils.SettingSave;
 import top.bogey.touch_tool_pro.utils.easy_float.EasyFloat;
+import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 
 public class SettingView extends Fragment {
     private ViewSettingBinding binding;
@@ -63,6 +66,7 @@ public class SettingView extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        MainActivity activity = (MainActivity) requireActivity();
         binding = ViewSettingBinding.inflate(inflater, container, false);
 
         // 应用设置
@@ -191,8 +195,46 @@ public class SettingView extends Fragment {
         binding.useExactAlarmSwitch.setSaveEnabled(false);
 
 
+        binding.useOcrSwitch.setOnClickListener(v -> {
+            if (binding.useOcrSwitch.isChecked()) {
+                if (Predictor.initOcr()) {
+                    SettingSave.getInstance().setUseOcr(true);
+                } else {
+                    new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.dialog_title)
+                            .setMessage(R.string.permission_setting_ocr_open_tips)
+                            .setPositiveButton(R.string.permission_setting_ocr_download, (dialog, which) -> {
+                                dialog.dismiss();
+                                AppUtils.gotoUrl(requireContext(), getString(R.string.permission_setting_ocr_download_url));
+                            })
+                            .setNegativeButton(R.string.permission_setting_ocr_import, (dialog, which) -> {
+                                dialog.dismiss();
+                                activity.launcherContent((code, intent) -> {
+                                    if (code == Activity.RESULT_OK) {
+                                        Uri uri = intent.getData();
+                                        if (uri != null && uri.getScheme() != null && uri.getScheme().equals(ContentResolver.SCHEME_FILE) && uri.getPath() != null) {
+                                            File file = new File(uri.getPath());
+                                            if (!file.getName().contains(".zip")) return;
+                                            if (Predictor.importModel(file)) {
+                                                SettingSave.getInstance().setUseOcr(true);
+                                                binding.useOcrSwitch.setChecked(true);
+                                            }
+                                        }
+                                    }
+                                });
+                            })
+                            .setNeutralButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                            .show();
+                    binding.useOcrSwitch.setChecked(false);
+                }
+            } else {
+                SettingSave.getInstance().setUseOcr(false);
+                Predictor.destroy();
+            }
+        });
+        binding.useOcrSwitch.setChecked(SettingSave.getInstance().isUseOcr());
+
         binding.useBluetoothSwitch.setOnClickListener(v -> {
-            MainActivity activity = (MainActivity) requireActivity();
             if (binding.useBluetoothSwitch.isChecked()) {
                 binding.useBluetoothSwitch.setChecked(false);
                 activity.launcherBluetooth((code, intent) -> {
@@ -220,17 +262,14 @@ public class SettingView extends Fragment {
                     .show();
         });
 
-        binding.taskImportButton.setOnClickListener(v -> {
-            MainActivity mainActivity = (MainActivity) requireActivity();
-            mainActivity.launcherContent((code, intent) -> {
-                if (code == Activity.RESULT_OK) {
-                    Uri uri = intent.getData();
-                    if (uri != null) {
-                        mainActivity.saveTasks(uri);
-                    }
+        binding.taskImportButton.setOnClickListener(v -> activity.launcherContent((code, intent) -> {
+            if (code == Activity.RESULT_OK) {
+                Uri uri = intent.getData();
+                if (uri != null) {
+                    activity.saveTasks(uri);
                 }
-            });
-        });
+            }
+        }));
 
         binding.playViewVisibleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {

@@ -156,7 +156,7 @@ public class BaseActivity extends AppCompatActivity {
             return;
         }
         resultCallback = callback;
-        contentLauncher.launch("application/octet-stream");
+        contentLauncher.launch("*/*");
     }
 
     public void launcherCreateDocument(String fileName, ActivityResultCallback callback) {

@@ -27,7 +27,7 @@ static int clamp(int up, int low, int value) {
 static paddle::lite_api::PowerMode str_to_cpu_mode(const std::string &cpu_mode) {
     static std::map<std::string, paddle::lite_api::PowerMode> cpu_mode_map{
             {"LITE_POWER_HIGH",      paddle::lite_api::LITE_POWER_HIGH},
-            {"LITE_POWER_LOW",       paddle::lite_api::LITE_POWER_HIGH},
+            {"LITE_POWER_LOW",       paddle::lite_api::LITE_POWER_LOW},
             {"LITE_POWER_FULL",      paddle::lite_api::LITE_POWER_FULL},
             {"LITE_POWER_NO_BIND",   paddle::lite_api::LITE_POWER_NO_BIND},
             {"LITE_POWER_RAND_HIGH", paddle::lite_api::LITE_POWER_RAND_HIGH},
@@ -188,7 +188,7 @@ Java_top_bogey_touch_1tool_1pro_utils_ocr_Predictor_init(JNIEnv *env, jclass cla
 
 extern "C"
 JNIEXPORT jfloatArray JNICALL
-Java_top_bogey_touch_1tool_1pro_utils_ocr_Predictor_forward(JNIEnv *env, jobject thiz, jlong j_pointer, jobject j_original_image, jint j_max_size_len, jint j_run_det, jint j_run_cls, jint j_run_rec) {
+Java_top_bogey_touch_1tool_1pro_utils_ocr_Predictor_forward(JNIEnv *env, jclass thiz, jlong j_pointer, jobject j_original_image, jint j_max_size_len, jint j_run_det, jint j_run_cls, jint j_run_rec) {
     LOGI("begin to run native forward");
     if (j_pointer == 0) {
         LOGE("JAVA pointer is NULL");
@@ -236,7 +236,7 @@ Java_top_bogey_touch_1tool_1pro_utils_ocr_Predictor_forward(JNIEnv *env, jobject
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_top_bogey_touch_1tool_1pro_utils_ocr_Predictor_release(JNIEnv *env, jobject thiz, jlong j_pointer) {
+Java_top_bogey_touch_1tool_1pro_utils_ocr_Predictor_release(JNIEnv *env, jclass thiz, jlong j_pointer) {
     if (j_pointer == 0) {
         LOGE("JAVA pointer is NULL");
         return;

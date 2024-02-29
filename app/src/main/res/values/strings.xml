@@ -147,6 +147,7 @@
     <string name="error_no_alarm_permission">需要开启精确定时</string>
     <string name="error_no_bluetooth_permission">需要开启蓝牙权限</string>
     <string name="error_math_expression_linked">表达式不能连接</string>
+    <string name="error_ocr_not_ready">需要开启Ocr功能</string>
 
     <!-- 警告 -->
     <string name="warning_check_time_too_short">检查间隔过短，可能引起卡顿</string>
@@ -615,6 +616,13 @@
 
     <string name="permission_setting_first_use_exact_alarm">精确定时</string>
     <string name="permission_setting_first_use_exact_alarm_tips">使用精确定时可以使用“定时执行”卡片</string>
+
+    <string name="permission_setting_ocr">Ocr配置</string>
+    <string name="permission_setting_ocr_tips">配置Ocr模型可以使用“界面内存在文本(OCR)”、“获取文本(OCR)”卡片</string>
+    <string name="permission_setting_ocr_open_tips">未找到Ocr模型，需要下载后导入</string>
+    <string name="permission_setting_ocr_download">去下载</string>
+    <string name="permission_setting_ocr_download_url">https://www.123pan.com/s/GK8Wjv-tuNh.html</string>
+    <string name="permission_setting_ocr_import">去导入</string>
 
     <string name="permission_setting_bluetooth">蓝牙权限</string>
     <string name="permission_setting_bluetooth_tips">使用蓝牙权限可以使用“蓝牙连接变动时执行”、“蓝牙状态”卡片</string>

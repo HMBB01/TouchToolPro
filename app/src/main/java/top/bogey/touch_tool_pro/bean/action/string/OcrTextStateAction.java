@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import top.bogey.touch_tool_pro.MainApplication;
 import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.Action;
+import top.bogey.touch_tool_pro.bean.action.ActionCheckResult;
 import top.bogey.touch_tool_pro.bean.action.ActionType;
 import top.bogey.touch_tool_pro.bean.function.FunctionContext;
 import top.bogey.touch_tool_pro.bean.pin.Pin;
@@ -55,17 +56,8 @@ public class OcrTextStateAction extends Action {
         Rect areaArea = area.getArea(service);
         Bitmap currImage = runnable.getCurrImage(service);
         Bitmap bitmap = DisplayUtils.safeCreateBitmap(currImage, areaArea);
-        ArrayList<OcrResult> results = Predictor.getInstance().runOcr(bitmap);
-        if (results == null) return;
-
-        results.sort((o1, o2) -> {
-            int topOffset = -(o1.getArea().top - o2.getArea().top);
-            if (Math.abs(topOffset) <= 10) {
-                return -(o1.getArea().left - o2.getArea().left);
-            } else {
-                return topOffset;
-            }
-        });
+        ArrayList<OcrResult> results = Predictor.runOcr(bitmap);
+        if (results.isEmpty()) return;
 
         PinInteger similar = (PinInteger) getPinValue(runnable, context, similarPin);
         StringBuilder builder = new StringBuilder();
@@ -76,5 +68,13 @@ public class OcrTextStateAction extends Action {
             }
         }
         text.setValue(builder.toString());
+    }
+
+    @Override
+    public ActionCheckResult check(FunctionContext context) {
+        if (!Predictor.ocrReady()) {
+            return new ActionCheckResult(ActionCheckResult.ActionResultType.ERROR, R.string.error_ocr_not_ready);
+        }
+        return super.check(context);
     }
 }

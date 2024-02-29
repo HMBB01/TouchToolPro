@@ -20,7 +20,7 @@ android {
         applicationId = "top.bogey.touch_tool_pro"
         minSdk = 24
         targetSdk = 34
-        versionCode = 59
+        versionCode = 60
         versionName = now
 
         externalNativeBuild {
@@ -60,8 +60,8 @@ android {
         }
     }
 
-    applicationVariants.configureEach {
-        outputs.configureEach {
+    applicationVariants.all {
+        outputs.all {
             if (buildType.name == "release") {
                 val impl = this as BaseVariantOutputImpl
                 impl.outputFileName = "点击助手Pro_$now.APK"

@@ -4,45 +4,112 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Vector;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import top.bogey.touch_tool_pro.MainApplication;
-import top.bogey.touch_tool_pro.utils.AppUtils;
+import top.bogey.touch_tool_pro.utils.SettingSave;
 
 public class Predictor {
-    private static Predictor predictor;
-    private final Vector<String> labels = new Vector<>();
-    private long nativePointer;
-    private boolean warmup = false;
+    private final static String KEYS = "keys.txt";
+    private final static String DET = "det.nb";
+    private final static String CLS = "cls.nb";
+    private final static String REC = "rec.nb";
 
-    private Predictor(Context context) {
-        loadModel(context);
-        loadLabels(context);
+    private static final ArrayList<String> labels = new ArrayList<>();
+    private static long nativePointer;
+
+    public static void tryInitOcr() {
+        if (SettingSave.getInstance().isUseOcr()) initOcr();
     }
 
-    public static Predictor getInstance() {
-        if (predictor == null) {
-            predictor = new Predictor(MainApplication.getInstance());
+    public static boolean initOcr() {
+        String[] fileNames = new String[]{KEYS, DET, CLS, REC};
+        for (String fileName : fileNames) {
+            File file = getFile(fileName);
+            if (!file.exists()) return false;
         }
-        return predictor;
+        return loadLabels() && loadModel();
     }
 
-    public static native long init(String detModelPath, String recModelPath, String clsModelPath, int useOpencl, int threadNum, String cpuMode);
+    public static boolean ocrReady() {
+        return nativePointer != 0;
+    }
 
-    public ArrayList<OcrResult> runOcr(Bitmap image) {
-        if (image == null) return null;
-        if (!warmup) {
-            forward(nativePointer, image, 960, 1, 0, 1);
-            warmup = true;
+    private static boolean loadLabels() {
+        labels.clear();
+        labels.add("black");
+
+        try (InputStream inputStream = new FileInputStream(getFile(KEYS))) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                labels.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
+
+        labels.add(" ");
+        return true;
+    }
+
+    private static boolean loadModel() {
+        Context context = MainApplication.getInstance();
+        String modelDir = context.getFilesDir() + File.separator + "ocr" + File.separator;
+        nativePointer = init(modelDir + DET, modelDir + REC, modelDir + CLS, 0, 8, "LITE_POWER_HIGH");
+        return nativePointer != 0;
+    }
+
+    private static File getFile(String fileName) {
+        Context context = MainApplication.getInstance();
+        return new File(context.getFilesDir(), File.separator + "ocr" + File.separator + fileName);
+    }
+
+    public static boolean importModel(File zipFile) {
+        Context context = MainApplication.getInstance();
+        String modelDir = context.getFilesDir() + File.separator + "ocr";
+        File dirFile = new File(modelDir);
+        if (!dirFile.exists()) if (!dirFile.mkdirs()) return false;
+
+        try {
+            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFile));
+            ZipEntry zipEntry;
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                File file = new File(modelDir, zipEntry.getName());
+                if (file.isDirectory()) continue;
+
+                FileOutputStream outputStream = new FileOutputStream(file);
+                byte[] bytes = new byte[1024];
+                int len;
+                while ((len = zipInputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, len);
+                }
+                outputStream.close();
+            }
+            zipInputStream.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static ArrayList<OcrResult> runOcr(Bitmap image) {
+        ArrayList<OcrResult> results = new ArrayList<>();
+        if (!ocrReady() || image == null) return results;
+
         float[] floats = forward(nativePointer, image, 960, 1, 0, 1);
 
-        ArrayList<OcrResult> results = new ArrayList<>();
         int begin = 0;
         while (begin < floats.length) {
             int pointNum = Math.round(floats[begin]);
@@ -77,40 +144,28 @@ public class Predictor {
 
             begin += (3 + pointNum * 2 + wordNum + 2);
         }
+
+        results.sort((o1, o2) -> {
+            int topOffset = -(o1.getArea().top - o2.getArea().top);
+            if (Math.abs(topOffset) <= 10) {
+                return -(o1.getArea().left - o2.getArea().left);
+            } else {
+                return topOffset;
+            }
+        });
+
         return results;
     }
 
-    public void destroy() {
-        release(nativePointer);
+    public static void destroy() {
+        if (ocrReady()) release(nativePointer);
+        nativePointer = 0;
     }
 
-    private void loadModel(Context context) {
-        String modelDir = context.getFilesDir() + "/models";
-        AppUtils.copyDirFromAssets(context, "models", modelDir);
-        nativePointer = init(modelDir + File.separator + "det.nb",
-                modelDir + File.separator + "rec.nb",
-                modelDir + File.separator + "cls.nb",
-                0, 4, "LITE_POWER_HIGH");
-    }
 
-    private void loadLabels(Context context) {
-        labels.clear();
-        labels.add("black");
+    private static native long init(String detModelPath, String recModelPath, String clsModelPath, int useOpencl, int threadNum, String cpuMode);
 
-        try (InputStream inputStream = context.getAssets().open("labels/keys.txt")) {
-            int available = inputStream.available();
-            byte[] lines = new byte[available];
-            inputStream.read(lines);
-            String word = new String(lines);
-            String[] words = word.split("\n");
-            Collections.addAll(labels, words);
-            labels.add(" ");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static native float[] forward(long pointer, Bitmap originalImage, int max_size_len, int run_det, int run_cls, int run_rec);
 
-    public native float[] forward(long pointer, Bitmap originalImage, int max_size_len, int run_det, int run_cls, int run_rec);
-
-    public native void release(long pointer);
+    private static native void release(long pointer);
 }

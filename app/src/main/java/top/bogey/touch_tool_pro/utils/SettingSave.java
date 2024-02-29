@@ -39,6 +39,7 @@ public class SettingSave {
 
     private static final String SUPER_USER_TYPE = "SUPER_USER_TYPE";                            // 超级用户类型
     private static final String USE_EXACT_ALARM = "USE_EXACT_ALARM";                            // 使用精确计时
+    private static final String USE_OCR = "USE_OCR";                                            // 使用Ocr
     private static final String USE_BLUETOOTH = "USE_BLUETOOTH";                                // 使用蓝牙
 
     private static final String PLAY_VIEW_VISIBLE_TYPE = "PLAY_VIEW_VISIBLE_TYPE";              // 显示手动执行悬浮窗
@@ -191,6 +192,14 @@ public class SettingSave {
 
     public void setUseExactAlarm(boolean useExactAlarm) {
         settingMMKV.encode(USE_EXACT_ALARM, useExactAlarm);
+    }
+
+    public boolean isUseOcr() {
+        return settingMMKV.decodeBool(USE_OCR, false);
+    }
+
+    public void setUseOcr(boolean useOcr) {
+        settingMMKV.encode(USE_OCR, useOcr);
     }
 
     public boolean getUseBluetooth(Context context) {
