@@ -3,15 +3,18 @@ package top.bogey.touch_tool_pro.utils.ocr;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.net.Uri;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -32,6 +35,7 @@ public class Predictor {
     }
 
     public static boolean initOcr() {
+        if (ocrReady()) return true;
         String[] fileNames = new String[]{KEYS, DET, CLS, REC};
         for (String fileName : fileNames) {
             File file = getFile(fileName);
@@ -75,17 +79,21 @@ public class Predictor {
         return new File(context.getFilesDir(), File.separator + "ocr" + File.separator + fileName);
     }
 
-    public static boolean importModel(File zipFile) {
+    public static boolean importModel(Uri uri) {
         Context context = MainApplication.getInstance();
         String modelDir = context.getFilesDir() + File.separator + "ocr";
         File dirFile = new File(modelDir);
         if (!dirFile.exists()) if (!dirFile.mkdirs()) return false;
 
+        ArrayList<String> fileNames = new ArrayList<>(Arrays.asList(KEYS, DET, CLS, REC));
         try {
-            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFile));
+            ZipInputStream zipInputStream = new ZipInputStream(context.getContentResolver().openInputStream(uri));
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                File file = new File(modelDir, zipEntry.getName());
+                String name = zipEntry.getName();
+                if (!fileNames.remove(name)) return false;
+
+                File file = new File(modelDir, name);
                 if (file.isDirectory()) continue;
 
                 FileOutputStream outputStream = new FileOutputStream(file);
@@ -97,7 +105,7 @@ public class Predictor {
                 outputStream.close();
             }
             zipInputStream.close();
-            return true;
+            return fileNames.isEmpty();
         } catch (IOException e) {
             e.printStackTrace();
             return false;

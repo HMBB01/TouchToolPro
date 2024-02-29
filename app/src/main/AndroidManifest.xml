@@ -109,6 +109,7 @@
                 <data android:scheme="content" />
                 <data android:pathPattern=".*\\.ttp.*" />
                 <data android:pathPattern=".*\\.apk.*" />
+                <data android:pathPattern="ocr.*\\.zip" />
                 <data android:mimeType="*/*" />
             </intent-filter>
 

@@ -2,7 +2,6 @@ package top.bogey.touch_tool_pro.ui.setting;
 
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -23,7 +22,6 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import top.bogey.touch_tool_pro.MainApplication;
@@ -212,12 +210,12 @@ public class SettingView extends Fragment {
                                 activity.launcherContent((code, intent) -> {
                                     if (code == Activity.RESULT_OK) {
                                         Uri uri = intent.getData();
-                                        if (uri != null && uri.getScheme() != null && uri.getScheme().equals(ContentResolver.SCHEME_FILE) && uri.getPath() != null) {
-                                            File file = new File(uri.getPath());
-                                            if (!file.getName().contains(".zip")) return;
-                                            if (Predictor.importModel(file)) {
+                                        if (uri != null) {
+                                            if (Predictor.importModel(uri)) {
                                                 SettingSave.getInstance().setUseOcr(true);
                                                 binding.useOcrSwitch.setChecked(true);
+                                            } else {
+                                                Toast.makeText(getContext(), R.string.permission_setting_ocr_import_error, Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     }

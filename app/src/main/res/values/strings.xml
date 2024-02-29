@@ -623,6 +623,8 @@
     <string name="permission_setting_ocr_download">去下载</string>
     <string name="permission_setting_ocr_download_url">https://www.123pan.com/s/GK8Wjv-tuNh.html</string>
     <string name="permission_setting_ocr_import">去导入</string>
+    <string name="permission_setting_ocr_import_error">模型导入失败</string>
+    <string name="permission_setting_ocr_import_success">模型导入成功</string>
 
     <string name="permission_setting_bluetooth">蓝牙权限</string>
     <string name="permission_setting_bluetooth_tips">使用蓝牙权限可以使用“蓝牙连接变动时执行”、“蓝牙状态”卡片</string>

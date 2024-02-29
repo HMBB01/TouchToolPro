@@ -46,6 +46,7 @@ import top.bogey.touch_tool_pro.utils.AppUtils;
 import top.bogey.touch_tool_pro.utils.GsonUtils;
 import top.bogey.touch_tool_pro.utils.SettingSave;
 import top.bogey.touch_tool_pro.utils.easy_float.EasyFloat;
+import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 
 public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
@@ -185,7 +186,7 @@ public class MainActivity extends BaseActivity {
             String path = uri.getPath();
             if (path != null) {
                 String pathLowerCase = path.toLowerCase();
-                String[] strings = {"\\.apk.*", "\\.ttp.*"};
+                String[] strings = {"\\.apk.*", "\\.ttp.*", "ocr.*\\.zip"};
                 for (int i = 0; i < strings.length; i++) {
                     String s = strings[i];
                     Pattern pattern = Pattern.compile(s);
@@ -193,6 +194,10 @@ public class MainActivity extends BaseActivity {
                         switch (i) {
                             case 0 -> AppUtils.installApk(this, uri);
                             case 1 -> saveTasks(uri);
+                            case 2 -> {
+                                Predictor.importModel(uri);
+                                Toast.makeText(this, R.string.permission_setting_ocr_import_success, Toast.LENGTH_SHORT).show();
+                            }
                         }
                         break;
                     }
