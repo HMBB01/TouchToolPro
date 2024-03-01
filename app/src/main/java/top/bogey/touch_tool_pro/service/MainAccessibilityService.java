@@ -70,6 +70,10 @@ import top.bogey.touch_tool_pro.utils.BitmapResultCallback;
 import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 
 public class MainAccessibilityService extends AccessibilityService {
+    static {
+        System.loadLibrary("native");
+    }
+
     public static final MutableLiveData<Boolean> serviceConnected = new MutableLiveData<>(false);
     public static final MutableLiveData<Boolean> serviceEnabled = new MutableLiveData<>(false);
     public static final MutableLiveData<Boolean> captureEnabled = new MutableLiveData<>(false);

@@ -8,7 +8,6 @@ import android.net.Uri;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,7 +115,7 @@ public class Predictor {
         ArrayList<OcrResult> results = new ArrayList<>();
         if (!ocrReady() || image == null) return results;
 
-        float[] floats = forward(nativePointer, image, 960, 1, 0, 1);
+        float[] floats = forward(nativePointer, image, Math.max(image.getWidth(), image.getHeight()), 1, 0, 1);
 
         int begin = 0;
         while (begin < floats.length) {
