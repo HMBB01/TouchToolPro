@@ -82,6 +82,7 @@ public class PinString extends PinValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PinString pinString = (PinString) o;
 
@@ -90,6 +91,8 @@ public class PinString extends PinValue {
 
     @Override
     public int hashCode() {
-        return value != null ? value.hashCode() : 0;
+        int result = super.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
     }
 }

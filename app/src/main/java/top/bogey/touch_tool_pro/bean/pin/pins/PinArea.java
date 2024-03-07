@@ -96,6 +96,7 @@ public class PinArea extends PinScreen {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PinArea pinArea = (PinArea) o;
 
@@ -104,6 +105,8 @@ public class PinArea extends PinScreen {
 
     @Override
     public int hashCode() {
-        return area.hashCode();
+        int result = super.hashCode();
+        result = 31 * result + area.hashCode();
+        return result;
     }
 }

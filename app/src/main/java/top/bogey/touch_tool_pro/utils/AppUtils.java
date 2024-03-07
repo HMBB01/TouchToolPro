@@ -412,9 +412,9 @@ public class AppUtils {
 
     public static void copyDirFromAssets(Context context, String from, String to) {
         if (from == null || from.isEmpty() || to == null || to.isEmpty()) return;
-
-        if (!new File(to).exists()) {
-            new File(to).mkdirs();
+        File file = new File(to);
+        if (!file.exists()) {
+            if (!file.mkdirs()) return;
         }
 
         try {

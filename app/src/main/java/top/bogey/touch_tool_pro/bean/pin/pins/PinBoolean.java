@@ -63,6 +63,7 @@ public class PinBoolean extends PinValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PinBoolean that = (PinBoolean) o;
 
@@ -71,6 +72,8 @@ public class PinBoolean extends PinValue {
 
     @Override
     public int hashCode() {
-        return (bool ? 1 : 0);
+        int result = super.hashCode();
+        result = 31 * result + (bool ? 1 : 0);
+        return result;
     }
 }

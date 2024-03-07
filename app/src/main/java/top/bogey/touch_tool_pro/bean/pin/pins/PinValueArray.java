@@ -127,17 +127,19 @@ public class PinValueArray extends PinValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
-        PinValueArray array = (PinValueArray) o;
+        PinValueArray that = (PinValueArray) o;
 
-        if (pinType != array.pinType) return false;
-        if (canChange != array.canChange) return false;
-        return values.equals(array.values);
+        if (canChange != that.canChange) return false;
+        if (pinType != that.pinType) return false;
+        return values.equals(that.values);
     }
 
     @Override
     public int hashCode() {
-        int result = pinType.hashCode();
+        int result = super.hashCode();
+        result = 31 * result + pinType.hashCode();
         result = 31 * result + (canChange ? 1 : 0);
         result = 31 * result + values.hashCode();
         return result;

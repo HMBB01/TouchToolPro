@@ -54,4 +54,22 @@ public abstract class PinScreen extends PinValue {
     public void setScreen(Context context) {
         screen = DisplayUtils.getScreen(context);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        PinScreen pinScreen = (PinScreen) o;
+
+        return screen == pinScreen.screen;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + screen;
+        return result;
+    }
 }

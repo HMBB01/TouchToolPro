@@ -106,6 +106,7 @@ public class PinImage extends PinScreen {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PinImage pinImage = (PinImage) o;
 
@@ -115,7 +116,8 @@ public class PinImage extends PinScreen {
 
     @Override
     public int hashCode() {
-        int result = image != null ? image.hashCode() : 0;
+        int result = super.hashCode();
+        result = 31 * result + (image != null ? image.hashCode() : 0);
         result = 31 * result + (bitmap != null ? bitmap.hashCode() : 0);
         return result;
     }

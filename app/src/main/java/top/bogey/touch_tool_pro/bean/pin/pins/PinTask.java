@@ -87,6 +87,7 @@ public class PinTask extends PinValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PinTask pinTask = (PinTask) o;
 
@@ -96,7 +97,8 @@ public class PinTask extends PinValue {
 
     @Override
     public int hashCode() {
-        int result = taskId != null ? taskId.hashCode() : 0;
+        int result = super.hashCode();
+        result = 31 * result + (taskId != null ? taskId.hashCode() : 0);
         result = 31 * result + (startId != null ? startId.hashCode() : 0);
         return result;
     }

@@ -76,6 +76,24 @@ public abstract class PinObject {
         return subType;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PinObject pinObject = (PinObject) o;
+
+        if (type != pinObject.type) return false;
+        return subType == pinObject.subType;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + subType.hashCode();
+        return result;
+    }
+
     public static class PinObjectDeserializer implements JsonDeserializer<PinObject> {
 
         @Override

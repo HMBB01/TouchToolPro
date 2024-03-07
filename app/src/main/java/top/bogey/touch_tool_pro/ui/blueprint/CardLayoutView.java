@@ -312,6 +312,7 @@ public class CardLayoutView extends FrameLayout implements TaskSaveChangedListen
                 return true;
             }
         });
+        detector.setQuickScaleEnabled(false);
 
         for (ActionMap actionMap : ActionMap.values()) {
             if (actionMap == ActionMap.START) continue;

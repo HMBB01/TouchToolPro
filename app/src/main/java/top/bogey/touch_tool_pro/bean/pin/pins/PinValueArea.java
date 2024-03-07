@@ -114,6 +114,7 @@ public class PinValueArea extends PinValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PinValueArea that = (PinValueArea) o;
 
@@ -123,7 +124,8 @@ public class PinValueArea extends PinValue {
 
     @Override
     public int hashCode() {
-        int result = low;
+        int result = super.hashCode();
+        result = 31 * result + low;
         result = 31 * result + high;
         return result;
     }

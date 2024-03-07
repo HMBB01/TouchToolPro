@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import top.bogey.touch_tool_pro.R;
+import top.bogey.touch_tool_pro.bean.action.ActionCheckResult;
 import top.bogey.touch_tool_pro.bean.action.ActionMorePinInterface;
 import top.bogey.touch_tool_pro.bean.action.ActionType;
 import top.bogey.touch_tool_pro.bean.action.other.CheckAction;
@@ -36,6 +37,11 @@ public class StringRegexAction extends CheckAction implements ActionMorePinInter
         matchPin = reAddPin(matchPin);
         reAddPin(morePin, 1);
         addPin = reAddPin(addPin);
+    }
+
+    @Override
+    public void resetReturnValue(Pin pin) {
+        if (pin.equals(resultPin)) super.resetReturnValue(pin);
     }
 
     @Override
@@ -73,5 +79,16 @@ public class StringRegexAction extends CheckAction implements ActionMorePinInter
             if (pin == matchPin) start = true;
         }
         return pins;
+    }
+
+    @Override
+    public ActionCheckResult check(FunctionContext context) {
+        if (resultPin.getLinks().isEmpty()) {
+            for (Pin pin : calculateMorePins()) {
+                if (pin.getLinks().isEmpty()) continue;
+                return new ActionCheckResult(ActionCheckResult.ActionResultType.ERROR, R.string.error_result_pin_no_use);
+            }
+        }
+        return super.check(context);
     }
 }

@@ -113,6 +113,7 @@ public class PinSpinner extends PinValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PinSpinner that = (PinSpinner) o;
 
@@ -123,7 +124,8 @@ public class PinSpinner extends PinValue {
 
     @Override
     public int hashCode() {
-        int result = arrays.hashCode();
+        int result = super.hashCode();
+        result = 31 * result + arrays.hashCode();
         result = 31 * result + index;
         result = 31 * result + array;
         return result;

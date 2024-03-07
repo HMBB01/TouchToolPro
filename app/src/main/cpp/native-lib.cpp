@@ -111,8 +111,13 @@ Java_top_bogey_touch_1tool_1pro_utils_DisplayUtils_nativeMatchAllTemplate(JNIEnv
     for (int i = 0; i < result.rows; ++i) {
         for (int j = 0; j < result.cols; ++j) {
             bool flag = false;
+            float x = j;
+            float y = i;
+            float width = tmp.cols;
+            float height = tmp.rows;
+
             for (const auto &area: areas) {
-                if (area.contains(Point(j, i))) {
+                if (area.x < width + x && x < area.x + area.width && area.y < height + y && y < area.y + area.height) {
                     flag = true;
                     break;
                 }
@@ -121,8 +126,8 @@ Java_top_bogey_touch_1tool_1pro_utils_DisplayUtils_nativeMatchAllTemplate(JNIEnv
 
             float currValue = result.at<float>(i, j) * 100;
             if (currValue >= match_value) {
-                env->CallBooleanMethod(listObj, listAdd, createMatchResult(env, currValue, j * scale, i * scale, tmp.cols * scale, tmp.rows * scale));
-                areas.push_back(Rect(j, i, tmp.cols, tmp.rows));
+                env->CallBooleanMethod(listObj, listAdd, createMatchResult(env, currValue, x * scale, y * scale, width * scale, height * scale));
+                areas.push_back(Rect(x, y, width, height));
             }
         }
     }

@@ -19,6 +19,7 @@ public class PinColor extends PinScreen {
 
     public PinColor() {
         super(PinType.COLOR);
+        color = new int[]{0, 0, 0};
     }
 
     public PinColor(int[] color, int min, int max) {
@@ -88,6 +89,7 @@ public class PinColor extends PinScreen {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PinColor pinColor = (PinColor) o;
 
@@ -98,7 +100,8 @@ public class PinColor extends PinScreen {
 
     @Override
     public int hashCode() {
-        int result = Arrays.hashCode(color);
+        int result = super.hashCode();
+        result = 31 * result + Arrays.hashCode(color);
         result = 31 * result + min;
         result = 31 * result + max;
         return result;
