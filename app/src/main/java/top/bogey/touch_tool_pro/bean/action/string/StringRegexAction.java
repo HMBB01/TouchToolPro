@@ -46,6 +46,8 @@ public class StringRegexAction extends CheckAction implements ActionMorePinInter
 
     @Override
     public void calculate(TaskRunnable runnable, FunctionContext context, Pin pin) {
+        if (!pin.equals(resultPin)) return;
+
         PinBoolean result = resultPin.getValue(PinBoolean.class);
 
         PinString text = (PinString) getPinValue(runnable, context, textPin);

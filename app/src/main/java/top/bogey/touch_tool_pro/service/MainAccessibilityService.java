@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
@@ -45,6 +46,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import top.bogey.touch_tool_pro.MainApplication;
+import top.bogey.touch_tool_pro.R;
 import top.bogey.touch_tool_pro.bean.action.Action;
 import top.bogey.touch_tool_pro.bean.action.start.RestartType;
 import top.bogey.touch_tool_pro.bean.action.start.StartAction;
@@ -61,12 +63,12 @@ import top.bogey.touch_tool_pro.ui.PermissionActivity;
 import top.bogey.touch_tool_pro.ui.custom.KeepAliveFloatView;
 import top.bogey.touch_tool_pro.ui.custom.ToastFloatView;
 import top.bogey.touch_tool_pro.ui.custom.TouchPathFloatView;
+import top.bogey.touch_tool_pro.utils.BitmapResultCallback;
 import top.bogey.touch_tool_pro.utils.BooleanResultCallback;
 import top.bogey.touch_tool_pro.utils.SettingSave;
 import top.bogey.touch_tool_pro.utils.TaskQueue;
 import top.bogey.touch_tool_pro.utils.TaskThreadPoolExecutor;
 import top.bogey.touch_tool_pro.utils.easy_float.EasyFloat;
-import top.bogey.touch_tool_pro.utils.BitmapResultCallback;
 import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 
 public class MainAccessibilityService extends AccessibilityService {
@@ -91,6 +93,7 @@ public class MainAccessibilityService extends AccessibilityService {
     private MainCaptureService.CaptureServiceBinder binder = null;
     private ServiceConnection connection = null;
     private Bitmap lastBitmap = null;
+    private Handler handler = null;
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -174,6 +177,8 @@ public class MainAccessibilityService extends AccessibilityService {
             }
         };
         connectivityManager.registerDefaultNetworkCallback(networkCallback);
+
+        handler = new Handler();
     }
 
     @Override
@@ -522,6 +527,25 @@ public class MainAccessibilityService extends AccessibilityService {
         });
     }
 
+    @Override
+    protected boolean onKeyEvent(KeyEvent event) {
+        if (handler != null && event != null && event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                handler.postDelayed(() -> {
+                    if (isServiceEnabled()) {
+                        setServiceEnabled(false);
+                        showToast(getString(R.string.service_off));
+                    } else {
+                        setServiceEnabled(true);
+                        showToast(getString(R.string.service_on));
+                    }
+                }, 5000);
+            } else if (event.getAction() == KeyEvent.ACTION_UP) {
+                handler.removeCallbacksAndMessages(null);
+            }
+        }
+        return super.onKeyEvent(event);
+    }
 
     public void showToast(String msg) {
         KeepAliveFloatView keepView = MainApplication.getInstance().getKeepView();
