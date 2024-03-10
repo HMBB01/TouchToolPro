@@ -1,7 +1,7 @@
-package top.bogey.touch_tool_pro.super_user;
+package top.bogey.touch_tool_pro.utils.super_user;
 
-import top.bogey.touch_tool_pro.super_user.root.RootSuperUser;
-import top.bogey.touch_tool_pro.super_user.shizuku.ShizukuSuperUser;
+import top.bogey.touch_tool_pro.utils.super_user.root.RootSuperUser;
+import top.bogey.touch_tool_pro.utils.super_user.shizuku.ShizukuSuperUser;
 import top.bogey.touch_tool_pro.utils.SettingSave;
 
 public class SuperUser {

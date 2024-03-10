@@ -36,14 +36,15 @@ public class SniPasteAction extends NormalAction {
         PinValue value = (PinValue) getPinValue(runnable, context, valuePin);
         KeepAliveFloatView keepView = MainApplication.getInstance().getKeepView();
         if (keepView != null) {
+            final PinValue copyValue = (PinValue) value.copy();
             new Handler(Looper.getMainLooper()).post(() -> {
                 Context ctx = keepView.getContext();
-                if (value instanceof PinImage image) {
+                if (copyValue instanceof PinImage image) {
                     new SniPasteFloatView(ctx, image.getImage(ctx)).show();
-                } else if (value instanceof PinColor color) {
+                } else if (copyValue instanceof PinColor color) {
                     new SniPasteFloatView(ctx, color.getColor()).show();
                 } else {
-                    new SniPasteFloatView(ctx, value.toString()).show();
+                    new SniPasteFloatView(ctx, copyValue.toString()).show();
                 }
             });
         }

@@ -1,12 +1,12 @@
-package top.bogey.touch_tool_pro.super_user.root;
+package top.bogey.touch_tool_pro.utils.super_user.root;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import top.bogey.touch_tool_pro.super_user.CmdResult;
-import top.bogey.touch_tool_pro.super_user.ISuperUser;
+import top.bogey.touch_tool_pro.utils.super_user.CmdResult;
+import top.bogey.touch_tool_pro.utils.super_user.ISuperUser;
 
 public class RootSuperUser implements ISuperUser {
     private static boolean existRoot = false;

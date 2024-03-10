@@ -1,4 +1,4 @@
-package top.bogey.touch_tool_pro.super_user.shizuku;
+package top.bogey.touch_tool_pro.utils.super_user.shizuku;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import rikka.shizuku.Shizuku;
 import top.bogey.touch_tool_pro.BuildConfig;
-import top.bogey.touch_tool_pro.super_user.CmdResult;
-import top.bogey.touch_tool_pro.super_user.ISuperUser;
+import top.bogey.touch_tool_pro.utils.super_user.CmdResult;
+import top.bogey.touch_tool_pro.utils.super_user.ISuperUser;
 
 public class ShizukuSuperUser implements ISuperUser {
     private final static int SHIZUKU_CODE = 16777114;

@@ -11,8 +11,8 @@ import top.bogey.touch_tool_pro.bean.pin.PinSubType;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinExecute;
 import top.bogey.touch_tool_pro.bean.pin.pins.PinString;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
-import top.bogey.touch_tool_pro.super_user.CmdResult;
-import top.bogey.touch_tool_pro.super_user.SuperUser;
+import top.bogey.touch_tool_pro.utils.super_user.CmdResult;
+import top.bogey.touch_tool_pro.utils.super_user.SuperUser;
 
 public class ShellAction extends NormalAction {
     private transient Pin cmdPin = new Pin(new PinString(PinSubType.MULTI_LINE), R.string.action_shell_action_subtitle_cmd);

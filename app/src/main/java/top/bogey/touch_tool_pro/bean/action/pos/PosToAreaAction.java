@@ -41,6 +41,8 @@ public class PosToAreaAction extends Action {
         PinPoint rbPos = (PinPoint) getPinValue(runnable, context, RBPin);
 
         MainApplication instance = MainApplication.getInstance();
-        area.setArea(instance, new Rect(ltPos.getX(instance), ltPos.getY(instance), rbPos.getX(instance), rbPos.getY(instance)));
+        Rect rect = new Rect(ltPos.getX(instance), ltPos.getY(instance), rbPos.getX(instance), rbPos.getY(instance));
+        rect.sort();
+        area.setArea(instance, rect);
     }
 }

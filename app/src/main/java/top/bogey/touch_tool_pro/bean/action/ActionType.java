@@ -125,7 +125,7 @@ import top.bogey.touch_tool_pro.bean.action.var.GetCommonVariableValue;
 import top.bogey.touch_tool_pro.bean.action.var.GetLocalVariableValue;
 import top.bogey.touch_tool_pro.bean.action.var.SetCommonVariableValue;
 import top.bogey.touch_tool_pro.bean.action.var.SetLocalVariableValue;
-import top.bogey.touch_tool_pro.super_user.SuperUser;
+import top.bogey.touch_tool_pro.utils.super_user.SuperUser;
 import top.bogey.touch_tool_pro.utils.SettingSave;
 import top.bogey.touch_tool_pro.utils.ocr.Predictor;
 

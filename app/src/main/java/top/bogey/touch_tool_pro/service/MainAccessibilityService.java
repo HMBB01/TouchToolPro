@@ -57,7 +57,7 @@ import top.bogey.touch_tool_pro.bean.task.Task;
 import top.bogey.touch_tool_pro.bean.task.TaskRunnable;
 import top.bogey.touch_tool_pro.bean.task.TaskRunningListener;
 import top.bogey.touch_tool_pro.save.SaveRepository;
-import top.bogey.touch_tool_pro.super_user.SuperUser;
+import top.bogey.touch_tool_pro.utils.super_user.SuperUser;
 import top.bogey.touch_tool_pro.ui.InstantActivity;
 import top.bogey.touch_tool_pro.ui.PermissionActivity;
 import top.bogey.touch_tool_pro.ui.custom.KeepAliveFloatView;

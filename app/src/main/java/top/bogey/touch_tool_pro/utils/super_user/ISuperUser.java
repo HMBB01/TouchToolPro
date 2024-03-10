@@ -1,4 +1,4 @@
-package top.bogey.touch_tool_pro.super_user;
+package top.bogey.touch_tool_pro.utils.super_user;
 
 public interface ISuperUser {
 
